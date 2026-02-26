@@ -1,0 +1,7 @@
+{
+  "name": "Agartha World ",
+  "description": "Staff and Maintenance Interface for park operations, zone check-ins, and incident reporting.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
