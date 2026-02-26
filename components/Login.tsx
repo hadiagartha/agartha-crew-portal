@@ -17,7 +17,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [resetToken, setResetToken] = useState('');
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lockInfo, setLockInfo] = useState<{ locked_until: string } | null>(null);
@@ -136,8 +136,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
                   <User size={18} />
                 </div>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={staffId}
                   onChange={(e) => setStaffId(e.target.value)}
                   className="w-full bg-[#1a1d29] text-white border border-gray-700 rounded-lg py-3 pl-12 pr-4 outline-none focus:border-yellow-400 transition-colors placeholder-gray-600"
@@ -150,7 +150,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="block text-gray-400 text-xs font-bold uppercase tracking-wider">Password</label>
-                <button 
+                <button
                   type="button"
                   onClick={() => setStep('FORGOT_PASSWORD')}
                   className="text-yellow-400/70 hover:text-yellow-400 text-[10px] uppercase font-bold tracking-widest transition-colors"
@@ -162,8 +162,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
                   <Lock size={18} />
                 </div>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-[#1a1d29] text-white border border-gray-700 rounded-lg py-3 pl-12 pr-4 outline-none focus:border-yellow-400 transition-colors placeholder-gray-600"
@@ -173,7 +173,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               </div>
             </div>
 
-            <button 
+            <button
               type="submit"
               disabled={isLoading || !!lockInfo}
               className={`w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 text-[#1a1d29] font-bold py-3.5 rounded-lg flex items-center justify-center gap-2 transition-all ${isLoading || !!lockInfo ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-[0_0_20px_rgba(250,204,21,0.3)] hover:-translate-y-0.5'}`}
@@ -196,8 +196,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
                   <Phone size={18} />
                 </div>
-                <input 
-                  type="tel" 
+                <input
+                  type="tel"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   className="w-full bg-[#1a1d29] text-white border border-gray-700 rounded-lg py-3 pl-12 pr-4 outline-none focus:border-yellow-400 transition-colors placeholder-gray-600"
@@ -206,15 +206,15 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 />
               </div>
             </div>
-            <button 
+            <button
               type="submit"
               disabled={isLoading}
               className="w-full bg-yellow-400 hover:bg-yellow-300 text-[#1a1d29] font-bold py-3.5 rounded-lg transition-all"
             >
               {isLoading ? 'Sending...' : 'Send OTP'}
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => setStep('LOGIN')}
               className="w-full text-gray-500 text-xs font-bold uppercase tracking-widest hover:text-gray-300"
             >
@@ -237,8 +237,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
                   <KeyRound size={18} />
                 </div>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   maxLength={6}
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
@@ -248,7 +248,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 />
               </div>
             </div>
-            <button 
+            <button
               type="submit"
               disabled={isLoading}
               className="w-full bg-yellow-400 hover:bg-yellow-300 text-[#1a1d29] font-bold py-3.5 rounded-lg transition-all"
@@ -268,8 +268,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <div className="space-y-4">
               <div>
                 <label className="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">New Password</label>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full bg-[#1a1d29] text-white border border-gray-700 rounded-lg py-3 px-4 outline-none focus:border-yellow-400 transition-colors"
@@ -279,8 +279,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               </div>
               <div>
                 <label className="block text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Confirm Password</label>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full bg-[#1a1d29] text-white border border-gray-700 rounded-lg py-3 px-4 outline-none focus:border-yellow-400 transition-colors"
@@ -289,7 +289,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 />
               </div>
             </div>
-            <button 
+            <button
               type="submit"
               disabled={isLoading}
               className="w-full bg-yellow-400 hover:bg-yellow-300 text-[#1a1d29] font-bold py-3.5 rounded-lg transition-all"
@@ -304,21 +304,21 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#1a1d29] relative overflow-hidden">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-      
+
       <div className="relative z-10 w-full max-w-md p-8 animate-fadeIn">
         <div className="text-center mb-10 flex flex-col items-center">
           <div className="mb-6 relative">
-            <svg 
-              className="w-20 h-20 text-yellow-400 drop-shadow-[0_0_25px_rgba(250,204,21,0.4)]" 
-              viewBox="0 0 44.51 42.38" 
+            <svg
+              className="w-20 h-20 text-yellow-400 drop-shadow-[0_0_25px_rgba(250,204,21,0.4)]"
+              viewBox="0 0 44.51 42.38"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path fill="currentColor" d="M28.76.2c21.05,8.29,21.12,34.66-.48,42.1-.74.25-1.55-.15-1.79-.9-.24-.72.13-1.5.83-1.77,3.75-1.48,7.1-3.9,9.45-7.03,7.87-10.31,1.76-23.46-9.93-27.07-3.62-1.32-1.72-6.62,1.92-5.33h0Z"/>
-              <path fill="currentColor" d="M16.23,42.3C-5.38,34.85-5.28,8.49,15.75.2c1.46-.58,3.11.14,3.68,1.61.59,1.51-.22,3.23-1.76,3.73-3.6,1.18-6.93,3.28-9.38,6.14-5.2,5.78-5.42,14.81-.55,20.94,2.36,3.12,5.71,5.55,9.45,7.03,1.68.67.77,3.22-.96,2.67h0Z"/>
+              <path fill="currentColor" d="M28.76.2c21.05,8.29,21.12,34.66-.48,42.1-.74.25-1.55-.15-1.79-.9-.24-.72.13-1.5.83-1.77,3.75-1.48,7.1-3.9,9.45-7.03,7.87-10.31,1.76-23.46-9.93-27.07-3.62-1.32-1.72-6.62,1.92-5.33h0Z" />
+              <path fill="currentColor" d="M16.23,42.3C-5.38,34.85-5.28,8.49,15.75.2c1.46-.58,3.11.14,3.68,1.61.59,1.51-.22,3.23-1.76,3.73-3.6,1.18-6.93,3.28-9.38,6.14-5.2,5.78-5.42,14.81-.55,20.94,2.36,3.12,5.71,5.55,9.45,7.03,1.68.67.77,3.22-.96,2.67h0Z" />
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-[0.2em] mb-4 drop-shadow-lg uppercase">Agartha World</h1>
-          <p className="text-gray-400 uppercase tracking-widest text-[10px] font-bold">Staff Operations Portal</p>
+          <p className="text-gray-400 uppercase tracking-widest text-[10px] font-bold">Crew Portal</p>
         </div>
 
         <div className="bg-[#2d3142] p-8 rounded-2xl border border-white/5 shadow-2xl relative overflow-hidden">
@@ -333,7 +333,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
           {renderStep()}
         </div>
-        
+
         <p className="text-center text-gray-600 text-[10px] mt-8 uppercase tracking-widest">
           Restricted Access • Authorized Personnel Only
         </p>
