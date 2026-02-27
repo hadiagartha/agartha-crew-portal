@@ -112,7 +112,6 @@ export interface AuthResponse {
 }
 
 export type AppMode =
-  | 'OPS'
   | 'INTERNAL_MAINTENANCE'
   | 'SERVICE_CREW'
   | 'SECURITY_CREW'
@@ -128,7 +127,6 @@ export type AppMode =
 export function deriveModeFromStaff(staff: StaffMember): AppMode {
   const role = (staff.role ?? '').trim().toLowerCase();
 
-  if (role === 'ops') return 'OPS';
   if (role === 'internal_maintenance' || role === 'internal_maintainence_crew') return 'INTERNAL_MAINTENANCE';
 
   if (role === 'service_crew') return 'SERVICE_CREW';
@@ -142,15 +140,12 @@ export function deriveModeFromStaff(staff: StaffMember): AppMode {
   if (role === 'external_maintenance_crew' || role === 'external_maintenance') return 'EXTERNAL_MAINTENANCE';
 
   if (role.includes('maintenance') || role.includes('technician')) return 'INTERNAL_MAINTENANCE';
-  if (role.includes('operations')) return 'OPS';
 
   return 'UNKNOWN';
 }
 
 export function defaultViewForMode(mode: AppMode): View {
   switch (mode) {
-    case 'OPS':
-      return View.ZONE_SURVEILLANCE;
     case 'INTERNAL_MAINTENANCE':
       return View.MAINTENANCE_LOG;
     case 'SERVICE_CREW':
@@ -174,15 +169,6 @@ export function defaultViewForMode(mode: AppMode): View {
 
 export function allowedViewsForMode(mode: AppMode): View[] {
   switch (mode) {
-    case 'OPS':
-      return [
-        View.ZONE_SURVEILLANCE,
-        View.SHIFT_SCHEDULE,
-        View.INCIDENTS,
-        View.CHECK_IN_LOG,
-        View.SETTINGS,
-        View.ANNOUNCEMENTS
-      ];
     case 'INTERNAL_MAINTENANCE':
       return [
         View.ZONE_CHECK_IN,

@@ -81,7 +81,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
 
   const getModeLabel = () => {
     switch (appMode) {
-      case 'OPS': return 'Operations';
       case 'INTERNAL_MAINTENANCE': return 'Maintenance';
       case 'SERVICE_CREW': return 'Service';
       case 'SECURITY_CREW': return 'Security';

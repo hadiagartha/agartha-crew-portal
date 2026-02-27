@@ -38,7 +38,7 @@ const Settings: React.FC<SettingsProps> = ({ onLogout, staff, appMode, onChangeM
                            onChange={(e) => onChangeMode(e.target.value as AppMode)}
                            className="bg-[#1a1d29] text-white border-none outline-none text-xs font-bold py-2 px-3 focus:ring-2 focus:ring-yellow-400/50 rounded cursor-pointer"
                         >
-                           <option value="OPS">Operations</option>
+
                            <option value="INTERNAL_MAINTENANCE">Internal Maintenance</option>
                            <option value="EXTERNAL_MAINTENANCE">External Vendor</option>
                            <option value="SERVICE_CREW">Service Crew</option>

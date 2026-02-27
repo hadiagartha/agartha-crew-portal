@@ -46,6 +46,26 @@ const INITIAL_INCIDENTS: Incident[] = [
     zone_id: 'Z-02'
   },
   {
+    id: 'MED-771',
+    timestamp: new Date(Date.now() - 1000 * 60 * 15),
+    type: 'Personnel Health Crisis',
+    severity: IncidentSeverity.HIGH,
+    description: 'Staff member exhibiting tachycardia and disorientation in Zone 04 near biolume vents.',
+    status: 'OPEN',
+    reportedBy: 'AI-Pulse-01',
+    zone_id: 'Z-04'
+  },
+  {
+    id: 'MED-772',
+    timestamp: new Date(Date.now() - 1000 * 60 * 5),
+    type: 'Guest Medical Anomaly',
+    severity: IncidentSeverity.MEDIUM,
+    description: 'Minor respiratory distress reported in sector 7 corridor.',
+    status: 'OPEN',
+    reportedBy: 'Staff-881',
+    zone_id: 'Z-01'
+  },
+  {
     id: 'INC-087',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
     type: 'Safety Hazard',
@@ -80,7 +100,7 @@ const App: React.FC = () => {
   const [localAlerts, setLocalAlerts] = useState<Alert[]>([]);
   const [pendingStationaryAlert, setPendingStationaryAlert] = useState<Alert | null>(null);
   const [appMode, setAppMode] = useState<AppMode>('UNKNOWN');
-  const isTechOpsRole = ['INTERNAL_MAINTENANCE', 'OPS', 'TECH_SUPPORT'].includes(appMode);
+  const isTechOpsRole = ['INTERNAL_MAINTENANCE', 'TECH_SUPPORT'].includes(appMode);
 
   // Global Maintenance State
   const [systemHealthPercentage, setSystemHealthPercentage] = useState<number>(87);
