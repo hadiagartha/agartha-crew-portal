@@ -56,6 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     { id: View.SECURITY_DASHBOARD, label: 'Security Tactical', icon: ShieldAlert },
     { id: View.HEALTH_DASHBOARD, label: 'Medical Triage', icon: HeartPulse },
     { id: View.EXPERIENCE_DASHBOARD, label: 'Experience Control', icon: Sparkles },
+    { id: View.CLEANING_DASHBOARD, label: 'Sanitation Command', icon: Sparkles },
     { id: View.DAILY_CHECKLIST, label: 'Daily Checklist', icon: ClipboardCheck },
     { id: View.ZONE_SURVEILLANCE, label: 'Zone Surveillance', icon: Video },
     { id: View.INCIDENTS, label: 'Incidents', icon: AlertTriangle },
@@ -74,9 +75,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
       // Dynamic relabeling based on mode
       if (appMode === 'SERVICE_CREW' && item.id === View.ZONE_CHECK_IN) {
         return { ...item, label: 'Ticket Validation' };
-      }
-      if (appMode === 'CLEANING_CREW' && item.id === View.DAILY_CHECKLIST) {
-        return { ...item, label: 'Cleaning Checklist' };
       }
       return item;
     });

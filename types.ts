@@ -187,7 +187,6 @@ export function allowedViewsForMode(mode: AppMode): View[] {
       return [
         View.ZONE_CHECK_IN,
         View.MAINTENANCE_LOG,
-        View.DAILY_CHECKLIST,
         View.INCIDENTS,
         View.SETTINGS,
         View.ANNOUNCEMENTS
