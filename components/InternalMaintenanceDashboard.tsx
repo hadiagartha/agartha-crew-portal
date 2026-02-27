@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
     Save, AlertTriangle, CheckCircle, Activity, Lightbulb,
     Volume2, Move, Search, Cpu, Battery, QrCode, X,
-    Terminal, ShieldCheck, Camera, CheckSquare
+    Terminal, ShieldCheck, Camera, CheckSquare, ClipboardList
 } from 'lucide-react';
 import { Incident, Alert } from '../types';
+import { useGlobalState } from './GlobalStateContext';
 
 interface InternalMaintenanceProps {
     redAlerts: Alert[];
@@ -36,6 +37,7 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
     onResolveIncident,
     systemHealthPercentage
 }) => {
+    const { addHardwareChecklist } = useGlobalState();
     const [hardware, setHardware] = useState<HardwareUnit[]>(INITIAL_HARDWARE);
     const [selectedAsset, setSelectedAsset] = useState<HardwareUnit | null>(null);
 
@@ -44,14 +46,35 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
     const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
 
     // Resolution State
-    const [isResolving, setIsResolving] = useState(false);
     const [scanStep, setScanStep] = useState<0 | 1 | 2>(0); // 0: None, 1: QR Scanning, 2: Photo Capture
     const [scanProgress, setScanProgress] = useState(0);
     const tempIntervalRef = useRef<number | null>(null);
 
-    // Sync Hardware state with redAlerts roughly (for demo visual cohesion)
+    // Upkeep Checklist State
+    const [checklist, setChecklist] = useState([
+        { id: 'check-1', item: 'Hydraulic Piston Leak Test', status: 'Pending' },
+        { id: 'check-2', item: 'Lidar Lens Calibration', status: 'Pending' },
+        { id: 'check-3', item: 'Network Patch Panel Integrity', status: 'Pending' },
+        { id: 'check-4', item: 'Projector Cooling Fan Verification', status: 'Pending' }
+    ]);
+
+    const handleCheckItem = (id: string, result: 'Pass' | 'Fail') => {
+        setChecklist(prev => prev.map(c => c.id === id ? { ...c, status: result } : c));
+        const item = checklist.find(c => c.id === id);
+        if (item) {
+            addHardwareChecklist({
+                id: `HC-${Date.now()}`,
+                item: item.item,
+                zone: 'Central Warehouse',
+                status: result,
+                timestamp: new Date(),
+                checkedBy: 'Maint-01'
+            });
+        }
+    };
+
+    // Sync Hardware state with redAlerts roughly
     useEffect(() => {
-        // If there's an alert for Z-04, ensure Leviathan Hydraulics is RED
         const hasZ04Alert = redAlerts.some(a => a.zone_id === 'Z-04');
         setHardware(prev => prev.map(h => {
             if (h.id === 'HW-HYD-03') return { ...h, state: hasZ04Alert ? 'RED' : 'GREEN' };
@@ -101,15 +124,13 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
 
     const startResolutionFlow = (asset: HardwareUnit) => {
         setSelectedAsset(asset);
-        setScanStep(1); // Open QR scanner
+        setScanStep(1);
         setScanProgress(0);
 
-        // Simulate scan
         const simulateProgress = setInterval(() => {
             setScanProgress(prev => {
                 if (prev >= 100) {
                     clearInterval(simulateProgress);
-                    // Auto move to photo step
                     setTimeout(() => setScanStep(2), 500);
                     return 100;
                 }
@@ -120,14 +141,11 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
 
     const completePhotoCapture = () => {
         setScanStep(0);
-
-        // Mock resolving the incident visually in hardware list
         if (selectedAsset) {
             setHardware(prev => prev.map(h =>
                 h.id === selectedAsset.id ? { ...h, state: 'GREEN' } : h
             ));
 
-            // If there's a corresponding Red Alert, resolve it (using mock Z-04 mapping for demo)
             if (selectedAsset.zone === 'Z-04') {
                 const linkedAlert = redAlerts.find(a => a.zone_id === 'Z-04');
                 if (linkedAlert) {
@@ -143,7 +161,9 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
             {/* Top Header Stats */}
             <div className="flex-none p-6 border-b border-[#2d3142] flex flex-wrap gap-6 items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-white mb-1 tracking-tight">Maintenance Command</h2>
+                    <h2 className="text-2xl font-bold text-white mb-1 tracking-tight flex items-center gap-3">
+                        <ShieldCheck className="text-blue-500" /> Maintenance Command
+                    </h2>
                     <p className="text-gray-400 text-sm">System Topologies & Hardware Triage</p>
                 </div>
                 <div className="flex gap-4">
@@ -170,15 +190,44 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
 
             <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
 
-                {/* LEFT COLUMN: SYSTEM FEED */}
-                <div className="w-full lg:w-1/3 min-w-[320px] flex flex-col border-r border-[#2d3142] bg-[#1a1d29]/50">
+                {/* LEFT COLUMN: CHECKLIST & FEED */}
+                <div className="w-full lg:w-1/3 min-w-[320px] flex flex-col border-r border-[#2d3142] bg-[#1a1d29]/50 overflow-y-auto">
+
+                    {/* Mandatory Upkeep Section */}
+                    <div className="p-6 border-b border-[#2d3142]">
+                        <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2 mb-6">
+                            <ClipboardList size={16} /> Daily Hardware Upkeep
+                        </h3>
+                        <div className="space-y-4">
+                            {checklist.map(item => (
+                                <div key={item.id} className="bg-[#2d3142]/50 p-4 rounded-xl border border-gray-700/50">
+                                    <p className="text-sm text-white font-bold mb-3">{item.item}</p>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => handleCheckItem(item.id, 'Pass')}
+                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${item.status === 'Pass' ? 'bg-green-600 text-white' : 'bg-[#1a1d29] text-gray-500 hover:text-green-400'}`}
+                                        >
+                                            PASS
+                                        </button>
+                                        <button
+                                            onClick={() => handleCheckItem(item.id, 'Fail')}
+                                            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${item.status === 'Fail' ? 'bg-red-600 text-white' : 'bg-[#1a1d29] text-gray-500 hover:text-red-400'}`}
+                                        >
+                                            FAIL
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
                     <div className="p-4 border-b border-[#2d3142]">
                         <h3 className="text-xs font-bold text-red-500 uppercase tracking-widest flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                             Active System Operations
                         </h3>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div className="flex-1 p-4 space-y-3">
                         {redAlerts.length === 0 ? (
                             <div className="text-center p-8 bg-[#2d3142]/30 rounded-xl border border-dashed border-gray-700">
                                 <CheckCircle size={32} className="mx-auto text-green-500 mb-3 opacity-50" />
@@ -205,7 +254,7 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                 </div>
 
                 {/* RIGHT COLUMN: HARDWARE TOPOLOGY */}
-                <div className="flex-1 flex flex-col overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-black/40">
+                <div className="flex-1 flex flex-col overflow-hidden bg-black/40">
                     <div className="p-4 bg-[#1a1d29]/90 backdrop-blur-sm border-b border-[#2d3142] flex justify-between items-center z-10">
                         <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
                             Hardware Topology Grid
@@ -217,14 +266,14 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                                 <div
                                     key={item.id}
                                     className={`bg-[#2d3142]/90 backdrop-blur-md border rounded-xl p-5 shadow-xl transition-all ${item.state === 'GREEN' ? 'border-green-500/20 shadow-green-500/5' :
-                                            item.state === 'YELLOW' ? 'border-yellow-500/30' :
-                                                'border-red-500/40 shadow-red-500/10'
+                                        item.state === 'YELLOW' ? 'border-yellow-500/30' :
+                                            'border-red-500/40 shadow-red-500/10'
                                         }`}
                                 >
                                     <div className="flex justify-between items-start mb-4">
                                         <div className={`p-2.5 rounded-lg ${item.state === 'GREEN' ? 'bg-green-500/10 text-green-500' :
-                                                item.state === 'YELLOW' ? 'bg-yellow-500/10 text-yellow-500' :
-                                                    'bg-red-500/10 text-red-500 animate-pulse'
+                                            item.state === 'YELLOW' ? 'bg-yellow-500/10 text-yellow-500' :
+                                                'bg-red-500/10 text-red-500 animate-pulse'
                                             }`}>
                                             {item.type === 'Camera' && <Camera size={20} />}
                                             {item.type === 'Hydraulics' && <Activity size={20} />}
@@ -233,8 +282,8 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                                             {item.type === 'Network Node' && <Cpu size={20} />}
                                         </div>
                                         <span className={`text-[10px] font-mono font-bold px-2 py-1 rounded border ${item.state === 'GREEN' ? 'border-green-500/30 text-green-400 bg-green-500/5' :
-                                                item.state === 'YELLOW' ? 'border-yellow-500/30 text-yellow-400 bg-yellow-500/5' :
-                                                    'border-red-500/30 text-red-500 bg-red-500/5'
+                                            item.state === 'YELLOW' ? 'border-yellow-500/30 text-yellow-400 bg-yellow-500/5' :
+                                                'border-red-500/30 text-red-500 bg-red-500/5'
                                             }`}>
                                             {item.id}
                                         </span>
@@ -274,7 +323,6 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
             {showTerminal && selectedAsset && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-sm animate-fadeIn">
                     <div className="w-full max-w-3xl bg-black border border-gray-800 rounded-xl overflow-hidden shadow-2xl flex flex-col h-[70vh]">
-                        {/* Terminal Header */}
                         <div className="bg-[#1a1d29] border-b border-gray-800 px-4 py-3 flex justify-between items-center">
                             <div className="flex items-center gap-3 text-sm">
                                 <Terminal size={16} className="text-gray-400" />
@@ -284,17 +332,13 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                                 <X size={20} />
                             </button>
                         </div>
-
-                        {/* Terminal Body */}
                         <div className="flex-1 p-6 overflow-y-auto font-mono text-sm bg-black">
                             {terminalLogs.map((log, i) => {
-                                // Simple color parsing for realism
                                 let color = "text-gray-300";
                                 if (log.includes("[ERROR]")) color = "text-red-500 font-bold";
                                 if (log.includes("[WARN]")) color = "text-yellow-400";
                                 if (log.includes("[OK]")) color = "text-green-400";
                                 if (log.includes("[INFO]")) color = "text-blue-400";
-
                                 return (
                                     <div key={i} className={`mb-2 animate-fadeIn ${color}`}>
                                         <span className="text-gray-600 mr-3 opacity-50">{String(i).padStart(3, '0')}</span>
@@ -311,18 +355,13 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                 </div>
             )}
 
-            {/* VALIDATION/RESOLUTION FLOW (QR -> PHOTO) */}
+            {/* VALIDATION/RESOLUTION FLOW */}
             {scanStep > 0 && selectedAsset && (
                 <div className="fixed inset-0 z-[110] bg-[#1a1d29]/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-fadeIn">
-                    <button
-                        onClick={() => setScanStep(0)}
-                        className="absolute top-8 right-8 text-gray-400 hover:text-white transition-colors"
-                    >
+                    <button onClick={() => setScanStep(0)} className="absolute top-8 right-8 text-gray-400 hover:text-white transition-colors">
                         <X size={32} />
                     </button>
-
                     <div className="max-w-md w-full flex flex-col items-center text-center">
-                        {/* STEP 1: QR SCANNER */}
                         {scanStep === 1 && (
                             <>
                                 <div className="w-16 h-16 bg-yellow-400/10 text-yellow-400 rounded-full flex items-center justify-center mb-4">
@@ -330,16 +369,12 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                                 </div>
                                 <h2 className="text-2xl font-bold text-white mb-2">Device Validation</h2>
                                 <p className="text-gray-400 mb-8 text-sm">Scan the QR code physically affixed to the {selectedAsset.name} rack to verify physical presence.</p>
-
                                 <div className="relative w-full aspect-square bg-black rounded-3xl border border-[#2d3142] overflow-hidden shadow-2xl mb-8">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black opacity-50" />
-                                    <div className="absolute inset-0 bg-[linear-gradient(rgba(250,204,21,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(250,204,21,0.05)_1px,transparent_1px)] bg-[size:20px_20px]" />
                                     <div className="absolute top-0 left-0 w-full h-1 bg-yellow-400 shadow-[0_0_20px_#facc15] animate-[scan_2s_ease-in-out_infinite] z-10" />
                                     <div className="absolute inset-8 border-2 border-yellow-400/30 rounded-xl flex items-center justify-center">
                                         <QrCode size={64} className="text-yellow-400/50 animate-pulse" />
                                     </div>
                                 </div>
-
                                 <div className="w-full">
                                     <div className="flex justify-between text-xs text-yellow-400 font-mono mb-2">
                                         <span>VERIFYING ASSET ID...</span>
@@ -351,8 +386,6 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                                 </div>
                             </>
                         )}
-
-                        {/* STEP 2: PHOTO PROOF */}
                         {scanStep === 2 && (
                             <div className="animate-fadeIn w-full flex flex-col items-center">
                                 <div className="w-16 h-16 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mb-4">
@@ -360,16 +393,10 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                                 </div>
                                 <h2 className="text-2xl font-bold text-white mb-2">Presence Verified</h2>
                                 <p className="text-gray-400 mb-8 text-sm">Upload visual proof of the clean installation/repair to close out the {selectedAsset.id} incident log.</p>
-
                                 <div className="relative w-full aspect-[4/3] bg-[#2d3142] rounded-2xl border-2 border-dashed border-gray-600 flex flex-col items-center justify-center group hover:border-yellow-400 transition-colors cursor-pointer mb-8 overflow-hidden">
                                     <Camera size={48} className="text-gray-500 mb-4 group-hover:text-yellow-400 transition-colors" />
                                     <span className="text-gray-400 font-bold group-hover:text-white transition-colors">Tap to Open Camera</span>
-                                    {/* Simulation Overlay on click */}
-                                    <button
-                                        onClick={completePhotoCapture}
-                                        className="absolute inset-0 w-full h-full opacity-0 z-10"
-                                        aria-label="Simulate taking photo"
-                                    />
+                                    <button onClick={completePhotoCapture} className="absolute inset-0 w-full h-full opacity-0 z-10" />
                                 </div>
                             </div>
                         )}
@@ -380,7 +407,6 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
     );
 };
 
-// Quick helper to easily resolve missing MapPin import above without adding logic
 function MapPin(props: any) {
     return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
 }

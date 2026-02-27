@@ -1,28 +1,30 @@
-import React, { useState } from 'react';
-import { Sparkles, CheckCircle2, QrCode as QrCodeIcon, AlertTriangle, PackagePlus, Trash2, Droplet, ArrowRightLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sparkles, CheckCircle2, QrCode as QrCodeIcon, AlertTriangle, PackagePlus, Trash2, Droplet, ArrowRightLeft, Clock } from 'lucide-react';
 import { StaffMember, Incident, IncidentSeverity } from '../types';
+import { useGlobalState } from './GlobalStateContext';
 
 interface CleaningDashboardProps {
     staff: StaffMember;
-    zoneStatuses: Record<string, 'Ready' | 'Cleaning'>;
-    onToggleZoneStatus: (zoneId: string, status: 'Ready' | 'Cleaning') => void;
     onRequestRestock: (item: string, isUrgent: boolean) => void;
     handleAddIncident: (incident: Incident) => void;
 }
 
 const CleaningDashboard: React.FC<CleaningDashboardProps> = ({
     staff,
-    zoneStatuses,
-    onToggleZoneStatus,
     onRequestRestock,
     handleAddIncident
 }) => {
     const currentZone = staff.current_zone_id || 'Z-04';
-    const currentStatus = zoneStatuses[currentZone] || 'Ready';
+    const { cleaning_timers, setCleaningTimers } = useGlobalState();
+
+    // Fallback if not initialized in context
+    const currentTimer = cleaning_timers[currentZone] || { startTime: null, duration: null, isClean: true };
+    const isCleaning = !currentTimer.isClean;
 
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
     const [activeScanItem, setActiveScanItem] = useState<number | null>(null);
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
     const [checklist, setChecklist] = useState([
         { id: 1, category: 'Restrooms', text: 'Sanitize all sinks and surfaces', done: false, requiresScan: false },
@@ -32,6 +34,47 @@ const CleaningDashboard: React.FC<CleaningDashboardProps> = ({
         { id: 5, category: 'Waste', text: 'Empty all primary refuse bins', done: true, requiresScan: false },
         { id: 6, category: 'Waste', text: 'Deep Clean Waste Compressor Area', done: false, requiresScan: true, scanned: false },
     ]);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isCleaning && currentTimer.startTime) {
+            setElapsedSeconds(Math.floor((Date.now() - currentTimer.startTime) / 1000));
+            interval = setInterval(() => {
+                setElapsedSeconds(Math.floor((Date.now() - currentTimer.startTime!) / 1000));
+            }, 1000);
+        } else if (!isCleaning && currentTimer.duration) {
+            setElapsedSeconds(Math.floor(currentTimer.duration / 1000));
+        } else {
+            setElapsedSeconds(0);
+        }
+        return () => clearInterval(interval);
+    }, [isCleaning, currentTimer.startTime, currentTimer.duration]);
+
+    const handleToggleZoneStatus = () => {
+        if (isCleaning) {
+            // Clicked 'Zone Ready' (Completion Signal)
+            const duration = currentTimer.startTime ? Date.now() - currentTimer.startTime : 0;
+            setCleaningTimers(prev => ({
+                ...prev,
+                [currentZone]: {
+                    ...prev[currentZone],
+                    isClean: true,
+                    duration
+                }
+            }));
+            window.alert(`Zone Ready! Turnaround duration logged.`);
+        } else {
+            // Clicked 'Start Cleaning'
+            setCleaningTimers(prev => ({
+                ...prev,
+                [currentZone]: {
+                    startTime: Date.now(),
+                    duration: null,
+                    isClean: false
+                }
+            }));
+        }
+    };
 
     const handleToggleCheck = (id: number) => {
         const item = checklist.find(i => i.id === id);
@@ -87,9 +130,15 @@ const CleaningDashboard: React.FC<CleaningDashboardProps> = ({
     const completed = checklist.filter(i => i.done).length;
     const progress = Math.round((completed / checklist.length) * 100);
 
+    const formatTime = (secs: number) => {
+        const m = Math.floor(secs / 60).toString().padStart(2, '0');
+        const s = (secs % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    };
+
     return (
         <div className="flex flex-col gap-6 w-full max-w-6xl mx-auto h-full">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-2 gap-4">
                 <div>
                     <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
                         <Sparkles className="text-teal-400" size={28} /> Sanitation Command
@@ -98,14 +147,20 @@ const CleaningDashboard: React.FC<CleaningDashboardProps> = ({
                 </div>
 
                 {/* Global Zone Status Toggle */}
-                <div className="flex items-center gap-3 bg-[#2d3142] p-2 rounded-xl border border-gray-700">
-                    <span className="text-sm text-gray-400 font-bold px-2 block hidden sm:block">Zone {currentZone.replace('Z-', '')} Status:</span>
+                <div className="flex items-center gap-3 bg-[#2d3142] p-2 rounded-xl border border-gray-700 w-full md:w-auto">
+                    <div className="flex items-center gap-2 px-3 py-1 bg-[#1a1d29] rounded-lg">
+                        <Clock className={isCleaning ? 'text-yellow-400 animate-pulse' : 'text-gray-500'} size={20} />
+                        <span className={`font-mono font-bold text-lg ${isCleaning ? 'text-yellow-400' : 'text-gray-400'}`}>
+                            {formatTime(elapsedSeconds)}
+                        </span>
+                    </div>
+
                     <button
-                        onClick={() => onToggleZoneStatus(currentZone, currentStatus === 'Ready' ? 'Cleaning' : 'Ready')}
-                        className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all duration-300 ${currentStatus === 'Ready' ? 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30 animate-pulse'}`}
+                        onClick={handleToggleZoneStatus}
+                        className={`px-4 py-3 rounded-lg font-bold flex flex-1 items-center justify-center gap-2 transition-all duration-300 ${!isCleaning ? 'bg-yellow-500 hover:bg-yellow-400 text-black shadow-lg shadow-yellow-500/20' : 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30'}`}
                     >
                         <ArrowRightLeft size={16} />
-                        {currentStatus === 'Ready' ? 'Ready for Guests' : 'Cleaning in Progress'}
+                        {!isCleaning ? 'Start Turnaround' : 'Zone Ready'}
                     </button>
                 </div>
             </div>

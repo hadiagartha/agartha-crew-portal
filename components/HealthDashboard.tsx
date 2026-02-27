@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { HeartPulse, Activity, Syringe, Bandage, PhoneCall, QrCode as QrCodeIcon, Camera, Eye, AlertCircle } from 'lucide-react';
 import { Incident } from '../types';
+import { useGlobalState } from './GlobalStateContext';
 
 interface HealthDashboardProps {
     incidents: Incident[];
@@ -13,14 +14,9 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
     onJumpToSurveillance,
     onScanArrival
 }) => {
+    const { consumables, useConsumable } = useGlobalState();
     const [scanningIncidentId, setScanningIncidentId] = useState<string | null>(null);
     const [scanProgress, setScanProgress] = useState(0);
-
-    const [consumables, setConsumables] = useState({
-        traumaKits: 5,
-        bandages: 20,
-        ivFluids: 10
-    });
 
     const activeMedicalIncidents = incidents.filter(i =>
         i.status !== 'RESOLVED' &&
@@ -172,8 +168,8 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <span className={`font-bold ${consumables.traumaKits < 3 ? 'text-red-400 animate-pulse' : 'text-white'}`}>{consumables.traumaKits}</span>
-                                    <button onClick={() => setConsumables(p => ({ ...p, traumaKits: Math.max(0, p.traumaKits - 1) }))} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
+                                    <span className={`font-bold ${(consumables['Trauma Kits'] || 0) < 3 ? 'text-red-400 animate-pulse' : 'text-white'}`}>{consumables['Trauma Kits'] || 0}</span>
+                                    <button onClick={() => useConsumable('Trauma Kits', 1)} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
                                 </div>
                             </div>
 
@@ -188,8 +184,8 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <span className={`font-bold ${consumables.ivFluids < 5 ? 'text-red-400 animate-pulse' : 'text-white'}`}>{consumables.ivFluids}</span>
-                                    <button onClick={() => setConsumables(p => ({ ...p, ivFluids: Math.max(0, p.ivFluids - 1) }))} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
+                                    <span className={`font-bold ${(consumables['IV Fluids'] || 0) < 5 ? 'text-red-400 animate-pulse' : 'text-white'}`}>{consumables['IV Fluids'] || 0}</span>
+                                    <button onClick={() => useConsumable('IV Fluids', 1)} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
                                 </div>
                             </div>
 
@@ -204,8 +200,8 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <span className={`font-bold ${consumables.bandages <= 20 ? 'text-yellow-400' : 'text-white'}`}>{consumables.bandages}</span>
-                                    <button onClick={() => setConsumables(p => ({ ...p, bandages: Math.max(0, p.bandages - 1) }))} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
+                                    <span className={`font-bold ${(consumables['Bandages'] || 0) <= 20 ? 'text-yellow-400' : 'text-white'}`}>{consumables['Bandages'] || 0}</span>
+                                    <button onClick={() => useConsumable('Bandages', 1)} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
                                 </div>
                             </div>
                         </div>

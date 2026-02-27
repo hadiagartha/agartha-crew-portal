@@ -16,7 +16,8 @@ import {
   HeartPulse,
   Sparkles,
   Package,
-  Lock
+  Lock,
+  Users
 } from 'lucide-react';
 import { View, AppMode, allowedViewsForMode } from '../types';
 
@@ -43,11 +44,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     View.CLEANING_DASHBOARD,
     View.GIFTSHOP_DASHBOARD,
     View.MAINTENANCE_LOG,
-    View.EXTERNAL_MAINTENANCE_DASHBOARD
+    View.EXTERNAL_MAINTENANCE_DASHBOARD,
+    View.SERVICE_DASHBOARD
   ];
 
   const allNavItems = [
     { id: View.ZONE_CHECK_IN, label: 'Zone Check-In', icon: MapPin },
+    { id: View.SERVICE_DASHBOARD, label: 'Service Dashboard', icon: Users },
     { id: View.FNB_DASHBOARD, label: 'F&B Dashboard', icon: Coffee },
     { id: View.RUNNER_DASHBOARD, label: 'Runner Dashboard', icon: Truck },
     { id: View.SECURITY_DASHBOARD, label: 'Security Tactical', icon: ShieldAlert },

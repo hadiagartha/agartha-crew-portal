@@ -7,9 +7,13 @@ if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
+import { GlobalStateProvider } from './components/GlobalStateContext';
+
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <GlobalStateProvider>
+      <App />
+    </GlobalStateProvider>
   </React.StrictMode>
 );

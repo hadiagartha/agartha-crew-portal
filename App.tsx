@@ -20,6 +20,7 @@ import ExperienceDashboard from './components/ExperienceDashboard';
 import CleaningDashboard from './components/CleaningDashboard';
 import GiftShopDashboard from './components/GiftShopDashboard';
 import ExternalMaintenanceDashboard from './components/ExternalMaintenanceDashboard';
+import ServiceDashboard from './components/ServiceDashboard';
 import { View, Incident, IncidentSeverity, CheckInRecord, StaffMember, Alert, AuthResponse, AppMode, deriveModeFromStaff, defaultViewForMode, isViewAllowed, RestockTask } from './types';
 
 // Mock data moved to App level for persistence
@@ -460,7 +461,7 @@ const App: React.FC = () => {
     else if (appMode === 'EXPERIENCE_CREW') setCurrentView(View.EXPERIENCE_DASHBOARD);
     else if (appMode === 'CLEANING_CREW') setCurrentView(View.CLEANING_DASHBOARD);
     else if (appMode === 'GIFTSHOP_CREW') setCurrentView(View.GIFTSHOP_DASHBOARD);
-    else if (appMode === 'SERVICE_CREW') setCurrentView(View.INCIDENTS);
+    else if (appMode === 'SERVICE_CREW') setCurrentView(View.SERVICE_DASHBOARD);
     else if (appMode === 'INTERNAL_MAINTENANCE') setCurrentView(View.MAINTENANCE_LOG);
     else if (appMode === 'TECH_SUPPORT') setCurrentView(View.MAINTENANCE_LOG);
     else if (appMode === 'OPS') setCurrentView(View.ZONE_SURVEILLANCE);
@@ -502,7 +503,8 @@ const App: React.FC = () => {
       View.CLEANING_DASHBOARD,
       View.GIFTSHOP_DASHBOARD,
       View.MAINTENANCE_LOG,
-      View.EXTERNAL_MAINTENANCE_DASHBOARD
+      View.EXTERNAL_MAINTENANCE_DASHBOARD,
+      View.SERVICE_DASHBOARD
     ];
 
     if (!isOnShift && shiftRequiredViews.includes(activeView)) {
@@ -576,14 +578,14 @@ const App: React.FC = () => {
         return (
           <CleaningDashboard
             staff={staff!}
-            zoneStatuses={zoneStatuses}
-            onToggleZoneStatus={(zoneId, status) => setZoneStatuses(prev => ({ ...prev, [zoneId]: status }))}
             onRequestRestock={handleRequestRestock}
             handleAddIncident={handleAddIncident}
           />
         );
       case View.GIFTSHOP_DASHBOARD:
         return <GiftShopDashboard onRequestRestock={handleRequestRestock} />;
+      case View.SERVICE_DASHBOARD:
+        return <ServiceDashboard />;
       case View.MAINTENANCE_LOG:
         return (
           <InternalMaintenanceDashboard
