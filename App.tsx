@@ -580,9 +580,6 @@ const App: React.FC = () => {
         return (
           <HealthDashboard
             incidents={incidents}
-            onJumpToSurveillance={(zoneId) => {
-              setCurrentView(View.ZONE_SURVEILLANCE);
-            }}
             onScanArrival={handleSecurityScanArrival}
           />
         );

@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import { HeartPulse, Activity, Syringe, Bandage, PhoneCall, QrCode as QrCodeIcon, Camera, Eye, AlertCircle } from 'lucide-react';
+import { HeartPulse, Activity, Syringe, Bandage, PhoneCall, QrCode as QrCodeIcon, Camera, AlertCircle } from 'lucide-react';
 import { Incident } from '../types';
 import { useGlobalState } from './GlobalStateContext';
 
 interface HealthDashboardProps {
     incidents: Incident[];
-    onJumpToSurveillance: (zoneId: string) => void;
     onScanArrival: (id: string, timestamp: Date) => void;
 }
 
 const HealthDashboard: React.FC<HealthDashboardProps> = ({
     incidents,
-    onJumpToSurveillance,
     onScanArrival
 }) => {
     const { consumables, useConsumable } = useGlobalState();
@@ -107,14 +105,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
                                     )}
 
                                     {/* Action Buttons */}
-                                    <div className="grid grid-cols-2 gap-2 mt-2">
-                                        <button
-                                            onClick={() => onJumpToSurveillance(inc.zone_id!)}
-                                            disabled={!inc.zone_id}
-                                            className="bg-[#2d3142] hover:bg-[#3e445b] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs border border-gray-600 py-2 rounded font-bold flex items-center justify-center gap-2 transition-colors"
-                                        >
-                                            <Eye size={14} /> Surveillance Feed
-                                        </button>
+                                    <div className="flex flex-col gap-2 mt-2">
 
                                         {!inc.arrivalTimestamp ? (
                                             <button
