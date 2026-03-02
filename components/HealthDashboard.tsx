@@ -55,7 +55,6 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
     }
 
     return (
-    return (
         <div className="flex flex-col h-full bg-[#1a1d29]">
             {/* Header section */}
             <div className="flex-none p-4 md:p-6 border-b border-[#2d3142] flex flex-wrap gap-4 md:gap-6 items-center justify-between bg-[#1a1d29]/80 backdrop-blur-md sticky top-0 z-20">
