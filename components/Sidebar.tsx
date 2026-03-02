@@ -102,7 +102,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
           {getModeLabel()}
         </p>
         {onClose && (
-          <button onClick={onClose} className="md:hidden text-gray-400 hover:text-white">
+          <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-white">
             <X size={20} />
           </button>
         )}
@@ -154,18 +154,18 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
           onClick={onClose}
         />
       )}
 
       {/* Mobile Drawer */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#1a1d29] transform transition-transform duration-300 ease-in-out md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#1a1d29] transform transition-transform duration-300 ease-in-out lg:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <SidebarContent />
       </div>
 
       {/* Desktop Sidebar */}
-      <nav className="hidden md:flex w-64 shrink-0 h-full">
+      <nav className="hidden lg:flex w-64 shrink-0 h-full">
         <SidebarContent />
       </nav>
     </>

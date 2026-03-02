@@ -24,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ isOnShift, staff, onMenuToggle, appMode
         {onMenuToggle && (
           <button
             onClick={onMenuToggle}
-            className="md:hidden p-1 text-gray-400 hover:text-white transition-colors"
+            className="lg:hidden p-1 text-gray-400 hover:text-white transition-colors"
           >
             <Menu size={24} />
           </button>

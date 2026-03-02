@@ -225,28 +225,28 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
     return (
         <div className="flex flex-col h-full bg-[#1a1d29]">
             {/* Top Header Stats */}
-            <div className="flex-none p-6 border-b border-[#2d3142] flex flex-wrap gap-6 items-center justify-between">
+            <div className="flex-none p-4 md:p-6 border-b border-[#2d3142] flex flex-wrap gap-4 md:gap-6 items-center justify-between bg-[#1a1d29]/80 backdrop-blur-md sticky top-0 z-20">
                 <div>
-                    <h2 className="text-2xl font-bold text-white mb-1 tracking-tight flex items-center gap-3">
-                        <ShieldCheck className="text-blue-500" /> Maintenance Command
+                    <h2 className="text-xl md:text-2xl font-bold text-white mb-1 tracking-tight flex items-center gap-2 md:gap-3">
+                        <ShieldCheck className="text-blue-500" size={24} /> Maintenance Command
                     </h2>
-                    <p className="text-gray-400 text-sm">System Topologies & Hardware Triage</p>
+                    <p className="text-gray-400 text-xs md:text-sm">System Topologies & Hardware Triage</p>
                 </div>
-                <div className="flex gap-4">
-                    <div className="bg-[#2d3142] border border-gray-700 rounded-xl p-4 flex flex-col items-center min-w-[120px]">
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Global Health</span>
+                <div className="flex gap-2 md:gap-4 w-full sm:w-auto">
+                    <div className="flex-1 sm:flex-none bg-[#2d3142] border border-gray-700 rounded-xl p-3 md:p-4 flex flex-col items-center min-w-[100px] md:min-w-[120px]">
+                        <span className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Global Health</span>
                         <div className="flex items-center gap-2">
-                            <Activity size={20} className={systemHealthPercentage > 90 ? 'text-green-400' : 'text-yellow-400'} />
-                            <span className={`text - 2xl font - mono font - bold ${systemHealthPercentage > 90 ? 'text-green-400' : 'text-yellow-400'} `}>
+                            <Activity size={18} className={systemHealthPercentage > 90 ? 'text-green-400' : 'text-yellow-400'} />
+                            <span className={`text-xl md:text-2xl font-mono font-bold ${systemHealthPercentage > 90 ? 'text-green-400' : 'text-yellow-400'}`}>
                                 {systemHealthPercentage}%
                             </span>
                         </div>
                     </div>
-                    <div className="bg-[#2d3142] border border-red-500/30 rounded-xl p-4 flex flex-col items-center min-w-[120px] shadow-[0_0_15px_rgba(239,68,68,0.1)]">
-                        <span className="text-xs font-bold text-red-500/80 uppercase tracking-widest mb-1">Active Faults</span>
+                    <div className="flex-1 sm:flex-none bg-[#2d3142] border border-red-500/30 rounded-xl p-3 md:p-4 flex flex-col items-center min-w-[100px] md:min-w-[120px] shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                        <span className="text-[10px] md:text-xs font-bold text-red-500/80 uppercase tracking-widest mb-1">Active Faults</span>
                         <div className="flex items-center gap-2">
-                            <AlertTriangle size={20} className="text-red-500" />
-                            <span className="text - 2xl font - mono font - bold text - red - 500">
+                            <AlertTriangle size={18} className="text-red-500" />
+                            <span className="text-xl md:text-2xl font-mono font-bold text-red-500">
                                 {hardware.filter(h => h.state === 'RED').length}
                             </span>
                         </div>
@@ -254,10 +254,10 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                 </div>
             </div>
 
-            <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
+            <div className="flex-1 flex flex-col lg:flex-row overflow-visible lg:overflow-hidden">
 
                 {/* LEFT COLUMN: CHECKLIST & FEED */}
-                <div className="w-full lg:w-1/3 min-w-[320px] flex flex-col border-r border-[#2d3142] bg-[#1a1d29]/50 overflow-y-auto">
+                <div className="w-full lg:w-1/3 lg:min-w-[320px] flex flex-col border-b lg:border-b-0 lg:border-r border-[#2d3142] bg-[#1a1d29]/50 lg:overflow-y-auto hide-scrollbar">
 
                     {/* Mandatory Upkeep Section */}
                     <div className="p-6 border-b border-[#2d3142]">
@@ -322,14 +322,14 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                 </div>
 
                 {/* RIGHT COLUMN: HARDWARE TOPOLOGY */}
-                <div className="flex-1 flex flex-col overflow-hidden bg-black/40">
-                    <div className="p-4 bg-[#1a1d29]/90 backdrop-blur-sm border-b border-[#2d3142] flex justify-between items-center z-10">
+                <div className="flex-1 flex flex-col bg-black/40 lg:overflow-hidden">
+                    <div className="p-4 bg-[#1a1d29]/90 backdrop-blur-sm border-b border-[#2d3142] flex justify-between items-center z-10 sticky lg:relative top-0">
                         <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
                             Hardware Topology Grid
                         </h3>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div className="flex-1 lg:overflow-y-auto p-4 md:p-6 lg:p-10 hide-scrollbar">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                             {hardware.map(item => (
                                 <div
                                     key={item.id}
