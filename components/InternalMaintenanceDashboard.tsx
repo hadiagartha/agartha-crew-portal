@@ -228,7 +228,7 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
             <div className="flex-none p-4 md:p-6 border-b border-[#2d3142] flex flex-wrap gap-4 md:gap-6 items-center justify-between bg-[#1a1d29]/80 backdrop-blur-md sticky top-0 z-20">
                 <div>
                     <h2 className="text-xl md:text-2xl font-bold text-white mb-1 tracking-tight flex items-center gap-2 md:gap-3">
-                        <ShieldCheck className="text-blue-500" size={24} /> Maintenance Command
+                        <ShieldCheck className="text-blue-500" size={24} /> Maintenance Tactical
                     </h2>
                     <p className="text-gray-400 text-xs md:text-sm">System Topologies & Hardware Triage</p>
                 </div>
