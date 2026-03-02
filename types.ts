@@ -17,7 +17,8 @@ export enum View {
   GIFTSHOP_DASHBOARD = 'GIFTSHOP_DASHBOARD',
   EXTERNAL_MAINTENANCE_DASHBOARD = 'EXTERNAL_MAINTENANCE_DASHBOARD',
   SERVICE_DASHBOARD = 'SERVICE_DASHBOARD',
-  MAINTENANCE_MANAGER_DASHBOARD = 'MAINTENANCE_MANAGER_DASHBOARD'
+  MAINTENANCE_MANAGER_DASHBOARD = 'MAINTENANCE_MANAGER_DASHBOARD',
+  HOME = 'HOME'
 }
 
 export enum IncidentSeverity {
@@ -148,21 +149,16 @@ export function deriveModeFromStaff(staff: StaffMember): AppMode {
 export function defaultViewForMode(mode: AppMode): View {
   switch (mode) {
     case 'INTERNAL_MAINTENANCE':
-      return View.MAINTENANCE_LOG;
     case 'SERVICE_CREW':
-      return View.ZONE_CHECK_IN;
     case 'SECURITY_CREW':
-      return View.ZONE_CHECK_IN; // Ensure they check in first
     case 'HEALTH_CREW':
-      return View.ZONE_CHECK_IN;
     case 'CLEANING_CREW':
-      return View.ZONE_CHECK_IN;
     case 'FNB':
     case 'RUNNER':
     case 'EXPERIENCE_CREW':
     case 'GIFTSHOP_CREW':
     case 'EXTERNAL_MAINTENANCE':
-      return View.ZONE_CHECK_IN;
+      return View.HOME;
     default:
       return View.SETTINGS;
   }
@@ -172,32 +168,33 @@ export function allowedViewsForMode(mode: AppMode): View[] {
   switch (mode) {
     case 'INTERNAL_MAINTENANCE':
       return [
+        View.HOME,
         View.ZONE_CHECK_IN,
         View.MAINTENANCE_LOG,
         View.SETTINGS,
         View.ANNOUNCEMENTS
       ];
     case 'SERVICE_CREW':
-      return [View.ZONE_CHECK_IN, View.SERVICE_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [View.HOME, View.ZONE_CHECK_IN, View.SERVICE_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'SECURITY_CREW':
-      return [View.ZONE_CHECK_IN, View.SECURITY_DASHBOARD, View.INCIDENTS, View.ZONE_SURVEILLANCE, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [View.HOME, View.ZONE_CHECK_IN, View.SECURITY_DASHBOARD, View.INCIDENTS, View.ZONE_SURVEILLANCE, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'HEALTH_CREW':
-      return [View.ZONE_CHECK_IN, View.HEALTH_DASHBOARD, View.INCIDENTS, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [View.HOME, View.ZONE_CHECK_IN, View.HEALTH_DASHBOARD, View.INCIDENTS, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'CLEANING_CREW':
-      return [View.ZONE_CHECK_IN, View.CLEANING_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [View.HOME, View.ZONE_CHECK_IN, View.CLEANING_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'FNB':
-      return [View.ZONE_CHECK_IN, View.FNB_DASHBOARD, View.DAILY_CHECKLIST, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [View.HOME, View.ZONE_CHECK_IN, View.FNB_DASHBOARD, View.DAILY_CHECKLIST, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'RUNNER':
-      return [View.ZONE_CHECK_IN, View.RUNNER_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [View.HOME, View.ZONE_CHECK_IN, View.RUNNER_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'EXPERIENCE_CREW':
-      return [View.ZONE_CHECK_IN, View.EXPERIENCE_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [View.HOME, View.ZONE_CHECK_IN, View.EXPERIENCE_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'GIFTSHOP_CREW':
-      return [View.ZONE_CHECK_IN, View.GIFTSHOP_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [View.HOME, View.ZONE_CHECK_IN, View.GIFTSHOP_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'EXTERNAL_MAINTENANCE':
       // Very restricted view
-      return [View.ZONE_CHECK_IN, View.EXTERNAL_MAINTENANCE_DASHBOARD];
+      return [View.HOME, View.ZONE_CHECK_IN, View.EXTERNAL_MAINTENANCE_DASHBOARD];
     default:
-      return [View.SETTINGS];
+      return [View.HOME, View.SETTINGS];
   }
 }
 

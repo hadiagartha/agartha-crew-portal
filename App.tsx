@@ -22,6 +22,7 @@ import GiftShopDashboard from './components/GiftShopDashboard';
 import ExternalMaintenanceDashboard from './components/ExternalMaintenanceDashboard';
 import ServiceDashboard from './components/ServiceDashboard';
 import MaintenanceManagerDashboard from './components/MaintenanceManagerDashboard';
+import Home from './components/Home';
 import { View, Incident, IncidentSeverity, CheckInRecord, StaffMember, Alert, AuthResponse, AppMode, deriveModeFromStaff, defaultViewForMode, isViewAllowed, RestockTask } from './types';
 
 // Mock data moved to App level for persistence
@@ -474,19 +475,8 @@ const App: React.FC = () => {
 
     setCheckInLogs(prev => [newLog, ...prev]);
 
-    // Auto-route based on role
-    if (appMode === 'FNB') setCurrentView(View.FNB_DASHBOARD);
-    else if (appMode === 'RUNNER') setCurrentView(View.RUNNER_DASHBOARD);
-    else if (appMode === 'SECURITY_CREW') setCurrentView(View.SECURITY_DASHBOARD);
-    else if (appMode === 'HEALTH_CREW') setCurrentView(View.HEALTH_DASHBOARD);
-    else if (appMode === 'EXPERIENCE_CREW') setCurrentView(View.EXPERIENCE_DASHBOARD);
-    else if (appMode === 'CLEANING_CREW') setCurrentView(View.CLEANING_DASHBOARD);
-    else if (appMode === 'GIFTSHOP_CREW') setCurrentView(View.GIFTSHOP_DASHBOARD);
-    else if (appMode === 'SERVICE_CREW') setCurrentView(View.SERVICE_DASHBOARD);
-    else if (appMode === 'INTERNAL_MAINTENANCE') setCurrentView(View.MAINTENANCE_LOG);
-    else if (appMode === 'TECH_SUPPORT') setCurrentView(View.MAINTENANCE_LOG);
-    else if (appMode === 'OPS') setCurrentView(View.ZONE_SURVEILLANCE);
-    else setCurrentView(View.DAILY_CHECKLIST); // Default for other modes
+    // Auto-route to Home page after check-in
+    setCurrentView(View.HOME);
   };
 
   const handleCheckOutComplete = () => {
@@ -552,6 +542,8 @@ const App: React.FC = () => {
     }
 
     switch (activeView) {
+      case View.HOME:
+        return <Home appMode={appMode} onViewChange={setCurrentView} />;
       case View.ZONE_CHECK_IN:
         return (
           <ZoneCheckIn

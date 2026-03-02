@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Truck, Navigation, PackageCheck, AlertTriangle, QrCode as QrCodeIcon, Map as MapIcon, Loader2, CheckCircle2, Camera, Download, KeyRound } from 'lucide-react';
+import { Truck, Navigation, PackageCheck, AlertTriangle, QrCode as QrCodeIcon, Loader2, CheckCircle2, Camera, Download, KeyRound } from 'lucide-react';
 import { RestockTask } from '../types';
 import { useGlobalState } from './GlobalStateContext';
 
@@ -220,33 +220,6 @@ const RunnerDashboard: React.FC<RunnerDashboardProps> = ({ tasks, onPickupTask, 
                                 </form>
                             </div>
                         )}
-                    </div>
-
-                    {/* Live Heatmap Navigation */}
-                    <div className="bg-[#2d3142] p-6 rounded-2xl border border-white/5 shadow-xl relative overflow-hidden flex flex-col flex-1">
-                        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2 z-10">
-                            <MapIcon className="text-blue-400" /> Live Heatmap Routing
-                        </h3>
-                        <p className="text-sm text-gray-400 mb-4 z-10 leading-relaxed">Guest density overlay for planning optimal back-of-house traversal routes.</p>
-
-                        <div className="flex-1 min-h-[250px] bg-[#1a1d29] rounded-xl border border-gray-700/50 relative flex items-center justify-center overflow-hidden shadow-inner isolate">
-                            {/* Base Grid */}
-                            <div className="absolute inset-0 opacity-20 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:20px_20px]" />
-                            <div className="absolute top-[20%] left-[20%] w-32 h-32 bg-red-500/30 rounded-full blur-3xl animate-[pulse_4s_ease-in-out_infinite]" />
-                            <div className="absolute top-[30%] left-[30%] w-16 h-16 bg-red-600/40 rounded-full blur-2xl animate-[pulse_3s_ease-in-out_infinite]" />
-                            <div className="absolute bottom-[30%] right-[20%] w-40 h-40 bg-orange-500/20 rounded-full blur-3xl" />
-                            <div className="absolute bottom-[10%] left-[40%] w-24 h-24 bg-green-500/20 rounded-full blur-2xl" />
-
-                            <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 400 300">
-                                <path d="M 50,250 L 150,100 L 250,50" fill="none" stroke="#ef4444" strokeWidth="4" strokeDasharray="8 4" className="animate-[dash_20s_linear_infinite]" />
-                                <path d="M 50,250 L 200,280 L 350,150 L 250,50" fill="none" stroke="#22c55e" strokeWidth="4" strokeDasharray="8 4" className="animate-[dash_20s_linear_infinite]" />
-                            </svg>
-
-                            <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-2 rounded-lg border border-gray-700/50 flex flex-col gap-1 text-[10px] font-bold uppercase tracking-wider">
-                                <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-red-500"></div> High Density (Avoid)</span>
-                                <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500"></div> Optimal Route</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

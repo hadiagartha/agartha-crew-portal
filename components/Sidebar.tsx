@@ -17,7 +17,8 @@ import {
   Sparkles,
   Package,
   Lock,
-  Users
+  Users,
+  LayoutDashboard
 } from 'lucide-react';
 import { View, AppMode, allowedViewsForMode } from '../types';
 
@@ -49,6 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
   ];
 
   const allNavItems = [
+    { id: View.HOME, label: 'Home', icon: LayoutDashboard },
     { id: View.ZONE_CHECK_IN, label: 'Zone Check-In', icon: MapPin },
     { id: View.SERVICE_DASHBOARD, label: 'Service Dashboard', icon: Users },
     { id: View.FNB_DASHBOARD, label: 'F&B Dashboard', icon: Coffee },
