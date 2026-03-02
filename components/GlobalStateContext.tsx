@@ -10,6 +10,25 @@ interface HardwareChecklistEntry {
     checkedBy: string;
 }
 
+export interface TechnicalIncident {
+    id: string;
+    zoneId: string;
+    item: string;
+    reason: string;
+    severity: 'Low' | 'High';
+    timestamp: Date;
+    status: 'OPEN' | 'RESOLVED';
+}
+
+export interface ServiceTicket {
+    id: string;
+    incidentId: string;
+    zoneId: string;
+    item: string;
+    type: 'INTERNAL' | 'EXTERNAL';
+    status: 'ACTIVE' | 'PENDING' | 'COMPLETED';
+}
+
 interface PrepBatch {
     id: string;
     item: string;
@@ -78,6 +97,12 @@ export interface GlobalState {
     consumables: Record<string, number>;
     useConsumable: (item: string, amount: number) => void;
     restockConsumable: (item: string, amount: number) => void;
+
+    technical_incidents: TechnicalIncident[];
+    zone_statuses: Record<string, 'Green' | 'Yellow' | 'Degraded'>;
+    service_tickets: ServiceTicket[];
+    reportTechnicalFailure: (zoneId: string, item: string, reason: string, severity: 'Low' | 'High') => void;
+    resolveTechnicalFailure: (incidentId: string) => void;
 }
 
 const GlobalStateContext = createContext<GlobalState | undefined>(undefined);
@@ -110,6 +135,15 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         'Ice Packs': 50,
         'Antiseptic': 30
     });
+
+    const [technicalIncidents, setTechnicalIncidents] = useState<TechnicalIncident[]>([]);
+    const [zoneStatuses, setZoneStatuses] = useState<Record<string, 'Green' | 'Yellow' | 'Degraded'>>({
+        'Z-01': 'Green',
+        'Z-02': 'Green',
+        'Z-03': 'Green',
+        'Z-04': 'Green',
+    });
+    const [serviceTickets, setServiceTickets] = useState<ServiceTicket[]>([]);
 
     const addPromoCode = (code: string, scannedBy: string) => {
         setPromoCodes(prev => [...prev, { code, scannedAt: new Date(), scannedBy }]);
@@ -161,6 +195,43 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         }));
     };
 
+    const reportTechnicalFailure = (zoneId: string, item: string, reason: string, severity: 'Low' | 'High') => {
+        const incidentId = `TECH-${Date.now()}`;
+        const newIncident: TechnicalIncident = {
+            id: incidentId,
+            zoneId,
+            item,
+            reason,
+            severity,
+            timestamp: new Date(),
+            status: 'OPEN'
+        };
+
+        setTechnicalIncidents(prev => [...prev, newIncident]);
+        setZoneStatuses(prev => ({ ...prev, [zoneId]: severity === 'High' ? 'Degraded' : 'Yellow' }));
+
+        const newTicket: ServiceTicket = {
+            id: `TKT-${Date.now()}`,
+            incidentId,
+            zoneId,
+            item,
+            type: severity === 'High' ? 'EXTERNAL' : 'INTERNAL',
+            status: 'ACTIVE'
+        };
+        setServiceTickets(prev => [...prev, newTicket]);
+    };
+
+    const resolveTechnicalFailure = (incidentId: string) => {
+        setTechnicalIncidents(prev => prev.map(inc => inc.id === incidentId ? { ...inc, status: 'RESOLVED' } : inc));
+
+        const incident = technicalIncidents.find(inc => inc.id === incidentId);
+        if (incident) {
+            setZoneStatuses(prev => ({ ...prev, [incident.zoneId]: 'Green' }));
+        }
+
+        setServiceTickets(prev => prev.map(tkt => tkt.incidentId === incidentId ? { ...tkt, status: 'COMPLETED' } : tkt));
+    };
+
     const value: GlobalState = {
         live_guest_count: liveGuestCount,
         setLiveGuestCount,
@@ -184,7 +255,12 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         addHardwareChecklist,
         consumables,
         useConsumable,
-        restockConsumable
+        restockConsumable,
+        technical_incidents: technicalIncidents,
+        zone_statuses: zoneStatuses,
+        service_tickets: serviceTickets,
+        reportTechnicalFailure,
+        resolveTechnicalFailure
     };
 
     return <GlobalStateContext.Provider value={value}>{children}</GlobalStateContext.Provider>;

@@ -2,15 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
     Save, AlertTriangle, CheckCircle, Activity, Lightbulb,
     Volume2, Move, Search, Cpu, Battery, QrCode, X,
-    Terminal, ShieldCheck, Camera, CheckSquare, ClipboardList
+    Terminal, ShieldCheck, Camera, CheckSquare, ClipboardList,
+    Settings2
 } from 'lucide-react';
-import { Incident, Alert } from '../types';
+import { Incident, Alert, StaffMember } from '../types';
 import { useGlobalState } from './GlobalStateContext';
 
 interface InternalMaintenanceProps {
     redAlerts: Alert[];
     onResolveIncident: (incidentId: string) => void;
     systemHealthPercentage: number;
+    staff: StaffMember;
+    onLogout: () => void;
 }
 
 // Mock Hardware Status
@@ -35,7 +38,9 @@ const INITIAL_HARDWARE: HardwareUnit[] = [
 const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
     redAlerts,
     onResolveIncident,
-    systemHealthPercentage
+    systemHealthPercentage,
+    staff,
+    onLogout
 }) => {
     const { addHardwareChecklist } = useGlobalState();
     const [hardware, setHardware] = useState<HardwareUnit[]>(INITIAL_HARDWARE);
@@ -51,26 +56,87 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
     const tempIntervalRef = useRef<number | null>(null);
 
     // Upkeep Checklist State
+    const {
+        reportTechnicalFailure,
+        resolveTechnicalFailure,
+        technical_incidents,
+        zone_statuses
+    } = useGlobalState();
+
     const [checklist, setChecklist] = useState([
-        { id: 'check-1', item: 'Hydraulic Piston Leak Test', status: 'Pending' },
-        { id: 'check-2', item: 'Lidar Lens Calibration', status: 'Pending' },
-        { id: 'check-3', item: 'Network Patch Panel Integrity', status: 'Pending' },
-        { id: 'check-4', item: 'Projector Cooling Fan Verification', status: 'Pending' }
+        { id: 'check-1', item: 'Hydraulic Piston Leak Test', status: 'Pending', zoneId: 'Z-04' },
+        { id: 'check-2', item: 'Lidar Lens Calibration', status: 'Pending', zoneId: 'Z-02' },
+        { id: 'check-3', item: 'Network Patch Panel Integrity', status: 'Pending', zoneId: 'Z-03' },
+        { id: 'check-4', item: 'Projector Cooling Fan Verification', status: 'Pending', zoneId: 'Z-01' }
     ]);
 
+    const [failureModal, setFailureModal] = useState<{ isOpen: boolean; itemId: string | null; item: string | null; zoneId: string | null }>({
+        isOpen: false,
+        itemId: null,
+        item: null,
+        zoneId: null
+    });
+    const [failureReason, setFailureReason] = useState('');
+    const [failureSeverity, setFailureSeverity] = useState<'Low' | 'High'>('Low');
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
     const handleCheckItem = (id: string, result: 'Pass' | 'Fail') => {
-        setChecklist(prev => prev.map(c => c.id === id ? { ...c, status: result } : c));
-        const item = checklist.find(c => c.id === id);
-        if (item) {
-            addHardwareChecklist({
-                id: `HC-${Date.now()}`,
-                item: item.item,
-                zone: 'Central Warehouse',
-                status: result,
-                timestamp: new Date(),
-                checkedBy: 'Maint-01'
-            });
+        console.log(`[Checklist] ${id} clicked as ${result}`);
+        const checkItem = checklist.find(c => c.id === id);
+        if (!checkItem) {
+            console.error(`[Checklist] Item ${id} not found in state.`);
+            return;
         }
+
+        if (result === 'Fail') {
+            console.log(`[Checklist] Opening failure modal for ${checkItem.item}`);
+            setFailureModal({
+                isOpen: true,
+                itemId: id,
+                item: checkItem.item,
+                zoneId: checkItem.zoneId
+            });
+            return;
+        }
+
+        // Handle Pass
+        setChecklist(prev => prev.map(c => c.id === id ? { ...c, status: 'Pass' } : c));
+
+        // Check if there was a previous failure to resolve
+        const existingIncident = technical_incidents.find(inc =>
+            inc.item === checkItem.item &&
+            inc.zoneId === checkItem.zoneId &&
+            inc.status === 'OPEN'
+        );
+        if (existingIncident) {
+            resolveTechnicalFailure(existingIncident.id);
+        }
+
+        addHardwareChecklist({
+            id: `HC-${Date.now()}`,
+            item: checkItem.item,
+            zone: checkItem.zoneId,
+            status: 'Pass',
+            timestamp: new Date(),
+            checkedBy: 'Maint-01'
+        });
+    };
+
+    const submitFailure = () => {
+        if (!failureModal.itemId || !failureModal.item || !failureModal.zoneId) return;
+
+        reportTechnicalFailure(
+            failureModal.zoneId,
+            failureModal.item,
+            failureReason,
+            failureSeverity
+        );
+
+        setChecklist(prev => prev.map(c => c.id === failureModal.itemId ? { ...c, status: 'Fail' } : c));
+
+        setFailureModal({ isOpen: false, itemId: null, item: null, zoneId: null });
+        setFailureReason('');
+        setFailureSeverity('Low');
     };
 
     // Sync Hardware state with redAlerts roughly
@@ -186,6 +252,13 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                         </div>
                     </div>
                 </div>
+                <button
+                    onClick={() => setIsSettingsOpen(true)}
+                    className="p-3 bg-[#2d3142] hover:bg-[#3e445b] border border-gray-700 rounded-xl transition-all text-gray-400 hover:text-white"
+                    title="Settings"
+                >
+                    <Settings2 size={24} />
+                </button>
             </div>
 
             <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
@@ -228,27 +301,29 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                         </h3>
                     </div>
                     <div className="flex-1 p-4 space-y-3">
-                        {redAlerts.length === 0 ? (
+                        {redAlerts.filter(a => a.alert_type !== 'health_pulse').length === 0 ? (
                             <div className="text-center p-8 bg-[#2d3142]/30 rounded-xl border border-dashed border-gray-700">
                                 <CheckCircle size={32} className="mx-auto text-green-500 mb-3 opacity-50" />
                                 <p className="text-gray-400 font-medium">No critical incidents active.</p>
                             </div>
                         ) : (
-                            redAlerts.map(alert => (
-                                <div key={alert.id} className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 relative overflow-hidden group">
-                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />
-                                    <div className="flex justify-between items-start mb-2">
-                                        <span className="text-xs font-mono font-bold text-red-400">{alert.id}</span>
-                                        <span className="text-[10px] text-red-400/60 font-mono">
-                                            {new Date(alert.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
+                            redAlerts
+                                .filter(a => a.alert_type !== 'health_pulse')
+                                .map(alert => (
+                                    <div key={alert.id} className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 relative overflow-hidden group">
+                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className="text-xs font-mono font-bold text-red-400">{alert.id}</span>
+                                            <span className="text-[10px] text-red-400/60 font-mono">
+                                                {new Date(alert.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
+                                        <h4 className="text-sm font-bold text-white mb-1 group-hover:text-red-300 transition-colors">{alert.description}</h4>
+                                        <p className="text-xs text-gray-400 flex items-center gap-1 mt-2">
+                                            <Cpu size={12} /> {alert.zone_name || alert.zone_id}
+                                        </p>
                                     </div>
-                                    <h4 className="text-sm font-bold text-white mb-1 group-hover:text-red-300 transition-colors">{alert.description}</h4>
-                                    <p className="text-xs text-gray-400 flex items-center gap-1 mt-2">
-                                        <Cpu size={12} /> {alert.zone_name || alert.zone_id}
-                                    </p>
-                                </div>
-                            ))
+                                ))
                         )}
                     </div>
                 </div>
@@ -402,6 +477,157 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                         )}
                     </div>
                 </div>
+            )}
+
+            {/* FAILURE MODAL */}
+            {failureModal.isOpen && (
+                <div className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md flex items-center justify-center p-6 animate-fadeIn">
+                    <div className="bg-[#1a1d29] border border-red-500/30 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-3 bg-red-500/10 rounded-full text-red-500">
+                                <AlertTriangle size={24} />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-white">Report Hardware Failure</h2>
+                                <p className="text-gray-400 text-sm">{failureModal.item} — {failureModal.zoneId}</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 mb-8">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Reason for Failure</label>
+                                <textarea
+                                    value={failureReason}
+                                    onChange={(e) => setFailureReason(e.target.value)}
+                                    placeholder="Describe the issue..."
+                                    className="w-full bg-[#2d3142] border border-gray-700 rounded-xl px-4 py-3 text-white text-sm focus:border-red-500/50 transition-colors h-24 placeholder:text-gray-600 outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Severity Level</label>
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={() => setFailureSeverity('Low')}
+                                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${failureSeverity === 'Low' ? 'bg-yellow-500 text-black' : 'bg-[#2d3142] text-gray-400 hover:text-white'}`}
+                                    >
+                                        LOW (Triage)
+                                    </button>
+                                    <button
+                                        onClick={() => setFailureSeverity('High')}
+                                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${failureSeverity === 'High' ? 'bg-red-600 text-white' : 'bg-[#2d3142] text-gray-400 hover:text-white'}`}
+                                    >
+                                        HIGH (Degraded)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => setFailureModal({ isOpen: false, itemId: null, item: null, zoneId: null })}
+                                className="flex-1 py-3 text-gray-400 hover:text-white text-sm font-bold transition-colors"
+                            >
+                                CANCEL
+                            </button>
+                            <button
+                                onClick={submitFailure}
+                                disabled={!failureReason.trim()}
+                                className="flex-1 py-3 bg-red-600 hover:bg-red-500 disabled:opacity-50 disabled:hover:bg-red-600 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-red-600/20"
+                            >
+                                LOG FAILURE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Settings Sidepanel */}
+            <div className={`fixed inset-y-0 right-0 z-[200] w-full max-w-sm bg-[#1a1d29] border-l border-gray-700 shadow-2xl transform transition-transform duration-300 ease-in-out ${isSettingsOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                <div className="h-full flex flex-col">
+                    <div className="p-6 border-b border-gray-700 flex items-center justify-between bg-[#2d3142]">
+                        <div className="flex items-center gap-2">
+                            <Settings2 className="text-blue-400" size={20} />
+                            <h2 className="text-xl font-bold text-white">Maintenance Settings</h2>
+                        </div>
+                        <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 hover:text-white transition-colors">
+                            <X size={24} />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                        {/* Account Info */}
+                        <section>
+                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Account Access</h3>
+                            <div className="bg-black/20 rounded-xl p-4 border border-white/5 space-y-3">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-500 text-sm">Staff ID</span>
+                                    <span className="text-white font-mono text-sm">{staff.staff_id}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-500 text-sm">Role</span>
+                                    <span className="text-white text-sm">{staff.role}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-500 text-sm">Primary Zone</span>
+                                    <span className="text-blue-400 text-sm font-bold">{staff.current_zone_id || 'Z-04'}</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Session Status */}
+                        <section>
+                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">System Monitoring</h3>
+                            <div className="bg-black/20 rounded-xl p-4 border border-white/5 space-y-4">
+                                <div className="flex items-center gap-2 text-xs text-blue-400">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                                    SECURE NODE CONNECTION ACTIVE
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-green-400">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                                    HEARTBEAT MESA: 42ms
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Preferences */}
+                        <section>
+                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Device Preferences</h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between p-1">
+                                    <span className="text-sm text-gray-300">Audible Fault Alerts</span>
+                                    <div className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
+                                        <div className="w-3.5 h-3.5 bg-[#1a1d29] rounded-full" />
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-between p-1">
+                                    <span className="text-sm text-gray-300">High Contrast Mode</span>
+                                    <div className="w-10 h-5 bg-gray-600 rounded-full flex items-center justify-start px-1 cursor-pointer">
+                                        <div className="w-3.5 h-3.5 bg-[#1a1d29] rounded-full" />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div className="p-6 border-t border-gray-700 space-y-3 bg-[#2d3142]/50">
+                        <button
+                            onClick={() => onLogout()}
+                            className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-lg font-bold text-sm transition-all"
+                        >
+                            Emergency Terminate Session
+                        </button>
+                        <p className="text-[10px] text-gray-600 text-center uppercase tracking-widest font-mono">
+                            Node: AG-MAINT-CMD-01
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Backdrop */}
+            {isSettingsOpen && (
+                <div
+                    className="fixed inset-0 z-[190] bg-black/60 backdrop-blur-sm animate-fadeIn"
+                    onClick={() => setIsSettingsOpen(false)}
+                />
             )}
         </div>
     );

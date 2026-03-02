@@ -21,6 +21,7 @@ import CleaningDashboard from './components/CleaningDashboard';
 import GiftShopDashboard from './components/GiftShopDashboard';
 import ExternalMaintenanceDashboard from './components/ExternalMaintenanceDashboard';
 import ServiceDashboard from './components/ServiceDashboard';
+import MaintenanceManagerDashboard from './components/MaintenanceManagerDashboard';
 import { View, Incident, IncidentSeverity, CheckInRecord, StaffMember, Alert, AuthResponse, AppMode, deriveModeFromStaff, defaultViewForMode, isViewAllowed, RestockTask } from './types';
 
 // Mock data moved to App level for persistence
@@ -523,6 +524,7 @@ const App: React.FC = () => {
       View.CLEANING_DASHBOARD,
       View.GIFTSHOP_DASHBOARD,
       View.MAINTENANCE_LOG,
+      View.MAINTENANCE_MANAGER_DASHBOARD,
       View.EXTERNAL_MAINTENANCE_DASHBOARD,
       View.SERVICE_DASHBOARD
     ];
@@ -608,6 +610,8 @@ const App: React.FC = () => {
           <InternalMaintenanceDashboard
             redAlerts={[...localAlerts, ...broadcasts].filter(a => a.severity === 'high' || a.severity === 'critical' || a.alert_type === 'health_pulse')}
             systemHealthPercentage={systemHealthPercentage}
+            staff={staff!}
+            onLogout={handleLogout}
             onResolveIncident={(incidentId) => {
               // Mock resolving the alert in global state
               setBroadcasts(prev => prev.filter(a => a.id !== incidentId));
@@ -615,6 +619,8 @@ const App: React.FC = () => {
             }}
           />
         );
+      case View.MAINTENANCE_MANAGER_DASHBOARD:
+        return <MaintenanceManagerDashboard />;
       case View.EXTERNAL_MAINTENANCE_DASHBOARD:
         return (
           <ExternalMaintenanceDashboard

@@ -100,21 +100,21 @@ const ZoneCheckIn: React.FC<ZoneCheckInProps> = ({ onViewChange, isOnShift, onCh
           finishScanning();
           return 100;
         }
-        return prev + 2; // Speed of scan
+        return prev + 10; // Increased from 2 to 10 for faster scan
       });
-    }, 50);
+    }, 40); // Reduced from 50ms to 40ms
   };
 
   const finishScanning = () => {
     // Automatically progress through the system checks (steps 3, 4, 5)
-    setTimeout(() => setCurrentStep(3), 500); // Verify
-    setTimeout(() => setCurrentStep(4), 1500); // Type
-    setTimeout(() => setCurrentStep(5), 2500); // Update
+    setTimeout(() => setCurrentStep(3), 200); // Verify (Faster)
+    setTimeout(() => setCurrentStep(4), 600); // Type (Faster)
+    setTimeout(() => setCurrentStep(5), 1000); // Update (Faster)
     setTimeout(() => {
-      setCurrentStep(6); // Confirm
+      setCurrentStep(6); // Confirm (Faster)
       setIsCameraActive(false);
-      onCheckInComplete(new Date()); // Notify parent app with timestamp
-    }, 3500);
+      onCheckInComplete(new Date());
+    }, 1400);
   };
 
   const handleCheckOut = () => {

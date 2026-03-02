@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldAlert, Crosshair, QrCode as QrCodeIcon, Camera, Siren, CheckCircle2, AlertTriangle, Eye, Image as ImageIcon, Map, Search, Lock, Unlock } from 'lucide-react';
 import { Incident } from '../types';
+import { useGlobalState } from './GlobalStateContext';
 
 interface SecurityDashboardProps {
     incidents: Incident[];
@@ -17,6 +18,7 @@ const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
     onScanArrival,
     onLogEvidence
 }) => {
+    const { zone_statuses } = useGlobalState();
     const [scanningIncidentId, setScanningIncidentId] = useState<string | null>(null);
     const [scanProgress, setScanProgress] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
@@ -102,8 +104,8 @@ const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
                                         </div>
                                         <div className="text-right">
                                             <span className={`text-[10px] px-3 py-1 rounded-full border uppercase tracking-widest font-black ${inc.severity === 'High' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                                                    inc.severity === 'Medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
-                                                        'bg-green-500/10 text-green-500 border-green-500/20'
+                                                inc.severity === 'Medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                                                    'bg-green-500/10 text-green-500 border-green-500/20'
                                                 }`}>
                                                 {inc.severity} PRIORITY
                                             </span>
@@ -186,38 +188,44 @@ const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
                             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] bg-[size:15px_15px] pointer-events-none" />
 
                             {[
-                                { id: 'Z-01', name: 'Alpha Sector', status: 'SECURE', color: 'green' },
-                                { id: 'Z-02', name: 'Beta Sector', status: 'ELEVATED', color: 'yellow' },
-                                { id: 'Z-03', name: 'Gamma Sector', status: 'SECURE', color: 'green' },
-                                { id: 'Z-04', name: 'Delta Sector', status: 'BREACH', color: 'red' }
-                            ].map(sector => (
-                                <div key={sector.id} className={`group/item relative flex items-center justify-between bg-[#1a1d29] p-4 rounded-xl border transition-all duration-300 hover:translate-x-1 ${sector.color === 'green' ? 'border-green-500/20' :
-                                        sector.color === 'yellow' ? 'border-yellow-500/30 shadow-[0_0_15px_rgba(234,179,8,0.05)]' :
+                                { id: 'Z-01', name: 'Alpha Sector' },
+                                { id: 'Z-02', name: 'Beta Sector' },
+                                { id: 'Z-03', name: 'Gamma Sector' },
+                                { id: 'Z-04', name: 'Delta Sector' }
+                            ].map(sector => {
+                                const zoneStatus = zone_statuses[sector.id] || 'Green';
+                                const sectorStatus = zoneStatus === 'Green' ? 'SECURE' : zoneStatus === 'Yellow' ? 'ELEVATED' : 'BREACH';
+                                const sectorColor = zoneStatus === 'Green' ? 'green' : zoneStatus === 'Yellow' ? 'yellow' : 'red';
+
+                                return (
+                                    <div key={sector.id} className={`group/item relative flex items-center justify-between bg-[#1a1d29] p-4 rounded-xl border transition-all duration-300 hover:translate-x-1 ${sectorColor === 'green' ? 'border-green-500/20' :
+                                        sectorColor === 'yellow' ? 'border-yellow-500/30 shadow-[0_0_15px_rgba(234,179,8,0.05)]' :
                                             'border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.1)] active-sector-danger'
-                                    }`}>
-                                    <div className="flex items-center gap-4">
-                                        <div className={`p-2 rounded-lg ${sector.color === 'green' ? 'bg-green-500/10 text-green-400' :
-                                                sector.color === 'yellow' ? 'bg-yellow-500/10 text-yellow-400' :
+                                        }`}>
+                                        <div className="flex items-center gap-4">
+                                            <div className={`p-2 rounded-lg ${sectorColor === 'green' ? 'bg-green-500/10 text-green-400' :
+                                                sectorColor === 'yellow' ? 'bg-yellow-500/10 text-yellow-400' :
                                                     'bg-red-500/10 text-red-500 animate-pulse'
-                                            }`}>
-                                            {sector.color === 'red' ? <Lock size={18} /> : <Unlock size={18} />}
+                                                }`}>
+                                                {sectorColor === 'red' ? <Lock size={18} /> : <Unlock size={18} />}
+                                            </div>
+                                            <div>
+                                                <span className="text-sm font-black text-white block tracking-tight">{sector.name}</span>
+                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{sector.id}</span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <span className="text-sm font-black text-white block tracking-tight">{sector.name}</span>
-                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{sector.id}</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col items-end">
-                                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border transition-colors ${sector.color === 'green' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                sector.color === 'yellow' ? 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20' :
+                                        <div className="flex flex-col items-end">
+                                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border transition-colors ${sectorColor === 'green' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                                sectorColor === 'yellow' ? 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20' :
                                                     'bg-red-600 text-white border-red-500 animate-pulse'
-                                            }`}>
-                                            {sector.status}
-                                        </span>
-                                        <span className="text-[9px] text-gray-600 mt-1 font-mono uppercase">Last Ping: 0.2ms</span>
+                                                }`}>
+                                                {sectorStatus}
+                                            </span>
+                                            <span className="text-[9px] text-gray-600 mt-1 font-mono uppercase">Last Ping: 0.2ms</span>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
 
                             {/* Compliance watermark */}
                             <div className="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">

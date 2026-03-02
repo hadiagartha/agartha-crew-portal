@@ -62,6 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     { id: View.INCIDENTS, label: 'Incidents', icon: AlertTriangle },
     { id: View.SHIFT_SCHEDULE, label: 'Shift Schedule', icon: Calendar },
     { id: View.MAINTENANCE_LOG, label: 'Maintenance Tactical', icon: Wrench },
+    { id: View.MAINTENANCE_MANAGER_DASHBOARD, label: 'Maintenance Command', icon: ShieldAlert },
     { id: View.CHECK_IN_LOG, label: 'Check-In Log', icon: History },
     { id: View.GIFTSHOP_DASHBOARD, label: 'Retail Control', icon: Package },
     { id: View.EXTERNAL_MAINTENANCE_DASHBOARD, label: 'Vendor Portal', icon: Wrench },
