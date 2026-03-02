@@ -6,11 +6,13 @@ import { useGlobalState } from './GlobalStateContext';
 interface HealthDashboardProps {
     incidents: Incident[];
     onScanArrival: (id: string, timestamp: Date) => void;
+    onRequestRestock: (item: string, isUrgent: boolean) => void;
 }
 
 const HealthDashboard: React.FC<HealthDashboardProps> = ({
     incidents,
-    onScanArrival
+    onScanArrival,
+    onRequestRestock
 }) => {
     const { consumables, useConsumable } = useGlobalState();
     const [scanningIncidentId, setScanningIncidentId] = useState<string | null>(null);
@@ -160,7 +162,17 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className={`font-bold ${(consumables['Trauma Kits'] || 0) < 3 ? 'text-red-400 animate-pulse' : 'text-white'}`}>{consumables['Trauma Kits'] || 0}</span>
-                                    <button onClick={() => useConsumable('Trauma Kits', 1)} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
+                                    <div className="flex gap-1">
+                                        {(consumables['Trauma Kits'] || 0) < 10 && (
+                                            <button
+                                                onClick={() => onRequestRestock('Trauma Kits', (consumables['Trauma Kits'] || 0) < 3)}
+                                                className="px-2 py-1 text-[10px] font-bold bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors uppercase"
+                                            >
+                                                Request
+                                            </button>
+                                        )}
+                                        <button onClick={() => useConsumable('Trauma Kits', 1)} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -176,7 +188,17 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className={`font-bold ${(consumables['IV Fluids'] || 0) < 5 ? 'text-red-400 animate-pulse' : 'text-white'}`}>{consumables['IV Fluids'] || 0}</span>
-                                    <button onClick={() => useConsumable('IV Fluids', 1)} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
+                                    <div className="flex gap-1">
+                                        {(consumables['IV Fluids'] || 0) < 20 && (
+                                            <button
+                                                onClick={() => onRequestRestock('IV Fluids', (consumables['IV Fluids'] || 0) < 5)}
+                                                className="px-2 py-1 text-[10px] font-bold bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors uppercase"
+                                            >
+                                                Request
+                                            </button>
+                                        )}
+                                        <button onClick={() => useConsumable('IV Fluids', 1)} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -192,7 +214,17 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className={`font-bold ${(consumables['Bandages'] || 0) <= 20 ? 'text-yellow-400' : 'text-white'}`}>{consumables['Bandages'] || 0}</span>
-                                    <button onClick={() => useConsumable('Bandages', 1)} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
+                                    <div className="flex gap-1">
+                                        {(consumables['Bandages'] || 0) < 50 && (
+                                            <button
+                                                onClick={() => onRequestRestock('Bandages', (consumables['Bandages'] || 0) <= 20)}
+                                                className="px-2 py-1 text-[10px] font-bold bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors uppercase"
+                                            >
+                                                Request
+                                            </button>
+                                        )}
+                                        <button onClick={() => useConsumable('Bandages', 1)} className="w-8 h-8 rounded bg-[#2d3142] hover:bg-gray-600 text-white font-bold">-</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
