@@ -310,9 +310,6 @@ const FNBDashboard: React.FC<FNBDashboardProps> = ({ onRequestRestock, restockTa
                 </div>
             </div>
         </div>
-
-            </div >
-        </div >
     );
 };
 
