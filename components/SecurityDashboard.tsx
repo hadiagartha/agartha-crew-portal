@@ -48,13 +48,13 @@ const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
     };
 
     return (
-        <div className="flex flex-col gap-6 w-full max-w-6xl mx-auto h-full">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+        <div className="flex flex-col gap-4 md:gap-6 w-full max-w-6xl mx-auto h-full">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1a1d31]/80 backdrop-blur-md sticky top-0 z-20 pb-4 md:pb-0">
                 <div>
                     <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
                         <ShieldAlert className="text-blue-500 animate-pulse" size={28} /> Security Tactical Command
                     </h2>
-                    <p className="text-sm md:text-base text-gray-400 mt-1">Unified incident response and compliance audit trail.</p>
+                    <p className="text-xs md:text-sm text-gray-400 mt-1">Unified incident response and compliance audit trail.</p>
                 </div>
                 <div className="relative w-full md:w-64">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
@@ -68,15 +68,15 @@ const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto pb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:overflow-hidden pb-6">
 
                 {/* Tactical Incident Feed */}
-                <div className="bg-[#2d3142]/80 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-2xl flex flex-col h-full min-h-[500px]">
+                <div className="bg-[#2d3142]/80 backdrop-blur-md p-4 md:p-6 rounded-2xl border border-white/5 shadow-2xl flex flex-col h-full min-h-[400px] md:min-h-[500px]">
                     <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
                         <Crosshair className="text-red-400" /> Priority Operations Feed
                     </h3>
 
-                    <div className="flex-1 overflow-y-auto pr-2 space-y-4 custom-scrollbar">
+                    <div className="flex-1 lg:overflow-y-auto pr-2 space-y-4 hide-scrollbar">
                         {activeIncidents.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-20 text-gray-500 italic opacity-50">
                                 <ShieldAlert size={48} className="mb-4 text-gray-700" />

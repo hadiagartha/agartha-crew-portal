@@ -86,25 +86,25 @@ const RunnerDashboard: React.FC<RunnerDashboardProps> = ({ tasks, onPickupTask, 
     };
 
     return (
-        <div className="flex flex-col gap-6 w-full max-w-6xl mx-auto h-full">
-            <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-col gap-4 md:gap-6 w-full max-w-6xl mx-auto h-full">
+            <div className="flex flex-wrap items-center justify-between gap-4 bg-[#1a1d31]/80 backdrop-blur-md sticky top-0 z-20 pb-4">
                 <div>
                     <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
                         <Truck className="text-purple-400" size={28} /> Runner tactical Dashboard
                     </h2>
-                    <p className="text-sm md:text-base text-gray-400 mt-1">Manage dispatch tasks and external supply intakes.</p>
+                    <p className="text-xs md:text-sm text-gray-400 mt-1">Manage dispatch tasks and external supply intakes.</p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto pb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:overflow-hidden pb-6">
 
                 {/* Prioritized Task Queue */}
-                <div className="bg-[#2d3142] p-6 rounded-2xl border border-white/5 shadow-xl flex flex-col min-h-[400px]">
+                <div className="bg-[#2d3142] p-4 md:p-6 rounded-2xl border border-white/5 shadow-xl flex flex-col min-h-[400px] lg:overflow-hidden">
                     <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
                         <PackageCheck className="text-yellow-400" /> Dispatch Queue
                     </h3>
 
-                    <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+                    <div className="flex-1 lg:overflow-y-auto pr-2 space-y-4 hide-scrollbar">
                         {activeTasks.length > 0 && (
                             <div className="mb-6">
                                 <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">In Transit</h4>
