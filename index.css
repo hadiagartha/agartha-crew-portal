@@ -1,0 +1,78 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(100%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-scan {
+  animation: scan 2s ease-in-out infinite;
+}
+
+/* Custom scrollbar for dark theme integration */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1d29;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2d3142;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3e445b;
+}
+
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #1a1d29;
+  color: #e5e7eb;
+  overflow: hidden;
+  /* Prevent body scroll, handled by main container */
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}

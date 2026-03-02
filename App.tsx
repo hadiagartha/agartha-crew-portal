@@ -583,6 +583,7 @@ const App: React.FC = () => {
           <HealthDashboard
             incidents={incidents}
             onScanArrival={handleSecurityScanArrival}
+            onRequestRestock={handleRequestRestock}
           />
         );
       case View.EXPERIENCE_DASHBOARD:
@@ -697,7 +698,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen w-full bg-[#1a1d29]">
+    <div className="flex flex-col h-full w-full bg-[#1a1d29] overflow-hidden">
       <Header
         isOnShift={isOnShift}
         staff={staff}
@@ -728,10 +729,10 @@ const App: React.FC = () => {
           isOpen={isMobileMenuOpen}
           onClose={() => setIsMobileMenuOpen(false)}
         />
-        <main className="flex-1 overflow-hidden relative w-full">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto relative w-full hide-scrollbar">
           {/* Subtle background grid pattern for tech feel */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-          <div className="relative z-10 h-full w-full overflow-y-auto p-4 md:p-6">
+          <div className="relative z-10 h-full w-full p-4 md:p-6 lg:p-10">
             {currentView !== View.ANNOUNCEMENTS && isTechOpsRole && (
               <Broadcasts
                 alerts={[...localAlerts, ...broadcasts]
