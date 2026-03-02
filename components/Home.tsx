@@ -77,21 +77,21 @@ const Home: React.FC<HomeProps> = ({ appMode, onViewChange }) => {
                 <p className="text-gray-400 text-lg">Select a module to begin your operations.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
                 {filteredWidgets.map((widget) => (
                     <button
                         key={widget.id}
                         onClick={() => onViewChange(widget.id)}
-                        className="group relative flex flex-col items-center justify-center p-8 rounded-2xl bg-[#2d3142]/40 border border-white/5 hover:border-yellow-400/50 hover:bg-[#2d3142]/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-yellow-400/10"
+                        className="group relative flex flex-col items-center justify-center p-4 md:p-6 rounded-xl bg-[#2d3142]/40 border border-white/5 hover:border-yellow-400/50 hover:bg-[#2d3142]/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-yellow-400/10"
                     >
-                        <div className={`w-16 h-16 rounded-2xl ${widget.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                            <widget.icon className={`${widget.color} w-8 h-8`} />
+                        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl ${widget.bg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                            <widget.icon className={`${widget.color} w-5 h-5 md:w-6 md:h-6`} />
                         </div>
-                        <span className="text-white font-bold text-lg text-center group-hover:text-yellow-400 transition-colors uppercase tracking-wide">
+                        <span className="text-white font-bold text-xs md:text-sm text-center group-hover:text-yellow-400 transition-colors uppercase tracking-wider">
                             {widget.label}
                         </span>
-                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div className="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.8)] animate-pulse" />
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.8)] animate-pulse" />
                         </div>
                     </button>
                 ))}
