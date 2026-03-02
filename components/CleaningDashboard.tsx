@@ -137,27 +137,28 @@ const CleaningDashboard: React.FC<CleaningDashboardProps> = ({
     };
 
     return (
-        <div className="flex flex-col gap-6 w-full max-w-6xl mx-auto h-full">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-2 gap-4">
+        <div className="flex flex-col h-full bg-[#1a1d29]">
+            {/* Header section */}
+            <div className="flex-none p-4 md:p-6 border-b border-[#2d3142] flex flex-wrap gap-4 md:gap-6 items-center justify-between bg-[#1a1d29]/80 backdrop-blur-md sticky top-0 z-20">
                 <div>
                     <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
                         <Sparkles className="text-teal-400" size={28} /> Sanitation Command
                     </h2>
-                    <p className="text-sm md:text-base text-gray-400 mt-1">Manage zone cleanliness, restock supplies, and report facility wear.</p>
+                    <p className="text-sm text-gray-400 mt-1">Manage zone cleanliness, restock supplies, and report facility wear.</p>
                 </div>
 
                 {/* Global Zone Status Toggle */}
-                <div className="flex items-center gap-3 bg-[#2d3142] p-2 rounded-xl border border-gray-700 w-full md:w-auto">
+                <div className="flex items-center gap-3 bg-[#2d3142] p-2 rounded-xl border border-gray-700 w-full sm:w-auto">
                     <div className="flex items-center gap-2 px-3 py-1 bg-[#1a1d29] rounded-lg">
                         <Clock className={isCleaning ? 'text-yellow-400 animate-pulse' : 'text-gray-500'} size={20} />
-                        <span className={`font-mono font-bold text-lg ${isCleaning ? 'text-yellow-400' : 'text-gray-400'}`}>
+                        <span className={`font-mono font-bold text-base md:text-lg ${isCleaning ? 'text-yellow-400' : 'text-gray-400'}`}>
                             {formatTime(elapsedSeconds)}
                         </span>
                     </div>
 
                     <button
                         onClick={handleToggleZoneStatus}
-                        className={`px-4 py-3 rounded-lg font-bold flex flex-1 items-center justify-center gap-2 transition-all duration-300 ${!isCleaning ? 'bg-yellow-500 hover:bg-yellow-400 text-black shadow-lg shadow-yellow-500/20' : 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30'}`}
+                        className={`px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold flex flex-1 items-center justify-center gap-1.5 md:gap-2 transition-all duration-300 text-sm ${!isCleaning ? 'bg-yellow-500 hover:bg-yellow-400 text-black shadow-lg shadow-yellow-500/20' : 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30'}`}
                     >
                         <ArrowRightLeft size={16} />
                         {!isCleaning ? 'Start Turnaround' : 'Zone Ready'}
@@ -165,103 +166,108 @@ const CleaningDashboard: React.FC<CleaningDashboardProps> = ({
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-y-auto pb-6">
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6">
+                <div className="max-w-7xl mx-auto space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                {/* Smart Checklist Widget */}
-                <div className="lg:col-span-2 bg-[#2d3142] p-6 rounded-2xl border border-white/5 shadow-xl flex flex-col h-full">
-                    <div className="flex justify-between items-end mb-6">
-                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                            <CheckCircle2 className="text-teal-400" /> Deep Clean Protocol
-                        </h3>
-                        <div className="text-right">
-                            <span className="text-3xl font-black text-teal-400">{progress}%</span>
-                            <span className="text-xs text-gray-500 uppercase tracking-widest block">Completion</span>
-                        </div>
-                    </div>
-
-                    <div className="w-full bg-gray-800 rounded-full h-2 mb-6">
-                        <div className="bg-teal-400 h-2 rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto pr-2 space-y-6">
-                        {/* Categories */}
-                        {['Restrooms', 'High-Touch', 'Waste'].map(category => (
-                            <div key={category}>
-                                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                    {category === 'Restrooms' ? <Droplet size={14} /> : category === 'High-Touch' ? <Sparkles size={14} /> : <Trash2 size={14} />}
-                                    {category}
-                                </h4>
-                                <div className="space-y-2">
-                                    {checklist.filter(i => i.category === category).map(item => (
-                                        <div key={item.id} className={`flex items-center gap-3 bg-[#1a1d29] p-4 rounded-xl border transition-all ${item.done ? 'border-gray-700/30 opacity-60' : item.requiresScan ? 'border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.1)]' : 'border-gray-700/50 hover:border-teal-500/30'}`}>
-
-                                            <button
-                                                onClick={() => handleToggleCheck(item.id)}
-                                                className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors ${item.done ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30' : 'bg-[#2d3142] border border-gray-600 hover:border-teal-400'}`}
-                                            >
-                                                {item.done && <CheckCircle2 size={14} />}
-                                            </button>
-
-                                            <div className="flex-1 flex justify-between items-center">
-                                                <span className={`text-sm ${item.done ? 'text-gray-500 line-through' : 'text-gray-200'} ${item.requiresScan && !item.done ? 'font-bold text-white' : ''}`}>
-                                                    {item.text}
-                                                </span>
-                                                {item.requiresScan && !item.done && (
-                                                    <span className="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30 flex items-center gap-1 uppercase tracking-widest">
-                                                        <QrCodeIcon size={10} /> Scan Required
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
+                        {/* Smart Checklist Widget */}
+                        <div className="lg:col-span-2 bg-[#2d3142] p-6 rounded-2xl border border-white/5 shadow-xl flex flex-col h-full">
+                            <div className="flex flex-wrap justify-between items-end gap-2 mb-6">
+                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                    <CheckCircle2 className="text-teal-400" /> Deep Clean Protocol
+                                </h3>
+                                <div className="text-right ml-auto">
+                                    <span className="text-2xl md:text-3xl font-black text-teal-400">{progress}%</span>
+                                    <span className="text-[10px] md:text-xs text-gray-500 uppercase tracking-widest block">Completion</span>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </div>
 
-                <div className="flex flex-col gap-6">
-                    {/* Runner Request Integration */}
-                    <div className="bg-[#2d3142] p-6 rounded-2xl border border-white/5 shadow-xl flex flex-col">
-                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                            <PackagePlus className="text-blue-400" /> Request Supplies
-                        </h3>
-                        <p className="text-xs text-gray-400 mb-4 leading-relaxed">Dispatch Runner Crew to your location with urgent restock materials.</p>
+                            <div className="w-full bg-gray-800 rounded-full h-2 mb-6">
+                                <div className="bg-teal-400 h-2 rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                            </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                            <button onClick={() => handleRequestSupplies('Sanitizer Refill')} className="bg-[#1a1d29] border border-blue-500/30 hover:bg-blue-500/10 text-white p-3 rounded-xl flex flex-col items-center gap-2 transition-colors">
-                                <Droplet size={20} className="text-blue-400" />
-                                <span className="text-xs font-bold text-center">Sanitizer Refill</span>
-                            </button>
-                            <button onClick={() => handleRequestSupplies('Paper Towels')} className="bg-[#1a1d29] border border-blue-500/30 hover:bg-blue-500/10 text-white p-3 rounded-xl flex flex-col items-center gap-2 transition-colors">
-                                <PackagePlus size={20} className="text-blue-400" />
-                                <span className="text-xs font-bold text-center">Paper Towels</span>
-                            </button>
-                            <button onClick={() => handleRequestSupplies('Waste Bags')} className="bg-[#1a1d29] border border-blue-500/30 hover:bg-blue-500/10 text-white p-3 rounded-xl flex flex-col items-center gap-2 transition-colors">
-                                <Trash2 size={20} className="text-blue-400" />
-                                <span className="text-xs font-bold text-center">Waste Bags</span>
-                            </button>
-                            <button onClick={() => handleRequestSupplies('Spill Kit')} className="bg-[#1a1d29] border border-red-500/30 hover:bg-red-500/10 text-red-100 p-3 rounded-xl flex flex-col items-center gap-2 transition-colors shadow-[0_0_10px_rgba(239,68,68,0.1)]">
-                                <AlertTriangle size={20} className="text-red-400" />
-                                <span className="text-xs font-bold text-center text-red-200">Spill Kit</span>
-                            </button>
+                            <div className="flex-1 overflow-y-auto pr-2 space-y-6 custom-scrollbar max-h-[500px]">
+                                {/* Categories */}
+                                {['Restrooms', 'High-Touch', 'Waste'].map(category => (
+                                    <div key={category}>
+                                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                            {category === 'Restrooms' ? <Droplet size={14} /> : category === 'High-Touch' ? <Sparkles size={14} /> : <Trash2 size={14} />}
+                                            {category}
+                                        </h4>
+                                        <div className="space-y-2">
+                                            {checklist.filter(i => i.category === category).map(item => (
+                                                <div key={item.id} className={`flex items-center gap-3 bg-[#1a1d29] p-4 rounded-xl border transition-all ${item.done ? 'border-gray-700/30 opacity-60' : item.requiresScan ? 'border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.1)]' : 'border-gray-700/50 hover:border-teal-500/30'}`}>
+
+                                                    <button
+                                                        onClick={() => handleToggleCheck(item.id)}
+                                                        className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors ${item.done ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30' : 'bg-[#2d3142] border border-gray-600 hover:border-teal-400'}`}
+                                                    >
+                                                        {item.done && <CheckCircle2 size={14} />}
+                                                    </button>
+
+                                                    <div className="flex-1 flex justify-between items-center gap-2">
+                                                        <span className={`text-sm ${item.done ? 'text-gray-500 line-through' : 'text-gray-200'} ${item.requiresScan && !item.done ? 'font-bold text-white' : ''}`}>
+                                                            {item.text}
+                                                        </span>
+                                                        {item.requiresScan && !item.done && (
+                                                            <span className="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30 flex items-center gap-1 uppercase tracking-widest whitespace-nowrap">
+                                                                <QrCodeIcon size={10} /> Scan
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
 
-                    {/* One-Tap Maintenance Logging */}
-                    <div className="bg-red-500/10 border border-red-500/30 p-6 rounded-2xl shadow-xl flex flex-col mt-auto relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors" />
-                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2 relative z-10">
-                            <AlertTriangle className="text-red-400" /> Physical Damage
-                        </h3>
-                        <p className="text-xs text-red-200/70 mb-4 leading-relaxed relative z-10">Report broken fixtures, biohazards, or infrastructure damage instantly.</p>
+                        <div className="flex flex-col gap-6">
+                            {/* Runner Request Integration */}
+                            <div className="bg-[#2d3142] p-6 rounded-2xl border border-white/5 shadow-xl flex flex-col">
+                                <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                                    <PackagePlus className="text-blue-400" /> Request Supplies
+                                </h3>
+                                <p className="text-xs text-gray-400 mb-4 leading-relaxed">Dispatch Runner Crew to your location with items.</p>
 
-                        <button
-                            onClick={handleLogDamage}
-                            className="w-full bg-red-600 hover:bg-red-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 relative z-10 shadow-[0_0_15px_rgba(220,38,38,0.4)]"
-                        >
-                            Log Facility Issue
-                        </button>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button onClick={() => handleRequestSupplies('Sanitizer Refill')} className="bg-[#1a1d29] border border-blue-500/30 hover:bg-blue-500/10 text-white p-3 rounded-xl flex flex-col items-center gap-2 transition-colors">
+                                        <Droplet size={20} className="text-blue-400" />
+                                        <span className="text-[10px] md:text-xs font-bold text-center">Sanitizer</span>
+                                    </button>
+                                    <button onClick={() => handleRequestSupplies('Paper Towels')} className="bg-[#1a1d29] border border-blue-500/30 hover:bg-blue-500/10 text-white p-3 rounded-xl flex flex-col items-center gap-2 transition-colors">
+                                        <PackagePlus size={20} className="text-blue-400" />
+                                        <span className="text-[10px] md:text-xs font-bold text-center">Towels</span>
+                                    </button>
+                                    <button onClick={() => handleRequestSupplies('Waste Bags')} className="bg-[#1a1d29] border border-blue-500/30 hover:bg-blue-500/10 text-white p-3 rounded-xl flex flex-col items-center gap-2 transition-colors">
+                                        <Trash2 size={20} className="text-blue-400" />
+                                        <span className="text-[10px] md:text-xs font-bold text-center">Bags</span>
+                                    </button>
+                                    <button onClick={() => handleRequestSupplies('Spill Kit')} className="bg-[#1a1d29] border border-red-500/30 hover:bg-red-500/10 text-red-100 p-3 rounded-xl flex flex-col items-center gap-2 transition-colors shadow-[0_0_10px_rgba(239,68,68,0.1)]">
+                                        <AlertTriangle size={20} className="text-red-400" />
+                                        <span className="text-[10px] md:text-xs font-bold text-center text-red-200">Spill Kit</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* One-Tap Maintenance Logging */}
+                            <div className="bg-red-500/10 border border-red-500/30 p-6 rounded-2xl shadow-xl flex flex-col mt-auto relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors" />
+                                <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2 relative z-10">
+                                    <AlertTriangle className="text-red-400" /> Physical Damage
+                                </h3>
+                                <p className="text-xs text-red-200/70 mb-4 leading-relaxed relative z-10">Report broken fixtures or biohazards.</p>
+
+                                <button
+                                    onClick={handleLogDamage}
+                                    className="w-full bg-red-600 hover:bg-red-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 relative z-10 shadow-[0_0_15px_rgba(220,38,38,0.4)]"
+                                >
+                                    Log Facility Issue
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

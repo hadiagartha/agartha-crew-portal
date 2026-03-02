@@ -91,159 +91,164 @@ const GiftShopDashboard: React.FC<GiftShopDashboardProps> = ({ onRequestRestock 
     };
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6">
-            <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col h-full bg-[#1a1d29]">
+            {/* Header section */}
+            <div className="flex-none p-4 md:p-6 border-b border-[#2d3142] flex flex-wrap gap-4 md:gap-6 items-center justify-between bg-[#1a1d29]/80 backdrop-blur-md sticky top-0 z-20">
                 <div>
-                    <h2 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
-                        <Package className="text-purple-400" size={32} />
-                        Retail Control
+                    <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
+                        <Package className="text-purple-400" size={28} /> Retail Control
                     </h2>
-                    <p className="text-gray-400 mt-1">Manage inventory, shipments, and guest returns</p>
+                    <p className="text-sm text-gray-400 mt-1">Manage inventory, shipments, and guest returns</p>
                 </div>
             </div>
 
-            {shrinkageAlerts.length > 0 && (
-                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6 animate-pulse">
-                    <div className="flex items-start gap-3">
-                        <ShieldAlert className="text-red-400 mt-0.5" size={20} />
-                        <div>
-                            <h4 className="text-red-400 font-bold">Shrinkage Alerts Detected</h4>
-                            <ul className="mt-2 space-y-1">
-                                {shrinkageAlerts.map((alert, idx) => (
-                                    <li key={idx} className="text-red-200 text-sm">{alert}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6">
+                <div className="max-w-7xl mx-auto space-y-6">
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Col: Inventory Health */}
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-[#2d3142] rounded-2xl p-6 border border-gray-700/50 shadow-xl">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                                <RefreshCw className="text-blue-400" size={24} />
-                                Live Stock & Inventory Health
-                            </h3>
+                    {shrinkageAlerts.length > 0 && (
+                        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 animate-pulse">
+                            <div className="flex items-start gap-3">
+                                <ShieldAlert className="text-red-400 mt-0.5" size={20} />
+                                <div>
+                                    <h4 className="text-red-400 font-bold">Shrinkage Alerts Detected</h4>
+                                    <ul className="mt-2 space-y-1">
+                                        {shrinkageAlerts.map((alert, idx) => (
+                                            <li key={idx} className="text-red-200 text-sm">{alert}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Left Col: Inventory Health */}
+                        <div className="lg:col-span-2 space-y-6">
+                            <div className="bg-[#2d3142] rounded-2xl p-6 border border-white/5 shadow-xl">
+                                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                                    <h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                                        <RefreshCw className="text-blue-400" size={24} /> Live Stock
+                                    </h3>
+                                    <button
+                                        onClick={triggerCycleCountSimulation}
+                                        className="text-[10px] md:text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ml-auto"
+                                    >
+                                        Simulate Cycle Count
+                                    </button>
+                                </div>
+
+                                <div className="overflow-x-auto custom-scrollbar -mx-2 md:mx-0">
+                                    <table className="w-full text-left border-collapse min-w-[500px]">
+                                        <thead>
+                                            <tr className="border-b border-gray-700 text-[10px] md:text-xs uppercase tracking-widest">
+                                                <th className="pb-3 font-semibold text-gray-400 px-2">Item</th>
+                                                <th className="pb-3 font-semibold text-gray-400 px-4">Level</th>
+                                                <th className="pb-3 font-semibold text-gray-400 px-4">Status</th>
+                                                <th className="pb-3 font-semibold text-gray-400 text-right px-2">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {inventory.map(item => {
+                                                const isLow = item.stock <= item.par * 0.3;
+                                                return (
+                                                    <tr key={item.id} className="border-b border-gray-700/50 last:border-0 hover:bg-white/5 transition-colors">
+                                                        <td className="py-4 px-2">
+                                                            <div className="flex items-center gap-2 text-white font-medium text-sm">
+                                                                {item.name}
+                                                                {item.isHighValue && <AlertTriangle size={14} className="text-yellow-400" />}
+                                                            </div>
+                                                            <div className="text-[10px] text-gray-500 mt-0.5">${item.price.toFixed(2)}</div>
+                                                        </td>
+                                                        <td className="py-4 px-4 text-white text-sm">
+                                                            <div className="flex items-baseline gap-2">
+                                                                <span className={`font-bold ${isLow ? 'text-red-400' : 'text-green-400'}`}>
+                                                                    {item.stock}
+                                                                </span>
+                                                                <span className="text-xs text-gray-500">/ {item.par}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-4 px-4">
+                                                            {isLow ? (
+                                                                <span className="px-2 py-0.5 md:py-1 bg-red-500/10 text-red-400 rounded-md text-[10px] md:text-xs font-semibold whitespace-nowrap">Below Par</span>
+                                                            ) : (
+                                                                <span className="px-2 py-0.5 md:py-1 bg-green-500/10 text-green-400 rounded-md text-[10px] md:text-xs font-semibold whitespace-nowrap">Healthy</span>
+                                                            )}
+                                                        </td>
+                                                        <td className="py-4 text-right px-2">
+                                                            <button
+                                                                onClick={() => onRequestRestock(item.name, isLow)}
+                                                                className={`px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold transition-colors whitespace-nowrap ${isLow
+                                                                    ? 'bg-yellow-500 hover:bg-yellow-400 text-black shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                                                    : 'bg-[#1a1d29] hover:bg-gray-700 text-gray-300 border border-gray-600'
+                                                                    }`}
+                                                            >
+                                                                Restock
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div className="bg-[#2d3142] rounded-2xl p-6 border border-white/5 shadow-xl">
+                                <h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-2 mb-6">
+                                    <Truck className="text-orange-400" size={24} />
+                                    Shipment Manager
+                                </h3>
+                                <div className="space-y-4">
+                                    {shipments.map(shipment => (
+                                        <div key={shipment.id} className="bg-[#1a1d29] border border-gray-700 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                            <div>
+                                                <h4 className="text-white font-bold text-sm md:text-base">{shipment.manifest}</h4>
+                                                <p className="text-xs text-gray-400 mt-1">Expected: {shipment.expectedItems} items</p>
+                                            </div>
+                                            {shipment.status === 'PENDING' ? (
+                                                <button
+                                                    onClick={() => setActiveModal('SHIPMENT')}
+                                                    className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all"
+                                                >
+                                                    Receive Manifest
+                                                </button>
+                                            ) : (
+                                                <span className="flex items-center gap-2 text-green-400 text-xs md:text-sm font-bold bg-green-500/10 px-3 py-1.5 rounded-lg w-full sm:w-auto justify-center">
+                                                    <CheckCircle2 size={16} /> Received
+                                                </span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Col: Actions */}
+                        <div className="space-y-4 md:space-y-6">
                             <button
-                                onClick={triggerCycleCountSimulation}
-                                className="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-lg transition-colors"
+                                onClick={() => setActiveModal('DAMAGE')}
+                                className="w-full bg-[#2d3142] hover:bg-red-500/10 border border-gray-700 hover:border-red-500/30 rounded-2xl p-6 text-left transition-all duration-300 group"
                             >
-                                Simulate Cycle Count
+                                <div className="bg-red-500/10 w-12 h-12 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                    <Camera className="text-red-400" size={24} />
+                                </div>
+                                <h3 className="text-white font-bold text-lg">Flag Damage</h3>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Log defective or broken items.</p>
+                            </button>
+
+                            <button
+                                onClick={() => setActiveModal('RETURN')}
+                                className="w-full bg-[#2d3142] hover:bg-purple-500/10 border border-gray-700 hover:border-purple-500/30 rounded-2xl p-6 text-left transition-all duration-300 group"
+                            >
+                                <div className="bg-purple-500/10 w-12 h-12 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                    <ArrowLeftRight className="text-purple-400" size={24} />
+                                </div>
+                                <h3 className="text-white font-bold text-lg">Return / Exchange</h3>
+                                <p className="text-gray-400 text-xs md:text-sm mt-2">Log guest returns and update status.</p>
                             </button>
                         </div>
-
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-gray-700">
-                                        <th className="pb-3 text-sm font-semibold text-gray-400">Item</th>
-                                        <th className="pb-3 text-sm font-semibold text-gray-400 px-4">Level</th>
-                                        <th className="pb-3 text-sm font-semibold text-gray-400 px-4">Status</th>
-                                        <th className="pb-3 text-sm font-semibold text-gray-400 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {inventory.map(item => {
-                                        const isLow = item.stock <= item.par * 0.3;
-                                        return (
-                                            <tr key={item.id} className="border-b border-gray-700/50 last:border-0 hover:bg-white/5 transition-colors">
-                                                <td className="py-4">
-                                                    <div className="flex items-center gap-2 text-white font-medium">
-                                                        {item.name}
-                                                        {item.isHighValue && <AlertTriangle size={14} className="text-yellow-400" />}
-                                                    </div>
-                                                    <div className="text-xs text-gray-500 mt-0.5">${item.price.toFixed(2)}</div>
-                                                </td>
-                                                <td className="py-4 px-4 text-white">
-                                                    <div className="flex items-baseline gap-2">
-                                                        <span className={`font-bold ${isLow ? 'text-red-400' : 'text-green-400'}`}>
-                                                            {item.stock}
-                                                        </span>
-                                                        <span className="text-xs text-gray-500">/ {item.par}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-4">
-                                                    {isLow ? (
-                                                        <span className="px-2 py-1 bg-red-500/10 text-red-400 rounded-md text-xs font-semibold">Below Par</span>
-                                                    ) : (
-                                                        <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded-md text-xs font-semibold">Healthy</span>
-                                                    )}
-                                                </td>
-                                                <td className="py-4 text-right">
-                                                    <button
-                                                        onClick={() => onRequestRestock(item.name, isLow)}
-                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${isLow
-                                                            ? 'bg-yellow-500 hover:bg-yellow-400 text-black shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                                            : 'bg-[#1a1d29] hover:bg-gray-700 text-gray-300 border border-gray-600'
-                                                            }`}
-                                                    >
-                                                        Request Restock
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
-
-                    <div className="bg-[#2d3142] rounded-2xl p-6 border border-gray-700/50 shadow-xl">
-                        <h3 className="text-xl font-bold text-white flex items-center gap-2 mb-6">
-                            <Truck className="text-orange-400" size={24} />
-                            Shipment Manager
-                        </h3>
-                        <div className="space-y-4">
-                            {shipments.map(shipment => (
-                                <div key={shipment.id} className="bg-[#1a1d29] border border-gray-700 rounded-xl p-4 flex items-center justify-between">
-                                    <div>
-                                        <h4 className="text-white font-bold">{shipment.manifest}</h4>
-                                        <p className="text-sm text-gray-400 mt-1">Expected: {shipment.expectedItems} items</p>
-                                    </div>
-                                    {shipment.status === 'PENDING' ? (
-                                        <button
-                                            onClick={() => setActiveModal('SHIPMENT')}
-                                            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors"
-                                        >
-                                            Receive Manifest
-                                        </button>
-                                    ) : (
-                                        <span className="flex items-center gap-2 text-green-400 text-sm font-bold bg-green-500/10 px-3 py-1.5 rounded-lg">
-                                            <CheckCircle2 size={16} /> Received
-                                        </span>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right Col: Actions */}
-                <div className="space-y-6">
-                    <button
-                        onClick={() => setActiveModal('DAMAGE')}
-                        className="w-full bg-[#2d3142] hover:bg-red-500/10 border border-gray-700 hover:border-red-500/30 rounded-2xl p-6 text-left transition-all duration-300 group"
-                    >
-                        <div className="bg-red-500/10 w-12 h-12 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                            <Camera className="text-red-400" size={24} />
-                        </div>
-                        <h3 className="text-white font-bold text-lg">Flag Damage</h3>
-                        <p className="text-gray-400 text-sm mt-2">Log defective or broken items to deduct from sellable stock.</p>
-                    </button>
-
-                    <button
-                        onClick={() => setActiveModal('RETURN')}
-                        className="w-full bg-[#2d3142] hover:bg-purple-500/10 border border-gray-700 hover:border-purple-500/30 rounded-2xl p-6 text-left transition-all duration-300 group"
-                    >
-                        <div className="bg-purple-500/10 w-12 h-12 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                            <ArrowLeftRight className="text-purple-400" size={24} />
-                        </div>
-                        <h3 className="text-white font-bold text-lg">Return / Exchange</h3>
-                        <p className="text-gray-400 text-sm mt-2">Log guest returns and update inventory status (Back to shelf / Damaged).</p>
-                    </button>
                 </div>
             </div>
 
