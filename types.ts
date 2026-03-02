@@ -16,7 +16,8 @@ export enum View {
   CLEANING_DASHBOARD = 'CLEANING_DASHBOARD',
   GIFTSHOP_DASHBOARD = 'GIFTSHOP_DASHBOARD',
   EXTERNAL_MAINTENANCE_DASHBOARD = 'EXTERNAL_MAINTENANCE_DASHBOARD',
-  SERVICE_DASHBOARD = 'SERVICE_DASHBOARD'
+  SERVICE_DASHBOARD = 'SERVICE_DASHBOARD',
+  MAINTENANCE_MANAGER_DASHBOARD = 'MAINTENANCE_MANAGER_DASHBOARD'
 }
 
 export enum IncidentSeverity {
@@ -79,7 +80,7 @@ export interface StaffMember {
 
 export interface Alert {
   id: string;
-  alert_type: 'auth_security' | 'broadcast' | 'system' | 'health_pulse';
+  alert_type: 'auth_security' | 'broadcast' | 'system' | 'technical_maintenance';
   severity: 'low' | 'medium' | 'high' | 'critical';
   staff_id?: string;
   zone_id?: string;
@@ -173,6 +174,7 @@ export function allowedViewsForMode(mode: AppMode): View[] {
       return [
         View.ZONE_CHECK_IN,
         View.MAINTENANCE_LOG,
+        View.MAINTENANCE_MANAGER_DASHBOARD,
         View.SETTINGS,
         View.ANNOUNCEMENTS
       ];

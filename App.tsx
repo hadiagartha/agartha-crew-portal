@@ -188,44 +188,44 @@ const App: React.FC = () => {
         setLocalAlerts(prev => {
           let next = [...prev];
 
-          // Type A: Stationary Anomaly (Medium)
+          // Type A: Fan Speed Anomaly (Medium)
           if (rand < 0.05) { // 5% chance to trigger/update
-            const alertId = 'HP-STATIONARY-GUEST-101';
+            const alertId = 'TECH-FAN-Z02';
             const exists = next.find(a => a.id === alertId);
             if (!exists) {
               next.push({
                 id: alertId,
-                alert_type: 'health_pulse',
+                alert_type: 'technical_maintenance',
                 severity: 'medium',
                 zone_id: 'Z-02',
                 zone_name: 'Zone 02',
                 status: 'open',
                 created_at: now,
-                description: 'Stationary anomaly: Guest #101 stationary in Zone 02 transit corridor for 3.5 minutes. Check camera feed.'
+                description: 'Technical Anomaly: Fan speed fluctuation detected in Zone 02 server rack. Calibration may be required.'
               });
             }
           } else if (rand > 0.98) { // 2% chance to clear
-            next = next.filter(a => a.id !== 'HP-STATIONARY-GUEST-101');
+            next = next.filter(a => a.id !== 'TECH-FAN-Z02');
           }
 
-          // Type B: Sprint Anomaly (Critical)
+          // Type B: Voltage Fluctuation (Critical)
           if (rand > 0.45 && rand < 0.50) { // 5% chance
-            const alertId = 'HP-SPRINT-GUEST-202';
+            const alertId = 'TECH-VOLT-Z04';
             const exists = next.find(a => a.id === alertId);
             if (!exists) {
               next.push({
                 id: alertId,
-                alert_type: 'health_pulse',
+                alert_type: 'technical_maintenance',
                 severity: 'critical',
                 zone_id: 'Z-04',
                 zone_name: 'Zone 04',
                 status: 'open',
                 created_at: now,
-                description: 'Sprint anomaly: Guest #202 moving 12.5 km/h toward exit in Zone 04 transit corridor. Possible panic event.'
+                description: 'Critical Alert: Severe voltage fluctuation detected in biolume power controller (Zone 04). Emergency bypass recommended.'
               });
             }
           } else if (rand < 0.02) { // 2% chance to clear
-            next = next.filter(a => a.id !== 'HP-SPRINT-GUEST-202');
+            next = next.filter(a => a.id !== 'TECH-VOLT-Z04');
           }
 
           return next;
@@ -293,13 +293,13 @@ const App: React.FC = () => {
   const handleAcknowledge = async (alert: Alert) => {
     if (!staff || !token) return;
 
-    if (alert.alert_type === 'health_pulse') {
+    if (alert.alert_type === 'technical_maintenance') {
       if (alert.severity === 'critical') {
-        // Type B: Sprint Anomaly - Immediate Incident
+        // Critical Technical Anomaly - Immediate Incident
         const newIncident: Incident = {
-          id: `INC-HP-${Date.now()}`,
+          id: `INC-TECH-${Date.now()}`,
           timestamp: new Date(),
-          type: 'Sprint Anomaly',
+          type: 'Technical Failure',
           severity: IncidentSeverity.HIGH,
           description: alert.description,
           status: 'OPEN',
@@ -310,7 +310,7 @@ const App: React.FC = () => {
         setIncidentDefaultTab('LOG');
         setCurrentView(View.INCIDENTS);
       } else {
-        // Type A: Stationary Anomaly - Needs Confirmation
+        // Medium Technical Anomaly - Needs Confirmation
         setPendingStationaryAlert(alert);
       }
       return;
@@ -358,11 +358,11 @@ const App: React.FC = () => {
 
     if (confirmed) {
       const newIncident: Incident = {
-        id: `INC-HP-${Date.now()}`,
+        id: `INC-TECH-${Date.now()}`,
         timestamp: new Date(),
-        type: 'Stationary Anomaly',
+        type: 'Technical Maintenance',
         severity: IncidentSeverity.MEDIUM,
-        description: pendingStationaryAlert.description + ' Emergency confirmed.',
+        description: pendingStationaryAlert.description + ' Action required.',
         status: 'OPEN',
         reportedBy: staff.staff_id
       };
@@ -643,7 +643,7 @@ const App: React.FC = () => {
       case View.DAILY_CHECKLIST:
         return <DailyChecklist appMode={appMode} />;
       case View.ZONE_SURVEILLANCE:
-        return <ZoneSurveillance hasHealthPulseAlert={localAlerts.some(a => a.alert_type === 'health_pulse')} />;
+        return <ZoneSurveillance hasHealthPulseAlert={localAlerts.some(a => a.alert_type === 'technical_maintenance')} />;
       case View.INCIDENTS:
         return (
           <Incidents

@@ -237,7 +237,7 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                         <span className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Global Health</span>
                         <div className="flex items-center gap-2">
                             <Activity size={20} className={systemHealthPercentage > 90 ? 'text-green-400' : 'text-yellow-400'} />
-                            <span className={`text-2xl font-mono font-bold ${systemHealthPercentage > 90 ? 'text-green-400' : 'text-yellow-400'}`}>
+                            <span className={`text - 2xl font - mono font - bold ${systemHealthPercentage > 90 ? 'text-green-400' : 'text-yellow-400'} `}>
                                 {systemHealthPercentage}%
                             </span>
                         </div>
@@ -246,19 +246,12 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                         <span className="text-xs font-bold text-red-500/80 uppercase tracking-widest mb-1">Active Faults</span>
                         <div className="flex items-center gap-2">
                             <AlertTriangle size={20} className="text-red-500" />
-                            <span className="text-2xl font-mono font-bold text-red-500">
+                            <span className="text - 2xl font - mono font - bold text - red - 500">
                                 {hardware.filter(h => h.state === 'RED').length}
                             </span>
                         </div>
                     </div>
                 </div>
-                <button
-                    onClick={() => setIsSettingsOpen(true)}
-                    className="p-3 bg-[#2d3142] hover:bg-[#3e445b] border border-gray-700 rounded-xl transition-all text-gray-400 hover:text-white"
-                    title="Settings"
-                >
-                    <Settings2 size={24} />
-                </button>
             </div>
 
             <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
@@ -301,14 +294,14 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                         </h3>
                     </div>
                     <div className="flex-1 p-4 space-y-3">
-                        {redAlerts.filter(a => a.alert_type !== 'health_pulse').length === 0 ? (
+                        {redAlerts.filter(a => a.alert_type !== 'health_pulse').length === 0 && redAlerts.filter(a => a.alert_type === 'technical_maintenance').length === 0 ? (
                             <div className="text-center p-8 bg-[#2d3142]/30 rounded-xl border border-dashed border-gray-700">
                                 <CheckCircle size={32} className="mx-auto text-green-500 mb-3 opacity-50" />
                                 <p className="text-gray-400 font-medium">No critical incidents active.</p>
                             </div>
                         ) : (
                             redAlerts
-                                .filter(a => a.alert_type !== 'health_pulse')
+                                .filter(a => a.alert_type !== 'health_pulse') // Keep existing broadcast filters if any
                                 .map(alert => (
                                     <div key={alert.id} className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 relative overflow-hidden group">
                                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />
@@ -540,95 +533,7 @@ const InternalMaintenanceDashboard: React.FC<InternalMaintenanceProps> = ({
                     </div>
                 </div>
             )}
-            {/* Settings Sidepanel */}
-            <div className={`fixed inset-y-0 right-0 z-[200] w-full max-w-sm bg-[#1a1d29] border-l border-gray-700 shadow-2xl transform transition-transform duration-300 ease-in-out ${isSettingsOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                <div className="h-full flex flex-col">
-                    <div className="p-6 border-b border-gray-700 flex items-center justify-between bg-[#2d3142]">
-                        <div className="flex items-center gap-2">
-                            <Settings2 className="text-blue-400" size={20} />
-                            <h2 className="text-xl font-bold text-white">Maintenance Settings</h2>
-                        </div>
-                        <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 hover:text-white transition-colors">
-                            <X size={24} />
-                        </button>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                        {/* Account Info */}
-                        <section>
-                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Account Access</h3>
-                            <div className="bg-black/20 rounded-xl p-4 border border-white/5 space-y-3">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-500 text-sm">Staff ID</span>
-                                    <span className="text-white font-mono text-sm">{staff.staff_id}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-500 text-sm">Role</span>
-                                    <span className="text-white text-sm">{staff.role}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-500 text-sm">Primary Zone</span>
-                                    <span className="text-blue-400 text-sm font-bold">{staff.current_zone_id || 'Z-04'}</span>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Session Status */}
-                        <section>
-                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">System Monitoring</h3>
-                            <div className="bg-black/20 rounded-xl p-4 border border-white/5 space-y-4">
-                                <div className="flex items-center gap-2 text-xs text-blue-400">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                                    SECURE NODE CONNECTION ACTIVE
-                                </div>
-                                <div className="flex items-center gap-2 text-xs text-green-400">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                                    HEARTBEAT MESA: 42ms
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Preferences */}
-                        <section>
-                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Device Preferences</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between p-1">
-                                    <span className="text-sm text-gray-300">Audible Fault Alerts</span>
-                                    <div className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
-                                        <div className="w-3.5 h-3.5 bg-[#1a1d29] rounded-full" />
-                                    </div>
-                                </div>
-                                <div className="flex items-center justify-between p-1">
-                                    <span className="text-sm text-gray-300">High Contrast Mode</span>
-                                    <div className="w-10 h-5 bg-gray-600 rounded-full flex items-center justify-start px-1 cursor-pointer">
-                                        <div className="w-3.5 h-3.5 bg-[#1a1d29] rounded-full" />
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-
-                    <div className="p-6 border-t border-gray-700 space-y-3 bg-[#2d3142]/50">
-                        <button
-                            onClick={() => onLogout()}
-                            className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-lg font-bold text-sm transition-all"
-                        >
-                            Emergency Terminate Session
-                        </button>
-                        <p className="text-[10px] text-gray-600 text-center uppercase tracking-widest font-mono">
-                            Node: AG-MAINT-CMD-01
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Backdrop */}
-            {isSettingsOpen && (
-                <div
-                    className="fixed inset-0 z-[190] bg-black/60 backdrop-blur-sm animate-fadeIn"
-                    onClick={() => setIsSettingsOpen(false)}
-                />
-            )}
+            {/* Settings sidepanel markup removed */}
         </div>
     );
 };
