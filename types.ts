@@ -69,6 +69,8 @@ export interface RestockTask {
   distanceEstimate?: string;
   zoneId?: string;
   pickedUpQuantity?: number;
+  priority?: 'NORMAL' | 'HIGH' | 'CRITICAL';
+  destination?: string;
 }
 
 export interface ZoneData {
@@ -240,7 +242,25 @@ export interface AuditRequest {
 export interface PurchaseOrder {
   id: string;
   supplier: string;
-  expectedItems: { item: string; qty: number; received: number }[];
   status: 'PENDING' | 'RECONCILED';
   createdAt: Date;
+  items: {
+    item: string;
+    category: 'RETAIL' | 'SAFETY' | 'F&B' | 'MAINTENANCE';
+    expected: number;
+    received: number;
+    photoProof?: string;
+  }[];
+}
+
+export interface ManualRestockLog {
+  id: string;
+  destination: string;
+  item: string;
+  barcode: string;
+  quantity: number;
+  unit: string;
+  timestamp: Date;
+  photoProof: string;
+  zoneQrVerified: boolean;
 }

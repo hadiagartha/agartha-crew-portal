@@ -1,162 +1,283 @@
-import React, { useState } from 'react';
-import { PackageOpen, MapPin, QrCode, Camera, AlertTriangle, History, ShieldAlert, Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { PackageOpen, MapPin, QrCode, Camera, AlertTriangle, History, ShieldAlert, Check, ArrowRight, Play, CheckCircle2, QrCode as QrCodeIcon } from 'lucide-react';
 import { useGlobalState } from './GlobalStateContext';
-import { Incident, IncidentSeverity } from '../types';
+import { Incident, IncidentSeverity, ManualRestockLog } from '../types';
 
 export const ManualRestockTab: React.FC = () => {
-    const { central_storage, updateCentralStorage } = useGlobalState();
+    const { central_storage, updateCentralStorage, manual_restock_logs, addManualRestockLog } = useGlobalState();
     const [destination, setDestination] = useState('');
     const [item, setItem] = useState('');
+    const [barcode, setBarcode] = useState('');
     const [qty, setQty] = useState('');
     const [unit, setUnit] = useState('pcs');
-    const [isPartial, setIsPartial] = useState(false);
     const [hasPhoto, setHasPhoto] = useState(false);
+    const [showCamera, setShowCamera] = useState(false);
+    const [showQrScan, setShowQrScan] = useState(false);
+    const [showHistory, setShowHistory] = useState(false);
 
     const availableStock = central_storage[item] || 0;
     const requestedAmount = parseInt(qty, 10) || 0;
-    const isShortage = requestedAmount > availableStock;
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = () => {
         if (!hasPhoto) {
-            window.alert('Mandatory: Capture visual proof of the request/DO.');
+            window.alert('Mandatory: Capture visual proof of the request/items first.');
             return;
         }
-        if (isShortage && !isPartial) {
-            window.alert(`Insufficient Stock! Only ${availableStock} ${unit} available. Please select "Partial Fulfillment" to proceed.`);
-            return;
-        }
+        setShowQrScan(true);
+    };
 
-        const amountToDeduct = isPartial ? Math.min(requestedAmount, availableStock) : requestedAmount;
+    const handleFinalize = () => {
+        const amountToDeduct = requestedAmount;
         updateCentralStorage(item, -amountToDeduct);
 
-        window.alert(`Manual Restock Logged: ${amountToDeduct}/${requestedAmount} ${unit} of ${item} to ${destination}`);
+        const newLog: ManualRestockLog = {
+            id: `MAN-${Date.now()}`,
+            destination,
+            item,
+            barcode,
+            quantity: amountToDeduct,
+            unit,
+            timestamp: new Date(),
+            photoProof: 'verified_physical_move',
+            zoneQrVerified: true
+        };
+        addManualRestockLog(newLog);
+
+        window.alert(`Manual Restock Finalized & Logged to Audit Trail.`);
         setDestination('');
         setItem('');
+        setBarcode('');
         setQty('');
         setHasPhoto(false);
-        setIsPartial(false);
+        setShowQrScan(false);
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-[#2d3142] p-8 rounded-3xl border border-white/5 shadow-2xl space-y-8 animate-fadeIn">
-            <div className="flex items-center gap-3 border-b border-white/5 pb-6">
-                <PackageOpen className="text-orange-400" size={28} />
-                <div>
-                    <h3 className="text-xl font-bold text-white uppercase tracking-tighter">Ad-hoc Restock Logging</h3>
-                    <p className="text-gray-400 text-sm">Log requests coming via radio or walk-ins.</p>
-                </div>
+        <div className="flex flex-col gap-6 animate-fadeIn pb-20 text-white">
+            <div className="flex justify-between items-center mb-2">
+                <button
+                    onClick={() => setShowHistory(!showHistory)}
+                    className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-orange-400 hover:text-orange-300 transition-colors"
+                >
+                    <History size={16} /> {showHistory ? 'View Logging Form' : 'View Shift History'}
+                </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                    <label className="text-xs text-gray-500 uppercase font-black tracking-tighter">Destination Node</label>
-                    <div className="relative">
-                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400/50" size={18} />
-                        <input
-                            required
-                            placeholder="e.g. Zone D Medical Room"
-                            className="w-full bg-[#1a1d29] border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white focus:border-orange-500 outline-none transition-all"
-                            value={destination}
-                            onChange={e => setDestination(e.target.value)}
-                        />
-                    </div>
-                </div>
-
-                <div className="space-y-4">
-                    <label className="text-xs text-gray-500 uppercase font-black tracking-tighter">Inventory SKU</label>
-                    <div className="flex gap-3">
-                        <div className="relative flex-1">
-                            <input
-                                required
-                                placeholder="Item Name / SKU"
-                                className={`w-full bg-[#1a1d29] border rounded-2xl px-5 py-4 text-white focus:border-orange-500 outline-none transition-all ${item && !central_storage[item] ? 'border-red-500/50' : 'border-white/10'}`}
-                                value={item}
-                                onChange={e => setItem(e.target.value)}
-                            />
-                            {item && (
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-orange-400">
-                                    Stock: {availableStock}
-                                </div>
-                            )}
+            {!showHistory ? (
+                <div className="bg-[#1a1d31]/80 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/10 shadow-2xl space-y-8">
+                    <div className="flex items-center gap-4">
+                        <div className="p-4 bg-orange-500/10 rounded-[1.5rem] border border-orange-500/20">
+                            <PackageOpen className="text-orange-400" size={32} />
                         </div>
-                        <button type="button" className="p-4 bg-[#1a1d29] border border-white/10 rounded-2xl text-orange-400 hover:border-orange-500 transition-all">
-                            <QrCode size={24} />
+                        <div>
+                            <h3 className="text-2xl font-black uppercase tracking-tight">Manual Restock Entry</h3>
+                            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Log Unscheduled Material Movements</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Destination */}
+                        <div className="space-y-3">
+                            <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest ml-1">Destination Node</label>
+                            <div className="relative group">
+                                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400/50 group-focus-within:text-orange-400 transition-colors" size={20} />
+                                <input
+                                    placeholder="e.g. Zone D Medical Room"
+                                    className="w-full bg-black/30 border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-white focus:outline-none focus:border-orange-500/50 transition-all font-bold"
+                                    value={destination}
+                                    onChange={e => setDestination(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Item ID / Barcode */}
+                        <div className="space-y-3">
+                            <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest ml-1">Item Identification</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <input
+                                    placeholder="Item Name"
+                                    className="bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-orange-500/50 transition-all font-bold"
+                                    value={item}
+                                    onChange={e => setItem(e.target.value)}
+                                />
+                                <div className="relative">
+                                    <input
+                                        placeholder="Barcode"
+                                        className="w-full bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-orange-500/50 transition-all font-mono text-sm"
+                                        value={barcode}
+                                        onChange={e => setBarcode(e.target.value)}
+                                    />
+                                    <button className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-400 hover:text-white transition-colors">
+                                        <QrCode size={18} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Qty & Unit */}
+                        <div className="space-y-3">
+                            <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest ml-1">Quantity & Unit of Measure</label>
+                            <div className="flex gap-3">
+                                <div className="relative flex-1">
+                                    <input
+                                        type="number"
+                                        placeholder="0"
+                                        className="w-full bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-white text-center text-xl font-black focus:outline-none focus:border-orange-500/50 transition-all"
+                                        value={qty}
+                                        onChange={e => setQty(e.target.value)}
+                                    />
+                                </div>
+                                <select
+                                    className="bg-black/30 border border-white/5 rounded-2xl px-6 py-4 text-white font-black uppercase tracking-widest text-xs outline-none focus:border-orange-500/50 transition-all"
+                                    value={unit}
+                                    onChange={e => setUnit(e.target.value)}
+                                >
+                                    <option>pcs</option>
+                                    <option>kgs</option>
+                                    <option>liters</option>
+                                    <option>boxes</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Photo Proof */}
+                        <div className="space-y-3">
+                            <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest ml-1">Movement Verification</label>
+                            <button
+                                onClick={() => setShowCamera(true)}
+                                className={`w-full border-2 border-dashed rounded-2xl py-4 flex items-center justify-center gap-3 transition-all font-black uppercase tracking-widest text-xs ${hasPhoto ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-black/10 border-white/10 text-gray-500 hover:border-orange-500/50 hover:text-orange-400'}`}
+                            >
+                                <Camera size={20} /> {hasPhoto ? 'Physical Proof Recorded' : 'Capture Item Photo'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="pt-4">
+                        <button
+                            disabled={!destination || !item || !qty || !hasPhoto}
+                            onClick={handleSubmit}
+                            className="w-full bg-gradient-to-r from-orange-600 to-amber-500 text-white font-black uppercase tracking-widest py-5 rounded-[1.5rem] shadow-xl shadow-orange-900/20 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-30 disabled:grayscale transition-all flex items-center justify-center gap-3"
+                        >
+                            <Play size={20} fill="currentColor" /> Initialize Audit Log
                         </button>
                     </div>
                 </div>
-
-                <div className="space-y-4">
-                    <label className="text-xs text-gray-500 uppercase font-black tracking-tighter">Verified Amount</label>
-                    <div className="flex gap-3">
-                        <input
-                            required
-                            type="number"
-                            placeholder="0"
-                            className={`w-32 bg-[#1a1d29] border rounded-2xl px-5 py-4 text-white text-center text-xl font-bold focus:border-orange-500 outline-none transition-all ${isShortage ? 'border-red-500' : 'border-white/10'}`}
-                            value={qty}
-                            onChange={e => setQty(e.target.value)}
-                        />
-                        <select
-                            className="bg-[#1a1d29] border border-white/10 rounded-2xl px-4 py-4 text-white flex-1"
-                            value={unit}
-                            onChange={e => setUnit(e.target.value)}
-                        >
-                            <option>pcs</option>
-                            <option>kgs</option>
-                            <option>liters</option>
-                            <option>boxes</option>
-                        </select>
-                    </div>
+            ) : (
+                /* MANUAL HISTORY TABLE */
+                <div className="bg-black/20 rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-white/5 border-b border-white/10">
+                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Timestamp & ID</th>
+                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Item & Barcode</th>
+                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Destination</th>
+                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-center">Qty</th>
+                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Verification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {manual_restock_logs.map(log => (
+                                <tr key={log.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                                    <td className="px-6 py-6 font-bold">
+                                        <div className="text-white">{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                        <div className="text-[9px] text-gray-500 font-black uppercase mt-1">{log.id}</div>
+                                    </td>
+                                    <td className="px-6 py-6">
+                                        <div className="text-sm font-bold text-gray-200">{log.item}</div>
+                                        <div className="text-[10px] text-orange-400 font-mono mt-0.5">{log.barcode}</div>
+                                    </td>
+                                    <td className="px-6 py-6">
+                                        <div className="flex items-center gap-2 text-xs font-medium text-gray-300">
+                                            <MapPin size={12} className="text-red-400" />
+                                            {log.destination}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-6 text-center">
+                                        <span className="bg-white/5 px-2 py-1 rounded font-black text-xs">
+                                            -{log.quantity} {log.unit}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-6 text-right">
+                                        <span className="text-green-500 font-black text-[10px] uppercase tracking-widest flex items-center justify-end gap-1">
+                                            <CheckCircle2 size={12} /> QR SECURED
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                            {manual_restock_logs.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-20 text-center text-gray-600 italic text-sm font-bold uppercase tracking-widest">
+                                        No ad-hoc movements logged this shift.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
+            )}
 
-                <div className={`flex items-center gap-4 border p-5 rounded-2xl transition-all ${isShortage ? 'bg-red-500/10 border-red-500/30' : 'bg-orange-500/5 border-orange-500/10'}`}>
-                    <ShieldAlert className={isShortage ? 'text-red-500' : 'text-orange-400'} size={24} />
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                id="partial"
-                                checked={isPartial}
-                                onChange={e => setIsPartial(e.target.checked)}
-                                className="accent-orange-500"
-                            />
-                            <label htmlFor="partial" className="text-white font-bold text-sm uppercase">Shortage Workaround</label>
+            {/* MODALS */}
+            {showCamera && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" onClick={() => setShowCamera(false)}>
+                    <div className="bg-[#1a1d31] p-10 rounded-[3rem] border border-white/10 text-center space-y-6 max-w-sm w-full animate-zoomIn" onClick={e => e.stopPropagation()}>
+                        <div className="w-24 h-24 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Camera size={48} className="text-orange-400 animate-pulse" />
                         </div>
-                        <p className="text-[10px] text-gray-500 mt-1 uppercase">Allow partial fulfillment if warehouse stock is low.</p>
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tight">Manual Log Proof</h2>
+                        <p className="text-gray-400 text-sm leading-relaxed">Capture the physical item or the requester's badge for the official audit trail.</p>
+                        <button
+                            onClick={() => { setShowCamera(false); setHasPhoto(true); }}
+                            className="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 transition-all"
+                        >
+                            Log Photo Proof
+                        </button>
+                        <button onClick={() => setShowCamera(false)} className="text-gray-600 text-xs font-bold uppercase tracking-widest hover:text-gray-400 transition-colors">Cancel</button>
                     </div>
                 </div>
-            </div>
+            )}
 
-            <div className="flex flex-col md:flex-row gap-4 pt-4">
-                <button
-                    type="button"
-                    onClick={() => setHasPhoto(true)}
-                    className={`flex-1 border font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 ${hasPhoto ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-transparent border-white/10 text-gray-400 hover:bg-white/5'}`}
-                >
-                    <Camera size={20} /> {hasPhoto ? 'Proof Captured' : 'Capture Visual Proof'}
-                </button>
-                <button type="submit" className="flex-[2] bg-gradient-to-r from-orange-600 to-amber-500 text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all">
-                    Finalize Deduction
-                </button>
-            </div>
-        </form>
+            {/* QR SCAN MODAL */}
+            {showQrScan && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl" onClick={() => setShowQrScan(false)}>
+                    <div className="bg-[#1a1d31] p-10 rounded-[3rem] border border-orange-500/30 text-center space-y-8 max-w-sm w-full animate-zoomIn" onClick={e => e.stopPropagation()}>
+                        <div className="relative w-64 h-64 mx-auto border-4 border-orange-500/40 rounded-[2rem] overflow-hidden flex items-center justify-center bg-black/80 shadow-[0_0_50px_rgba(245,158,11,0.2)]">
+                            <QrCodeIcon size={120} className="text-orange-500/20" />
+                            <div className="absolute inset-x-0 top-0 h-1 bg-orange-500/80 animate-scanLine" />
+                            <div className="absolute inset-0 bg-orange-500/5 animate-pulse" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Authorize Deduction</h2>
+                            <p className="text-orange-400 text-[10px] font-black uppercase tracking-widest mt-1">Scan QR at node: {destination}</p>
+                        </div>
+                        <button
+                            onClick={handleFinalize}
+                            className="w-full bg-green-500 hover:bg-green-400 text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-green-500/20 transition-all flex items-center justify-center gap-2"
+                        >
+                            <CheckCircle2 size={24} /> Verify & Submit Log
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 
 export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = ({ initialData }) => {
     const { logistics_incidents, addLogisticsIncident } = useGlobalState();
-    const [type, setType] = useState(initialData?.type || 'Missing Items');
+    const [type, setType] = useState('Warehouse/PO Shortage');
     const [item, setItem] = useState(initialData?.item_id || '');
     const [expected, setExpected] = useState(initialData?.expected_qty?.toString() || '');
     const [actual, setActual] = useState(initialData?.actual_qty?.toString() || '');
     const [desc, setDesc] = useState(initialData?.description || '');
     const [hasEvidence, setHasEvidence] = useState(false);
+    const [showCamera, setShowCamera] = useState(false);
 
-    // Effect to update if initialData changes (e.g. from PO trigger)
-    React.useEffect(() => {
+    // Context-aware logic
+    const isShortage = type === 'Warehouse/PO Shortage';
+
+    useEffect(() => {
         if (initialData) {
-            setType(initialData.type || 'Missing Items');
+            setType('Warehouse/PO Shortage');
             setItem(initialData.item_id || '');
             setExpected(initialData.expected_qty?.toString() || '');
             setActual(initialData.actual_qty?.toString() || '');
@@ -167,7 +288,7 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!hasEvidence) {
-            window.alert('Mandatory: Please upload visual evidence of the discrepancy.');
+            window.alert('Mandatory: Please upload visual evidence representing the incident.');
             return;
         }
 
@@ -180,11 +301,11 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
             status: 'OPEN',
             reportedBy: 'Runner-Alpha',
             item_id: item,
-            expected_qty: parseInt(expected, 10),
-            actual_qty: parseInt(actual, 10)
+            expected_qty: isShortage ? parseInt(expected, 10) : undefined,
+            actual_qty: isShortage ? parseInt(actual, 10) : undefined
         };
         addLogisticsIncident(newIncident);
-        window.alert('High-Priority Incident Flashed to Management & Compliance');
+        window.alert('HIGH-PRIORITY ALERT: Incident broadcasted to Ops & Compliance.');
 
         // Reset
         setHasEvidence(false);
@@ -195,108 +316,156 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-            <div className="lg:col-span-2 bg-[#2d3142] p-8 rounded-[2rem] border border-red-500/20 shadow-2xl space-y-8">
-                <div className="flex items-center gap-3 border-b border-white/5 pb-6">
-                    <ShieldAlert className="text-red-500" size={28} />
-                    <h3 className="text-xl font-bold text-white uppercase tracking-tight">Log Discrepancy / Damage</h3>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Incident Category</label>
-                            <select
-                                className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none"
-                                value={type}
-                                onChange={e => setType(e.target.value)}
-                            >
-                                <option>Missing Items</option>
-                                <option>Damaged on Arrival</option>
-                                <option>Quantity Mismatch</option>
-                            </select>
+        <div className="flex flex-col gap-6 animate-fadeIn pb-20 text-white">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* ADAPTIVE FORM */}
+                <div className="lg:col-span-2 bg-[#1a1d31]/80 backdrop-blur-2xl p-10 rounded-[3rem] border border-red-500/20 shadow-2xl space-y-8">
+                    <div className="flex items-center gap-4">
+                        <div className="p-4 bg-red-500/10 rounded-2xl border border-red-500/20">
+                            <ShieldAlert className="text-red-500" size={32} />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Item SKU / Name</label>
-                            <div className="flex gap-2">
-                                <input
-                                    className="flex-1 bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none"
-                                    value={item}
-                                    onChange={e => setItem(e.target.value)}
-                                    placeholder="Scan or Type..."
+                        <div>
+                            <h3 className="text-2xl font-black uppercase tracking-tight">Adaptive Incident Logger</h3>
+                            <p className="text-red-400 font-bold text-[10px] uppercase tracking-widest">Protocol Deviation Enforcement</p>
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                                <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Incident Category</label>
+                                <select
+                                    className="w-full bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-white font-bold outline-none focus:border-red-500/50 transition-all appearance-none"
+                                    value={type}
+                                    onChange={e => setType(e.target.value)}
+                                >
+                                    <option>Warehouse/PO Shortage</option>
+                                    <option>Damaged/Broken</option>
+                                    <option>System Discrepancy</option>
+                                </select>
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Item ID / Barcode</label>
+                                <div className="relative">
+                                    <input
+                                        required
+                                        className="w-full bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-white font-bold outline-none focus:border-red-500/50 transition-all"
+                                        value={item}
+                                        onChange={e => setItem(e.target.value)}
+                                        placeholder="Scan Item..."
+                                    />
+                                    <QrCode className="absolute right-5 top-1/2 -translate-y-1/2 text-red-500/50" size={18} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* CONDITIONAL QUANTITY FIELDS */}
+                        {isShortage && (
+                            <div className="grid grid-cols-2 gap-6 animate-slideDown">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Expected System Qty</label>
+                                    <input
+                                        type="number"
+                                        className="w-full bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-white text-center text-xl font-black outline-none focus:border-red-500/50 transition-all"
+                                        value={expected}
+                                        onChange={e => setExpected(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Physical Physical Qty</label>
+                                    <input
+                                        type="number"
+                                        className="w-full bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-red-400 text-center text-xl font-black outline-none border-red-500/30 transition-all bg-red-500/5"
+                                        value={actual}
+                                        onChange={e => setActual(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-3">
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Visual Evidence & Description</label>
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCamera(true)}
+                                    className={`flex-1 border-2 border-dashed rounded-2xl py-8 flex flex-col items-center justify-center gap-2 transition-all ${hasEvidence ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-black/10 border-white/10 text-gray-500 hover:border-red-500/50 hover:text-red-400'}`}
+                                >
+                                    <Camera size={32} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">
+                                        {hasEvidence ? 'Evidence Locked' : isShortage ? 'Photo of Empty Shelf' : 'Photo of Damage'}
+                                    </span>
+                                </button>
+                                <textarea
+                                    className="flex-[2] bg-black/30 border border-white/5 rounded-2xl px-6 py-4 text-white h-full min-h-[140px] resize-none focus:border-red-500/50 outline-none font-medium leading-relaxed"
+                                    value={desc}
+                                    onChange={e => setDesc(e.target.value)}
+                                    placeholder="Explain the discrepancy for the compliance team..."
                                 />
-                                <button type="button" className="p-3 bg-[#1a1d29] border border-white/10 rounded-xl text-red-500 hover:border-red-500/50"><QrCode size={20} /></button>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Expected Qty</label>
-                            <input
-                                type="number"
-                                className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none"
-                                value={expected}
-                                onChange={e => setExpected(e.target.value)}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Actual Physical Qty</label>
-                            <input
-                                type="number"
-                                className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none"
-                                value={actual}
-                                onChange={e => setActual(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Variance Analysis / Description</label>
-                        <textarea
-                            className="w-full bg-[#1a1d29] border border-white/10 rounded-2xl px-4 py-3 text-white h-32 resize-none focus:border-red-500 outline-none"
-                            value={desc}
-                            onChange={e => setDesc(e.target.value)}
-                            placeholder="Detail the issue for the audit trail..."
-                        />
-                    </div>
-
-                    <div className="flex gap-4">
                         <button
-                            type="button"
-                            onClick={() => setHasEvidence(true)}
-                            className={`flex-1 border font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all ${hasEvidence ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-[#1a1d29] border-white/10 text-white hover:border-red-500/50'}`}
+                            type="submit"
+                            className="group relative w-full bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-[0.2em] py-6 rounded-[2rem] shadow-2xl shadow-red-900/30 transition-all hover:-translate-y-1 active:translate-y-0"
                         >
-                            <Camera size={22} className={hasEvidence ? 'text-green-500' : 'text-red-500'} />
-                            {hasEvidence ? 'Evidence Captured' : 'Evidence Upload'}
+                            <span className="flex items-center justify-center gap-3">
+                                <ShieldAlert size={20} className="group-hover:animate-bounce" /> FLASH HIGH-PRIORITY ALERT
+                            </span>
                         </button>
-                        <button type="submit" className="flex-1 bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all">
-                            FLASH AUDIT ALERT
-                        </button>
-                    </div>
-                </form>
-            </div>
+                    </form>
+                </div>
 
-            <div className="bg-[#2d3142]/50 p-6 rounded-3xl border border-white/5 space-y-6">
-                <h4 className="text-sm font-black text-white flex items-center gap-2 uppercase tracking-widest">
-                    <History className="text-gray-500" size={16} /> Recent Incident Feed
-                </h4>
-                <div className="space-y-4">
-                    {logistics_incidents.map(inc => (
-                        <div key={inc.id} className="bg-[#1a1d29] p-4 rounded-xl border-l-4 border-red-500">
-                            <div className="text-xs text-gray-500 uppercase font-bold">{inc.id} • {inc.type}</div>
-                            <div className="text-white font-medium mt-1">{inc.item_id}</div>
-                            <div className="flex justify-between items-center mt-3">
-                                <span className="bg-red-500/10 text-red-500 px-2 py-0.5 rounded text-[10px] font-bold">UNDER REVIEW</span>
-                                <span className="text-[10px] text-gray-500">{new Date(inc.timestamp).toLocaleTimeString()}</span>
-                            </div>
+                {/* INCIDENT LOG TABLE */}
+                <div className="space-y-6">
+                    <div className="bg-[#2d3142]/50 p-6 rounded-[2rem] border border-white/5 space-y-6">
+                        <h4 className="text-xs font-black text-white flex items-center gap-2 uppercase tracking-[0.1em]">
+                            <History className="text-red-500" size={16} /> Audit Status Feed
+                        </h4>
+                        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                            {logistics_incidents.map(inc => (
+                                <div key={inc.id} className="bg-black/20 p-5 rounded-2xl border border-white/5 space-y-3 group hover:border-red-500/20 transition-all">
+                                    <div className="flex justify-between items-start">
+                                        <div className="text-[10px] text-gray-500 uppercase font-black">{inc.id}</div>
+                                        <div className="text-[10px] text-red-500 font-black uppercase tracking-widest bg-red-500/10 px-2 py-0.5 rounded">Under Review</div>
+                                    </div>
+                                    <div className="font-bold text-sm text-white group-hover:text-red-400 transition-colors uppercase">{inc.type}</div>
+                                    <div className="text-xs text-gray-400 font-medium">{inc.item_id}</div>
+                                    <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                                        <span className="text-[9px] text-gray-500 font-bold">{new Date(inc.timestamp).toLocaleString()}</span>
+                                        <button className="text-[9px] text-blue-400 font-black uppercase hover:underline">View Detail</button>
+                                    </div>
+                                </div>
+                            ))}
+                            {logistics_incidents.length === 0 && (
+                                <div className="text-center py-20 text-gray-600 font-black uppercase tracking-widest text-[10px] opacity-50">
+                                    All clear. No active discrepancies.
+                                </div>
+                            )}
                         </div>
-                    ))}
-                    {logistics_incidents.length === 0 && (
-                        <div className="text-center py-12 text-gray-500 italic text-sm">No unresolved incidents.</div>
-                    )}
+                    </div>
                 </div>
             </div>
+
+            {/* CAMERA MODAL */}
+            {showCamera && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md" onClick={() => setShowCamera(false)}>
+                    <div className="bg-[#1a1d31] p-10 rounded-[3rem] border border-white/10 text-center space-y-6 max-w-sm w-full animate-zoomIn" onClick={e => e.stopPropagation()}>
+                        <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Camera size={48} className="text-red-500 animate-pulse" />
+                        </div>
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tight">Record Evidence</h2>
+                        <p className="text-gray-400 text-sm leading-relaxed">Clearly document the damaged item or the shortage area for the audit trail.</p>
+                        <button
+                            onClick={() => { setShowCamera(false); setHasEvidence(true); }}
+                            className="w-full bg-red-600 hover:bg-red-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all"
+                        >
+                            Capture Evidence
+                        </button>
+                        <button onClick={() => setShowCamera(false)} className="text-gray-600 text-xs font-bold uppercase tracking-widest hover:text-gray-400 transition-colors">Cancel</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -53,8 +53,15 @@ interface FridgeTemp {
 
 interface POEntry {
     id: string;
-    items: { item: string; expected: number; received: number }[];
+    supplier: string;
     status: 'PENDING' | 'RECONCILED';
+    items: {
+        item: string;
+        category: 'RETAIL' | 'SAFETY' | 'F&B' | 'MAINTENANCE';
+        expected: number;
+        received: number;
+        photoProof?: string;
+    }[];
 }
 
 interface PromoCodeEntry {
@@ -98,6 +105,9 @@ export interface GlobalState {
     logistics_incidents: Incident[];
     addLogisticsIncident: (incident: Incident) => void;
 
+    manual_restock_logs: any[]; // Using any for brevity or ManualRestockLog if imported
+    addManualRestockLog: (log: any) => void;
+
     audit_requests: AuditRequest[];
     updateAuditRequest: (auditId: string, actualQty: number) => void;
 
@@ -132,12 +142,34 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
     const [prepBatches, setPrepBatches] = useState<PrepBatch[]>([]);
     const [wasteLogs, setWasteLogs] = useState<WasteLog[]>([]);
     const [activePos, setActivePos] = useState<POEntry[]>([
-        { id: 'PO-1001', status: 'PENDING', items: [{ item: 'Napkins', expected: 500, received: 0 }, { item: 'Bottled Water', expected: 200, received: 0 }] }
+        {
+            id: 'PO-1001',
+            supplier: 'Galactic Supplies Co.',
+            status: 'PENDING',
+            items: [
+                { item: 'Napkins', category: 'F&B', expected: 500, received: 0 },
+                { item: 'Bottled Water', category: 'F&B', expected: 200, received: 0 },
+                { item: 'Safety Vests', category: 'SAFETY', expected: 50, received: 0 }
+            ]
+        },
+        {
+            id: 'PO-1002',
+            supplier: 'Terra Retail Group',
+            status: 'PENDING',
+            items: [
+                { item: 'Souvenir Magnets', category: 'RETAIL', expected: 100, received: 0 },
+                { item: 'Themed T-Shirts', category: 'RETAIL', expected: 75, received: 0 }
+            ]
+        }
     ]);
     const [centralStorage, setCentralStorage] = useState<Record<string, number>>({
         'Napkins': 1000,
-        'Bottled Water': 500
+        'Bottled Water': 500,
+        'Safety Vests': 50,
+        'Souvenir Magnets': 200,
+        'Themed T-Shirts': 150
     });
+    const [manualRestockLogs, setManualRestockLogs] = useState<any[]>([]);
 
     const [hardwareChecklists, setHardwareChecklists] = useState<HardwareChecklistEntry[]>([]);
     const [consumables, setConsumables] = useState<Record<string, number>>({
@@ -154,8 +186,8 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         'Z-04': 'Green',
     });
     const [restockTasks, setRestockTasks] = useState<RestockTask[]>([
-        { id: 'RT-101', item: 'Cola Syrup', quantity: 2, unit: 'boxes', standLocation: 'Zone A - Snack Bar', status: 'PENDING', requestedAt: new Date(), isUrgent: true, zoneId: 'Z-01' },
-        { id: 'RT-102', item: 'Paper Cups', quantity: 500, unit: 'pcs', standLocation: 'Zone B - Cafe', status: 'PENDING', requestedAt: new Date(), isUrgent: false, zoneId: 'Z-02' }
+        { id: 'RT-101', item: 'Cola Syrup', quantity: 2, unit: 'boxes', standLocation: 'Zone A - Snack Bar', status: 'PENDING', requestedAt: new Date(), isUrgent: true, zoneId: 'Z-01', priority: 'CRITICAL', barcode: 'SYN-001' },
+        { id: 'RT-102', item: 'Paper Cups', quantity: 500, unit: 'pcs', standLocation: 'Zone B - Cafe', status: 'PENDING', requestedAt: new Date(), isUrgent: false, zoneId: 'Z-02', priority: 'NORMAL', barcode: 'CUP-500' }
     ]);
     const [logisticsIncidents, setLogisticsIncidents] = useState<Incident[]>([]);
     const [auditRequests, setAuditRequests] = useState<AuditRequest[]>([
@@ -275,6 +307,8 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         updateRestockTask: (id, updates) => setRestockTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t)),
         logistics_incidents: logisticsIncidents,
         addLogisticsIncident: (inc) => setLogisticsIncidents(prev => [inc, ...prev]),
+        manual_restock_logs: manualRestockLogs,
+        addManualRestockLog: (log) => setManualRestockLogs(prev => [log, ...prev]),
         audit_requests: auditRequests,
         updateAuditRequest: (id, qty) => setAuditRequests(prev => prev.map(a => a.id === id ? { ...a, actualQty: qty, status: 'COMPLETED', lastUpdated: new Date() } : a)),
         hardware_checklists: hardwareChecklists,

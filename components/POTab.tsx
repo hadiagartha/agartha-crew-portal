@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Package, Check, AlertTriangle, Camera } from 'lucide-react';
+import { Search, Package, Check, AlertTriangle, Camera, ArrowRight, Truck } from 'lucide-react';
 import { useGlobalState } from './GlobalStateContext';
 
 interface POTabProps {
@@ -33,10 +33,16 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
             const received = parseInt(receivedQtys[i.item] || '0', 10);
             if (received !== i.expected) {
                 currentMismatches.push({
+                    id: `INC-PO-${selectedPO.id}-${Date.now()}`,
+                    timestamp: new Date(),
+                    type: 'Quantity Mismatch',
+                    severity: 'Medium',
                     item_id: i.item,
                     expected_qty: i.expected,
                     actual_qty: received,
-                    description: `Mismatch detected for ${i.item} in PO ${selectedPO.id}`
+                    description: `Mismatch detected for ${i.item} during PO ${selectedPO.id} reconciliation. Expected ${i.expected}, received ${received}.`,
+                    status: 'OPEN',
+                    reportedBy: 'System'
                 });
             }
             return { ...i, received: i.received + received };
@@ -45,142 +51,242 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
         if (currentMismatches.length > 0) {
             setMismatchData(currentMismatches);
         } else {
+            // Perfect match - update inventory and PO
+            updatedItems.forEach(item => {
+                updateCentralStorage(item.item, item.received);
+            });
             updatePO(selectedPO.id, updatedItems);
-            window.alert('PO Reconciled Successfully');
-            setSelectedPoId(null);
-            setHasPhoto(false);
-            setReceivedQtys({});
+            window.alert('PO Reconciled Successfully. Inventory Updated.');
+            resetSelection();
         }
     };
 
-    const confirmRecalcWithMismatches = () => {
+    const confirmLogWithVariances = () => {
         if (!selectedPO || !mismatchData) return;
         const updatedItems = selectedPO.items.map(i => {
             const received = parseInt(receivedQtys[i.item] || '0', 10);
+            updateCentralStorage(i.item, received);
             return { ...i, received: i.received + received };
         });
         updatePO(selectedPO.id, updatedItems);
+        window.alert('Inventory Updated with variances.');
+        resetSelection();
+    };
+
+    const resetSelection = () => {
         setSelectedPoId(null);
         setMismatchData(null);
         setHasPhoto(false);
         setReceivedQtys({});
-        window.alert('PO Logged with Variances');
     };
 
     const filteredPos = active_pos.filter(po =>
-        po.id.toLowerCase().includes(searchTerm.toLowerCase())
+        po.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        po.supplier.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const getCategoryStyles = (category: string) => {
+        switch (category) {
+            case 'RETAIL': return 'bg-pink-500/10 text-pink-400 border-pink-500/20';
+            case 'SAFETY': return 'bg-red-500/10 text-red-400 border-red-500/20';
+            case 'F&B': return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+            case 'MAINTENANCE': return 'bg-teal-500/10 text-teal-400 border-teal-500/20';
+            default: return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
+        }
+    };
+
     return (
-        <div className="flex flex-col gap-6 animate-fadeIn">
-            <div className="bg-[#2d3142]/50 p-6 rounded-2xl border border-white/5 space-y-4">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Search className="text-blue-400" size={20} /> Locate Purchase Order
-                </h3>
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Search PO Number..."
-                        className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredPos.map(po => (
-                        <button
-                            key={po.id}
-                            onClick={() => { setSelectedPoId(po.id); setMismatchData(null); }}
-                            className={`p-4 rounded-xl border transition-all text-left ${selectedPoId === po.id
-                                ? 'bg-blue-500/20 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
-                                : 'bg-[#1a1d29] border-white/5 hover:border-white/20'
-                                }`}
-                        >
-                            <div className="font-bold text-white">{po.id}</div>
-                            <div className="text-xs text-gray-500 mt-1">{po.status} • {po.items.length} Items</div>
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {selectedPO && (
-                <div className="bg-[#2d3142] p-6 rounded-2xl border border-white/10 shadow-2xl space-y-6">
-                    <div className="flex justify-between items-center">
-                        <div className="flex flex-col">
-                            <h3 className="text-xl font-bold text-white">Reconcile: {selectedPO.id}</h3>
-                            <p className="text-xs text-gray-500">Verify items against Delivery Order</p>
+        <div className="flex flex-col gap-6 animate-fadeIn pb-20 text-white">
+            {/* SEARCH & FILTERS SECTION */}
+            {!selectedPoId && (
+                <div className="space-y-6">
+                    <div className="bg-[#2d3142]/50 p-8 rounded-[2rem] border border-white/5 backdrop-blur-xl space-y-4">
+                        <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
+                                <Package className="text-blue-400" size={24} />
+                                Active Purchase Orders
+                            </h3>
                         </div>
-                        <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                            Step 1: Quantity Entry
-                        </span>
+                        <div className="relative group">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" size={20} />
+                            <input
+                                type="text"
+                                placeholder="Search PO # or Supplier Name..."
+                                className="w-full bg-black/20 border border-white/10 rounded-2xl px-12 py-4 text-white focus:outline-none focus:border-blue-500/50 transition-all placeholder:text-gray-600"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
                     </div>
 
-                    <div className="space-y-4">
-                        {selectedPO.items.map(item => (
-                            <div key={item.item} className="bg-[#1a1d29] p-4 rounded-xl flex items-center justify-between border border-white/5">
-                                <div>
-                                    <div className="text-white font-bold">{item.item}</div>
-                                    <div className="text-sm text-gray-500">Expected: {item.expected}</div>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="text-right">
-                                        <label className="text-[10px] text-gray-500 uppercase block mb-1">Physical Qty</label>
-                                        <input
-                                            type="number"
-                                            className="w-24 bg-[#2d3142] border border-white/10 rounded-lg px-2 py-1 text-white text-center focus:outline-none focus:border-blue-400"
-                                            value={receivedQtys[item.item] || ''}
-                                            onChange={(e) => handleQtyChange(item.item, e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="flex flex-col md:flex-row gap-4 pt-4 border-t border-white/5">
-                        <button
-                            onClick={() => setShowPhotoModal(true)}
-                            className={`flex-1 border font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all ${hasPhoto ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-[#1a1d29] border-white/10 hover:border-blue-500/50 text-white'}`}
-                        >
-                            <Camera size={20} className={hasPhoto ? 'text-green-500' : 'text-blue-400'} />
-                            {hasPhoto ? 'DO Captured' : 'Capture DO Receipt'}
-                        </button>
-                        <button
-                            onClick={handleReconcile}
-                            className="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all flex items-center justify-center gap-2"
-                        >
-                            <Check size={20} /> Verify & Update Inventory
-                        </button>
+                    {/* PO TABLE VIEW */}
+                    <div className="bg-black/20 rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-white/5 border-b border-white/10">
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">PO Number & Status</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Supplier Name</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Items & Categories</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredPos.map(po => (
+                                    <tr key={po.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                                        <td className="px-6 py-6">
+                                            <div className="font-bold text-white group-hover:text-blue-400 transition-colors">{po.id}</div>
+                                            <div className={`text-[10px] font-black uppercase tracking-widest mt-1 ${po.status === 'PENDING' ? 'text-yellow-400' : 'text-green-400'}`}>
+                                                {po.status}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6">
+                                            <div className="text-sm font-medium text-gray-300">{po.supplier}</div>
+                                        </td>
+                                        <td className="px-6 py-6">
+                                            <div className="flex flex-wrap gap-2">
+                                                {po.items.map((item, idx) => (
+                                                    <span key={idx} className={`px-2 py-0.5 rounded-md text-[9px] font-black border ${getCategoryStyles(item.category)}`}>
+                                                        {item.category}: {item.item}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6 text-right">
+                                            <button
+                                                onClick={() => setSelectedPoId(po.id)}
+                                                className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-black px-4 py-2 rounded-lg transition-all flex items-center gap-2 ml-auto"
+                                            >
+                                                SELECT <ArrowRight size={14} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             )}
 
+            {/* SELECTED PO RECONCILIATION VIEW */}
+            {selectedPO && (
+                <div className="space-y-6">
+                    <button onClick={resetSelection} className="text-gray-500 hover:text-white text-xs font-bold flex items-center gap-2 mb-2 transition-colors">
+                        <ArrowRight className="rotate-180" size={14} /> BACK TO LIST
+                    </button>
+
+                    <div className="bg-[#1a1d31]/80 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/10 shadow-2xl space-y-8">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <h3 className="text-3xl font-black text-white tracking-tight uppercase">PO Reconciliation</h3>
+                                <p className="text-blue-400/60 font-medium flex items-center gap-2">
+                                    <Truck size={16} /> {selectedPO.supplier} — {selectedPO.id}
+                                </p>
+                            </div>
+                            <div className="bg-yellow-400/10 px-4 py-2 rounded-xl border border-yellow-400/20">
+                                <span className="text-yellow-400 text-xs font-black uppercase tracking-widest">Awaiting Verification</span>
+                            </div>
+                        </div>
+
+                        {/* RECONCILIATION TABLE */}
+                        <div className="bg-black/40 rounded-2xl border border-white/5 overflow-hidden">
+                            <table className="w-full text-left">
+                                <thead className="bg-white/5 border-b border-white/10">
+                                    <tr>
+                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Expected Item</th>
+                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Category</th>
+                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-center">Expected</th>
+                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Actual Received</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {selectedPO.items.map(item => (
+                                        <tr key={item.item} className="border-b border-white/5">
+                                            <td className="px-6 py-6 font-bold">{item.item}</td>
+                                            <td className="px-6 py-6">
+                                                <span className={`px-2 py-1 rounded-md text-[9px] font-black border ${getCategoryStyles(item.category)}`}>
+                                                    {item.category}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-6 text-center text-blue-400 font-black">{item.expected}</td>
+                                            <td className="px-6 py-6 text-right">
+                                                <input
+                                                    type="number"
+                                                    placeholder="0"
+                                                    className="w-24 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-center font-bold focus:outline-none focus:border-blue-500 transition-all"
+                                                    value={receivedQtys[item.item] || ''}
+                                                    onChange={(e) => handleQtyChange(item.item, e.target.value)}
+                                                />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* FINALIZATION ACTIONS */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                            <button
+                                onClick={() => setShowPhotoModal(true)}
+                                className={`group flex items-center justify-center gap-4 py-5 rounded-2xl font-black uppercase tracking-widest transition-all border-2 ${hasPhoto
+                                    ? 'bg-green-500/10 border-green-500 text-green-500'
+                                    : 'bg-white/5 border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500'}`}
+                            >
+                                <Camera className={hasPhoto ? 'animate-none' : 'group-hover:scale-110 transition-transform'} size={24} />
+                                {hasPhoto ? 'DO Receipt Recorded' : 'Capture DO Proof'}
+                            </button>
+                            <button
+                                onClick={handleReconcile}
+                                className="bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-5 rounded-2xl shadow-[0_10px_30px_rgba(37,99,235,0.4)] transition-all flex items-center justify-center gap-3 hover:-translate-y-1 active:translate-y-0"
+                            >
+                                <Check size={24} /> Verify & Push to Stock
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* CAMERA MODAL MOCK */}
             {showPhotoModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" onClick={() => setShowPhotoModal(false)}>
-                    <div className="bg-[#1a1d29] p-8 rounded-3xl border border-white/10 text-center space-y-6 max-w-sm w-full" onClick={e => e.stopPropagation()}>
-                        <Camera size={64} className="mx-auto text-blue-400 animate-pulse" />
-                        <h2 className="text-xl font-bold text-white">Camera Interface</h2>
-                        <p className="text-gray-400 text-sm">Align the signed Delivery Order receipt within the frame.</p>
-                        <button onClick={() => { setShowPhotoModal(false); setHasPhoto(true); }} className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">Capture & Save</button>
+                    <div className="bg-[#1a1d31] p-10 rounded-[3rem] border border-white/10 text-center space-y-6 max-w-sm w-full animate-zoomIn" onClick={e => e.stopPropagation()}>
+                        <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Camera size={48} className="text-blue-400 animate-pulse" />
+                        </div>
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tight">DO Proof Required</h2>
+                        <p className="text-gray-400 text-sm leading-relaxed">Align the signed Delivery Order receipt within the frame to verify shipment contents.</p>
+                        <button
+                            onClick={() => { setShowPhotoModal(false); setHasPhoto(true); }}
+                            className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all"
+                        >
+                            Log Photo Proof
+                        </button>
+                        <button onClick={() => setShowPhotoModal(false)} className="text-gray-600 text-xs font-bold uppercase tracking-widest hover:text-gray-400 transition-colors">Cancel</button>
                     </div>
                 </div>
             )}
 
+            {/* MISMATCH TRIGGER MODAL */}
             {mismatchData && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/95 backdrop-blur-lg">
-                    <div className="bg-[#2d3142] p-8 rounded-[2rem] border border-red-500/50 shadow-[0_0_50px_rgba(239,68,68,0.2)] max-w-md w-full space-y-6 animate-zoomIn">
-                        <div className="flex items-center gap-4 text-red-500">
-                            <AlertTriangle size={32} />
-                            <h2 className="text-2xl font-black uppercase tracking-tight">Mismatch Detected</h2>
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
+                    <div className="bg-[#2d3142] p-10 rounded-[3rem] border border-red-500/50 shadow-[0_0_80px_rgba(239,68,68,0.3)] max-w-md w-full space-y-8 animate-zoomIn">
+                        <div className="flex items-center gap-6 text-red-500">
+                            <div className="p-4 bg-red-500/10 rounded-2xl">
+                                <AlertTriangle size={40} />
+                            </div>
+                            <div>
+                                <h2 className="text-3xl font-black uppercase tracking-tighter">Variances Detected</h2>
+                                <p className="text-red-400/60 text-xs font-bold uppercase tracking-widest">Protocol Deviation Alert</p>
+                            </div>
                         </div>
-                        <p className="text-gray-400 text-sm">The physical quantity for {mismatchData.length} item(s) differs from the Purchase Order records.</p>
 
-                        <div className="bg-black/20 rounded-2xl p-4 space-y-3">
+                        <div className="bg-black/30 rounded-[2rem] p-6 space-y-4 border border-white/5">
                             {mismatchData.map((m, idx) => (
-                                <div key={idx} className="flex justify-between text-xs font-bold">
-                                    <span className="text-white">{m.item_id}</span>
-                                    <span className="text-red-400">{m.expected_qty} exp. vs {m.actual_qty} act.</span>
+                                <div key={idx} className="flex flex-col gap-1 pb-3 border-b border-white/5 last:border-0 last:pb-0">
+                                    <span className="text-white font-black text-sm uppercase">{m.item_id}</span>
+                                    <div className="flex justify-between items-center bg-red-500/5 px-3 py-1.5 rounded-lg border border-red-500/10">
+                                        <span className="text-[10px] text-gray-500 font-black uppercase">Expected: {m.expected_qty}</span>
+                                        <span className="text-[10px] text-red-400 font-black uppercase">Received: {m.actual_qty}</span>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -188,20 +294,20 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                         <div className="flex flex-col gap-3">
                             <button
                                 onClick={() => {
-                                    onTriggerIncident(mismatchData[0]); // Report first mismatch as example
+                                    onTriggerIncident(mismatchData[0]); // Trigger first as context
                                     setMismatchData(null);
                                 }}
-                                className="w-full bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-xl flex items-center justify-center gap-2"
+                                className="w-full bg-red-600 hover:bg-red-500 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-red-500/20 transition-all hover:scale-[1.02]"
                             >
-                                <AlertTriangle size={18} /> OPEN INCIDENT REPORT
+                                <AlertTriangle size={20} /> OPEN INCIDENT REPORT
                             </button>
                             <button
-                                onClick={confirmRecalcWithMismatches}
-                                className="w-full bg-white/5 border border-white/10 text-gray-400 py-3 rounded-xl hover:bg-white/10 transition-all font-bold"
+                                onClick={confirmLogWithVariances}
+                                className="w-full bg-white/5 border border-white/10 text-gray-400 py-4 rounded-xl hover:bg-white/10 transition-all font-black uppercase tracking-widest text-xs"
                             >
-                                Log Variances & Close PO
+                                Accept Variances & Force Sync
                             </button>
-                            <button onClick={() => setMismatchData(null)} className="text-gray-500 text-xs underline">Back to Edit Qty</button>
+                            <button onClick={() => setMismatchData(null)} className="text-gray-600 text-[10px] font-black uppercase tracking-widest underline hover:text-gray-400 transition-colors mx-auto">Correction Needed</button>
                         </div>
                     </div>
                 </div>
