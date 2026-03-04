@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Incident, RestockTask, IncidentSeverity } from '../types';
+import { Incident, RestockTask, IncidentSeverity, AuditRequest } from '../types';
 
 interface HardwareChecklistEntry {
     id: string;
@@ -91,6 +91,16 @@ export interface GlobalState {
     central_storage: Record<string, number>;
     updateCentralStorage: (item: string, quantityAdded: number) => void;
 
+    restock_tasks: RestockTask[];
+    addRestockTask: (task: RestockTask) => void;
+    updateRestockTask: (taskId: string, updates: Partial<RestockTask>) => void;
+
+    logistics_incidents: Incident[];
+    addLogisticsIncident: (incident: Incident) => void;
+
+    audit_requests: AuditRequest[];
+    updateAuditRequest: (auditId: string, actualQty: number) => void;
+
     hardware_checklists: HardwareChecklistEntry[];
     addHardwareChecklist: (entry: HardwareChecklistEntry) => void;
 
@@ -143,6 +153,15 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         'Z-03': 'Green',
         'Z-04': 'Green',
     });
+    const [restockTasks, setRestockTasks] = useState<RestockTask[]>([
+        { id: 'RT-101', item: 'Cola Syrup', quantity: 2, unit: 'boxes', standLocation: 'Zone A - Snack Bar', status: 'PENDING', requestedAt: new Date(), isUrgent: true, zoneId: 'Z-01' },
+        { id: 'RT-102', item: 'Paper Cups', quantity: 500, unit: 'pcs', standLocation: 'Zone B - Cafe', status: 'PENDING', requestedAt: new Date(), isUrgent: false, zoneId: 'Z-02' }
+    ]);
+    const [logisticsIncidents, setLogisticsIncidents] = useState<Incident[]>([]);
+    const [auditRequests, setAuditRequests] = useState<AuditRequest[]>([
+        { id: 'AUD-001', item: 'Bottled Water 500ml', section: 'Main Warehouse A1', unit: 'cases', status: 'PENDING', expectedQty: 150, lastUpdated: new Date() },
+        { id: 'AUD-002', item: 'Napkins (Bulk)', section: 'Storage B2', unit: 'boxes', status: 'PENDING', expectedQty: 45, lastUpdated: new Date() }
+    ]);
     const [serviceTickets, setServiceTickets] = useState<ServiceTicket[]>([]);
 
     const addPromoCode = (code: string, scannedBy: string) => {
@@ -251,6 +270,13 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         updatePO,
         central_storage: centralStorage,
         updateCentralStorage,
+        restock_tasks: restockTasks,
+        addRestockTask: (task) => setRestockTasks(prev => [task, ...prev]),
+        updateRestockTask: (id, updates) => setRestockTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t)),
+        logistics_incidents: logisticsIncidents,
+        addLogisticsIncident: (inc) => setLogisticsIncidents(prev => [inc, ...prev]),
+        audit_requests: auditRequests,
+        updateAuditRequest: (id, qty) => setAuditRequests(prev => prev.map(a => a.id === id ? { ...a, actualQty: qty, status: 'COMPLETED', lastUpdated: new Date() } : a)),
         hardware_checklists: hardwareChecklists,
         addHardwareChecklist,
         consumables,

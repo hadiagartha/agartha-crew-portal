@@ -30,7 +30,7 @@ export enum IncidentSeverity {
 export interface Incident {
   id: string;
   timestamp: Date;
-  type: string;
+  type: 'Missing Items' | 'Damaged on Arrival' | 'Quantity Mismatch' | string;
   severity: IncidentSeverity;
   description: string;
   status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED';
@@ -38,23 +38,32 @@ export interface Incident {
   arrivalTimestamp?: Date; // Added for Security Arrival Verification
   evidenceLogged?: boolean; // Added for Security Evidence Logging
   zone_id?: string; // Standardize zone linkage
+  item_id?: string;
+  expected_qty?: number;
+  actual_qty?: number;
+  photo_proof?: string;
 }
 
 export interface RestockTask {
   id: string;
   item: string;
+  barcode?: string;
   quantity: number;
-  standLocation: string; // The zone requesting the restock
-  status: 'PENDING' | 'IN_TRANSIT' | 'COMPLETED';
+  unit: string;
+  standLocation: string;
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
   requestedAt: Date;
-  isUrgent: boolean; // True if triggered specifically by "Below Par" automation
+  isUrgent: boolean;
+  acceptedBy?: string;
+  photoProof?: string;
+  zoneQrVerified?: boolean;
 
-  // New Metadata fields
+  // Metadata for UI
   statusDetails?: string;
   action?: string;
   distanceEstimate?: string;
   zoneId?: string;
-  pickedUpQuantity?: number; // Added to track quantity verified during pickup
+  pickedUpQuantity?: number;
 }
 
 export interface ZoneData {
@@ -200,4 +209,23 @@ export function allowedViewsForMode(mode: AppMode): View[] {
 
 export function isViewAllowed(mode: AppMode, view: View): boolean {
   return allowedViewsForMode(mode).includes(view);
+}
+export interface AuditRequest {
+  id: string;
+  item: string;
+  section: string;
+  photo?: string;
+  unit: string;
+  status: 'PENDING' | 'COMPLETED' | 'RECOUNT_REQUIRED';
+  expectedQty?: number; // Hidden from runner (Blind Count)
+  actualQty?: number;
+  lastUpdated: Date;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  supplier: string;
+  expectedItems: { item: string; qty: number; received: number }[];
+  status: 'PENDING' | 'RECONCILED';
+  createdAt: Date;
 }
