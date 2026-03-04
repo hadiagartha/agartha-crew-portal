@@ -59,10 +59,13 @@ const RunnerDashboard: React.FC = () => {
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
-                        onClick={() => { setActiveTab(tab.id as any); setIncidentData(null); }}
+                        onClick={() => {
+                            setActiveTab(tab.id as any);
+                            if (tab.id !== 'INCIDENT') setIncidentData(null);
+                        }}
                         className={`flex-1 min-w-[140px] flex items-center justify-center gap-3 py-3 px-4 rounded-xl font-bold transition-all duration-300 ${activeTab === tab.id
-                                ? 'bg-white/10 text-white shadow-[0_4px_15px_rgba(0,0,0,0.2)] border border-white/10'
-                                : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                            ? 'bg-white/10 text-white shadow-[0_4px_15px_rgba(0,0,0,0.2)] border border-white/10'
+                            : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
                             }`}
                     >
                         <tab.icon className={activeTab === tab.id ? tab.color : 'text-gray-600'} size={18} />
@@ -100,7 +103,5 @@ const RunnerDashboard: React.FC = () => {
         </div>
     );
 };
-
-export default RunnerDashboard;
 
 export default RunnerDashboard;

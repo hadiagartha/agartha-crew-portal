@@ -4,21 +4,38 @@ import { useGlobalState } from './GlobalStateContext';
 import { Incident, IncidentSeverity } from '../types';
 
 export const ManualRestockTab: React.FC = () => {
-    const { updateCentralStorage } = useGlobalState();
+    const { central_storage, updateCentralStorage } = useGlobalState();
     const [destination, setDestination] = useState('');
     const [item, setItem] = useState('');
     const [qty, setQty] = useState('');
     const [unit, setUnit] = useState('pcs');
     const [isPartial, setIsPartial] = useState(false);
+    const [hasPhoto, setHasPhoto] = useState(false);
+
+    const availableStock = central_storage[item] || 0;
+    const requestedAmount = parseInt(qty, 10) || 0;
+    const isShortage = requestedAmount > availableStock;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const amount = parseInt(qty, 10) || 0;
-        updateCentralStorage(item, -amount);
-        window.alert(`Manual Restock Logged: ${amount} ${unit} of ${item} to ${destination}`);
+        if (!hasPhoto) {
+            window.alert('Mandatory: Capture visual proof of the request/DO.');
+            return;
+        }
+        if (isShortage && !isPartial) {
+            window.alert(`Insufficient Stock! Only ${availableStock} ${unit} available. Please select "Partial Fulfillment" to proceed.`);
+            return;
+        }
+
+        const amountToDeduct = isPartial ? Math.min(requestedAmount, availableStock) : requestedAmount;
+        updateCentralStorage(item, -amountToDeduct);
+
+        window.alert(`Manual Restock Logged: ${amountToDeduct}/${requestedAmount} ${unit} of ${item} to ${destination}`);
         setDestination('');
         setItem('');
         setQty('');
+        setHasPhoto(false);
+        setIsPartial(false);
     };
 
     return (
@@ -26,7 +43,7 @@ export const ManualRestockTab: React.FC = () => {
             <div className="flex items-center gap-3 border-b border-white/5 pb-6">
                 <PackageOpen className="text-orange-400" size={28} />
                 <div>
-                    <h3 className="text-xl font-bold text-white">Ad-hoc Restock Logging</h3>
+                    <h3 className="text-xl font-bold text-white uppercase tracking-tighter">Ad-hoc Restock Logging</h3>
                     <p className="text-gray-400 text-sm">Log requests coming via radio or walk-ins.</p>
                 </div>
             </div>
@@ -47,16 +64,21 @@ export const ManualRestockTab: React.FC = () => {
                 </div>
 
                 <div className="space-y-4">
-                    <label className="text-xs text-gray-500 uppercase font-black tracking-tighter">Inventory Deduction</label>
+                    <label className="text-xs text-gray-500 uppercase font-black tracking-tighter">Inventory SKU</label>
                     <div className="flex gap-3">
                         <div className="relative flex-1">
                             <input
                                 required
                                 placeholder="Item Name / SKU"
-                                className="w-full bg-[#1a1d29] border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-orange-500 outline-none transition-all"
+                                className={`w-full bg-[#1a1d29] border rounded-2xl px-5 py-4 text-white focus:border-orange-500 outline-none transition-all ${item && !central_storage[item] ? 'border-red-500/50' : 'border-white/10'}`}
                                 value={item}
                                 onChange={e => setItem(e.target.value)}
                             />
+                            {item && (
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-orange-400">
+                                    Stock: {availableStock}
+                                </div>
+                            )}
                         </div>
                         <button type="button" className="p-4 bg-[#1a1d29] border border-white/10 rounded-2xl text-orange-400 hover:border-orange-500 transition-all">
                             <QrCode size={24} />
@@ -71,7 +93,7 @@ export const ManualRestockTab: React.FC = () => {
                             required
                             type="number"
                             placeholder="0"
-                            className="w-32 bg-[#1a1d29] border border-white/10 rounded-2xl px-5 py-4 text-white text-center text-xl font-bold focus:border-orange-500 outline-none transition-all"
+                            className={`w-32 bg-[#1a1d29] border rounded-2xl px-5 py-4 text-white text-center text-xl font-bold focus:border-orange-500 outline-none transition-all ${isShortage ? 'border-red-500' : 'border-white/10'}`}
                             value={qty}
                             onChange={e => setQty(e.target.value)}
                         />
@@ -88,8 +110,8 @@ export const ManualRestockTab: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4 bg-orange-500/5 border border-orange-500/10 p-5 rounded-2xl">
-                    <ShieldAlert className="text-orange-400 shrink-0" size={24} />
+                <div className={`flex items-center gap-4 border p-5 rounded-2xl transition-all ${isShortage ? 'bg-red-500/10 border-red-500/30' : 'bg-orange-500/5 border-orange-500/10'}`}>
+                    <ShieldAlert className={isShortage ? 'text-red-500' : 'text-orange-400'} size={24} />
                     <div>
                         <div className="flex items-center gap-2">
                             <input
@@ -99,16 +121,20 @@ export const ManualRestockTab: React.FC = () => {
                                 onChange={e => setIsPartial(e.target.checked)}
                                 className="accent-orange-500"
                             />
-                            <label htmlFor="partial" className="text-white font-bold text-sm">Partial Fulfillment</label>
+                            <label htmlFor="partial" className="text-white font-bold text-sm uppercase">Shortage Workaround</label>
                         </div>
-                        <p className="text-[10px] text-gray-500 mt-1 uppercase">Select if warehouse stock is insufficient for full request.</p>
+                        <p className="text-[10px] text-gray-500 mt-1 uppercase">Allow partial fulfillment if warehouse stock is low.</p>
                     </div>
                 </div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 pt-4">
-                <button type="button" className="flex-1 bg-transparent border border-white/10 text-gray-400 font-bold py-4 rounded-2xl hover:bg-white/5 transition-all flex items-center justify-center gap-2">
-                    <Camera size={20} /> Capture Visual Proof
+                <button
+                    type="button"
+                    onClick={() => setHasPhoto(true)}
+                    className={`flex-1 border font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 ${hasPhoto ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-transparent border-white/10 text-gray-400 hover:bg-white/5'}`}
+                >
+                    <Camera size={20} /> {hasPhoto ? 'Proof Captured' : 'Capture Visual Proof'}
                 </button>
                 <button type="submit" className="flex-[2] bg-gradient-to-r from-orange-600 to-amber-500 text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all">
                     Finalize Deduction
@@ -125,9 +151,26 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
     const [expected, setExpected] = useState(initialData?.expected_qty?.toString() || '');
     const [actual, setActual] = useState(initialData?.actual_qty?.toString() || '');
     const [desc, setDesc] = useState(initialData?.description || '');
+    const [hasEvidence, setHasEvidence] = useState(false);
+
+    // Effect to update if initialData changes (e.g. from PO trigger)
+    React.useEffect(() => {
+        if (initialData) {
+            setType(initialData.type || 'Missing Items');
+            setItem(initialData.item_id || '');
+            setExpected(initialData.expected_qty?.toString() || '');
+            setActual(initialData.actual_qty?.toString() || '');
+            setDesc(initialData.description || '');
+        }
+    }, [initialData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!hasEvidence) {
+            window.alert('Mandatory: Please upload visual evidence of the discrepancy.');
+            return;
+        }
+
         const newIncident: Incident = {
             id: `INC-${Date.now()}`,
             timestamp: new Date(),
@@ -141,13 +184,19 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
             actual_qty: parseInt(actual, 10)
         };
         addLogisticsIncident(newIncident);
-        window.alert('High-Priority Incident Flashed to Management');
-        // Clear or redirect
+        window.alert('High-Priority Incident Flashed to Management & Compliance');
+
+        // Reset
+        setHasEvidence(false);
+        setItem('');
+        setExpected('');
+        setActual('');
+        setDesc('');
     };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-            <div className="lg:col-span-2 bg-[#2d3142] p-8 rounded-3xl border border-red-500/20 shadow-2xl space-y-8">
+            <div className="lg:col-span-2 bg-[#2d3142] p-8 rounded-[2rem] border border-red-500/20 shadow-2xl space-y-8">
                 <div className="flex items-center gap-3 border-b border-white/5 pb-6">
                     <ShieldAlert className="text-red-500" size={28} />
                     <h3 className="text-xl font-bold text-white uppercase tracking-tight">Log Discrepancy / Damage</h3>
@@ -156,9 +205,9 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] text-gray-500 font-black uppercase">Incident Category</label>
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Incident Category</label>
                             <select
-                                className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-red-500"
+                                className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none"
                                 value={type}
                                 onChange={e => setType(e.target.value)}
                             >
@@ -168,34 +217,34 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] text-gray-500 font-black uppercase">Item SKU / Name</label>
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Item SKU / Name</label>
                             <div className="flex gap-2">
                                 <input
-                                    className="flex-1 bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-red-500"
+                                    className="flex-1 bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none"
                                     value={item}
                                     onChange={e => setItem(e.target.value)}
                                     placeholder="Scan or Type..."
                                 />
-                                <button type="button" className="p-3 bg-[#1a1d29] border border-white/10 rounded-xl text-red-500"><QrCode size={20} /></button>
+                                <button type="button" className="p-3 bg-[#1a1d29] border border-white/10 rounded-xl text-red-500 hover:border-red-500/50"><QrCode size={20} /></button>
                             </div>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] text-gray-500 font-black uppercase">Expected Qty</label>
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Expected Qty</label>
                             <input
                                 type="number"
-                                className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white"
+                                className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none"
                                 value={expected}
                                 onChange={e => setExpected(e.target.value)}
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] text-gray-500 font-black uppercase">Actual Physical Qty</label>
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Actual Physical Qty</label>
                             <input
                                 type="number"
-                                className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white"
+                                className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none"
                                 value={actual}
                                 onChange={e => setActual(e.target.value)}
                             />
@@ -203,9 +252,9 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] text-gray-500 font-black uppercase">Variance Analysis / Description</label>
+                        <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Variance Analysis / Description</label>
                         <textarea
-                            className="w-full bg-[#1a1d29] border border-white/10 rounded-2xl px-4 py-3 text-white h-32 resize-none focus:border-red-500"
+                            className="w-full bg-[#1a1d29] border border-white/10 rounded-2xl px-4 py-3 text-white h-32 resize-none focus:border-red-500 outline-none"
                             value={desc}
                             onChange={e => setDesc(e.target.value)}
                             placeholder="Detail the issue for the audit trail..."
@@ -213,11 +262,16 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
                     </div>
 
                     <div className="flex gap-4">
-                        <button type="button" className="flex-1 bg-[#1a1d29] border border-white/10 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:border-red-500/50">
-                            <Camera size={22} className="text-red-500" /> Evidence Upload
+                        <button
+                            type="button"
+                            onClick={() => setHasEvidence(true)}
+                            className={`flex-1 border font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all ${hasEvidence ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-[#1a1d29] border-white/10 text-white hover:border-red-500/50'}`}
+                        >
+                            <Camera size={22} className={hasEvidence ? 'text-green-500' : 'text-red-500'} />
+                            {hasEvidence ? 'Evidence Captured' : 'Evidence Upload'}
                         </button>
-                        <button type="submit" className="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.4)]">
-                            Flash Audit Alert
+                        <button type="submit" className="flex-1 bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all">
+                            FLASH AUDIT ALERT
                         </button>
                     </div>
                 </form>

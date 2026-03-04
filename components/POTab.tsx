@@ -12,6 +12,8 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
     const [selectedPoId, setSelectedPoId] = useState<string | null>(null);
     const [receivedQtys, setReceivedQtys] = useState<Record<string, string>>({});
     const [showPhotoModal, setShowPhotoModal] = useState(false);
+    const [hasPhoto, setHasPhoto] = useState(false);
+    const [mismatchData, setMismatchData] = useState<any[] | null>(null);
 
     const selectedPO = active_pos.find(po => po.id === selectedPoId);
 
@@ -21,29 +23,48 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
 
     const handleReconcile = () => {
         if (!selectedPO) return;
+        if (!hasPhoto) {
+            window.alert('Mandatory: Please capture a photo of the signed DO receipt first.');
+            return;
+        }
 
+        const currentMismatches: any[] = [];
+        const updatedItems = selectedPO.items.map(i => {
+            const received = parseInt(receivedQtys[i.item] || '0', 10);
+            if (received !== i.expected) {
+                currentMismatches.push({
+                    item_id: i.item,
+                    expected_qty: i.expected,
+                    actual_qty: received,
+                    description: `Mismatch detected for ${i.item} in PO ${selectedPO.id}`
+                });
+            }
+            return { ...i, received: i.received + received };
+        });
+
+        if (currentMismatches.length > 0) {
+            setMismatchData(currentMismatches);
+        } else {
+            updatePO(selectedPO.id, updatedItems);
+            window.alert('PO Reconciled Successfully');
+            setSelectedPoId(null);
+            setHasPhoto(false);
+            setReceivedQtys({});
+        }
+    };
+
+    const confirmRecalcWithMismatches = () => {
+        if (!selectedPO || !mismatchData) return;
         const updatedItems = selectedPO.items.map(i => {
             const received = parseInt(receivedQtys[i.item] || '0', 10);
             return { ...i, received: i.received + received };
         });
-
         updatePO(selectedPO.id, updatedItems);
-
-        // Check for mismatch
-        updatedItems.forEach(i => {
-            if (i.received !== i.expected) {
-                onTriggerIncident({
-                    type: 'Quantity Mismatch',
-                    item_id: i.item,
-                    expected_qty: i.expected,
-                    actual_qty: i.received,
-                    description: `Mismatch detected for ${i.item} in PO ${selectedPO.id}`
-                });
-            }
-        });
-
-        window.alert('PO Reconciled Successfully');
         setSelectedPoId(null);
+        setMismatchData(null);
+        setHasPhoto(false);
+        setReceivedQtys({});
+        window.alert('PO Logged with Variances');
     };
 
     const filteredPos = active_pos.filter(po =>
@@ -70,10 +91,10 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                     {filteredPos.map(po => (
                         <button
                             key={po.id}
-                            onClick={() => setSelectedPoId(po.id)}
+                            onClick={() => { setSelectedPoId(po.id); setMismatchData(null); }}
                             className={`p-4 rounded-xl border transition-all text-left ${selectedPoId === po.id
-                                    ? 'bg-blue-500/20 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
-                                    : 'bg-[#1a1d29] border-white/5 hover:border-white/20'
+                                ? 'bg-blue-500/20 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                                : 'bg-[#1a1d29] border-white/5 hover:border-white/20'
                                 }`}
                         >
                             <div className="font-bold text-white">{po.id}</div>
@@ -86,9 +107,12 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
             {selectedPO && (
                 <div className="bg-[#2d3142] p-6 rounded-2xl border border-white/10 shadow-2xl space-y-6">
                     <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-bold text-white">Reconcile: {selectedPO.id}</h3>
+                        <div className="flex flex-col">
+                            <h3 className="text-xl font-bold text-white">Reconcile: {selectedPO.id}</h3>
+                            <p className="text-xs text-gray-500">Verify items against Delivery Order</p>
+                        </div>
                         <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                            Supplier Delivery Verification
+                            Step 1: Quantity Entry
                         </span>
                     </div>
 
@@ -117,9 +141,10 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                     <div className="flex flex-col md:flex-row gap-4 pt-4 border-t border-white/5">
                         <button
                             onClick={() => setShowPhotoModal(true)}
-                            className="flex-1 bg-[#1a1d29] border border-white/10 hover:border-blue-500/50 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all"
+                            className={`flex-1 border font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all ${hasPhoto ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-[#1a1d29] border-white/10 hover:border-blue-500/50 text-white'}`}
                         >
-                            <Camera size={20} className="text-blue-400" /> Capture DO Receipt
+                            <Camera size={20} className={hasPhoto ? 'text-green-500' : 'text-blue-400'} />
+                            {hasPhoto ? 'DO Captured' : 'Capture DO Receipt'}
                         </button>
                         <button
                             onClick={handleReconcile}
@@ -137,7 +162,47 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                         <Camera size={64} className="mx-auto text-blue-400 animate-pulse" />
                         <h2 className="text-xl font-bold text-white">Camera Interface</h2>
                         <p className="text-gray-400 text-sm">Align the signed Delivery Order receipt within the frame.</p>
-                        <button onClick={() => setShowPhotoModal(false)} className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">Capture & Save</button>
+                        <button onClick={() => { setShowPhotoModal(false); setHasPhoto(true); }} className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">Capture & Save</button>
+                    </div>
+                </div>
+            )}
+
+            {mismatchData && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/95 backdrop-blur-lg">
+                    <div className="bg-[#2d3142] p-8 rounded-[2rem] border border-red-500/50 shadow-[0_0_50px_rgba(239,68,68,0.2)] max-w-md w-full space-y-6 animate-zoomIn">
+                        <div className="flex items-center gap-4 text-red-500">
+                            <AlertTriangle size={32} />
+                            <h2 className="text-2xl font-black uppercase tracking-tight">Mismatch Detected</h2>
+                        </div>
+                        <p className="text-gray-400 text-sm">The physical quantity for {mismatchData.length} item(s) differs from the Purchase Order records.</p>
+
+                        <div className="bg-black/20 rounded-2xl p-4 space-y-3">
+                            {mismatchData.map((m, idx) => (
+                                <div key={idx} className="flex justify-between text-xs font-bold">
+                                    <span className="text-white">{m.item_id}</span>
+                                    <span className="text-red-400">{m.expected_qty} exp. vs {m.actual_qty} act.</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={() => {
+                                    onTriggerIncident(mismatchData[0]); // Report first mismatch as example
+                                    setMismatchData(null);
+                                }}
+                                className="w-full bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-xl flex items-center justify-center gap-2"
+                            >
+                                <AlertTriangle size={18} /> OPEN INCIDENT REPORT
+                            </button>
+                            <button
+                                onClick={confirmRecalcWithMismatches}
+                                className="w-full bg-white/5 border border-white/10 text-gray-400 py-3 rounded-xl hover:bg-white/10 transition-all font-bold"
+                            >
+                                Log Variances & Close PO
+                            </button>
+                            <button onClick={() => setMismatchData(null)} className="text-gray-500 text-xs underline">Back to Edit Qty</button>
+                        </div>
                     </div>
                 </div>
             )}

@@ -12,6 +12,8 @@ const RestockTab: React.FC = () => {
     const [unit, setUnit] = useState('pcs');
     const [showCamera, setShowCamera] = useState(false);
     const [showQrScan, setShowQrScan] = useState(false);
+    const [hasPhoto, setHasPhoto] = useState(false);
+    const [isScanningBarcode, setIsScanningBarcode] = useState(false);
 
     const activeTask = restock_tasks.find(t => t.id === activeTaskId);
 
@@ -19,6 +21,15 @@ const RestockTab: React.FC = () => {
         setActiveTaskId(taskId);
         updateRestockTask(taskId, { status: 'IN_PROGRESS' });
         setStep(2);
+    };
+
+    const handleBarcodeScan = () => {
+        setIsScanningBarcode(true);
+        setTimeout(() => {
+            setItemName(activeTask?.item || 'Unknown Item');
+            setAmount(activeTask?.quantity.toString() || '');
+            setIsScanningBarcode(false);
+        }, 1500);
     };
 
     const handleCompleteTask = () => {
@@ -31,6 +42,7 @@ const RestockTab: React.FC = () => {
         window.alert('Task Completed Successfully!');
         setActiveTaskId(null);
         setStep(1);
+        setHasPhoto(false);
     };
 
     return (
@@ -75,14 +87,25 @@ const RestockTab: React.FC = () => {
                                     <div className="space-y-2">
                                         <label className="text-xs text-gray-500 uppercase font-bold">Item Identifier</label>
                                         <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                placeholder="Name/Barcode"
-                                                className="flex-1 bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-yellow-500"
-                                                value={itemName}
-                                                onChange={(e) => setItemName(e.target.value)}
-                                            />
-                                            <button className="p-2 bg-[#1a1d29] border border-white/10 rounded-xl text-yellow-400" title="Scan Barcode">
+                                            <div className="relative flex-1">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Name/Barcode"
+                                                    className="w-full bg-[#1a1d29] border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-yellow-500"
+                                                    value={itemName}
+                                                    onChange={(e) => setItemName(e.target.value)}
+                                                />
+                                                {isScanningBarcode && (
+                                                    <div className="absolute inset-0 bg-yellow-500/20 rounded-xl animate-pulse flex items-center justify-center">
+                                                        <span className="text-[10px] font-black text-yellow-500">SCANNING...</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <button
+                                                onClick={handleBarcodeScan}
+                                                className="p-2 bg-[#1a1d29] border border-white/10 rounded-xl text-yellow-400 hover:border-yellow-500"
+                                                title="Scan Barcode"
+                                            >
                                                 <QrCode size={18} />
                                             </button>
                                         </div>
@@ -122,16 +145,18 @@ const RestockTab: React.FC = () => {
                                 <div className="flex flex-col gap-3">
                                     <button
                                         onClick={() => setShowCamera(true)}
-                                        className="w-full bg-[#1a1d29] border border-white/10 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:border-yellow-500/50"
+                                        className={`w-full border font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all ${hasPhoto ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-[#1a1d29] border-white/10 text-white hover:border-yellow-500/50'}`}
                                     >
-                                        <Camera size={20} className="text-yellow-400" /> Photo Proof (Destination)
+                                        <Camera size={20} className={hasPhoto ? 'text-green-500' : 'text-yellow-400'} />
+                                        {hasPhoto ? 'Photo Captured' : 'Photo Proof (Destination)'}
                                     </button>
                                     <button
                                         onClick={() => setStep(3)}
-                                        disabled={!itemName || !amount}
-                                        className="w-full bg-yellow-500 text-black font-bold py-4 rounded-xl disabled:opacity-50 disabled:grayscale"
+                                        disabled={!itemName || !amount || !hasPhoto}
+                                        className="w-full bg-yellow-500 text-black font-bold py-4 rounded-xl disabled:opacity-50 disabled:grayscale transition-all"
                                     >
                                         Continue to Final Verification
+                                        {!hasPhoto && <span className="block text-[10px] font-black uppercase opacity-60 mt-1">(Photo Proof Required)</span>}
                                     </button>
                                 </div>
                             </div>
@@ -167,7 +192,7 @@ const RestockTab: React.FC = () => {
                     <div className="bg-[#1a1d29] p-8 rounded-3xl border border-white/10 text-center max-w-sm w-full" onClick={e => e.stopPropagation()}>
                         <Camera size={64} className="mx-auto text-yellow-500 mb-4" />
                         <h2 className="text-xl font-bold text-white">Capture Delivery Proof</h2>
-                        <button onClick={() => setShowCamera(false)} className="mt-6 w-full bg-yellow-500 text-black py-3 rounded-xl font-bold">Capture Photo</button>
+                        <button onClick={() => { setShowCamera(false); setHasPhoto(true); }} className="mt-6 w-full bg-yellow-500 text-black py-3 rounded-xl font-bold">Capture Photo</button>
                     </div>
                 </div>
             )}
