@@ -18,7 +18,9 @@ import {
   Package,
   Lock,
   Users,
-  LayoutDashboard
+  LayoutDashboard,
+  PackageOpen,
+  ClipboardList
 } from 'lucide-react';
 import { View, AppMode, allowedViewsForMode } from '../types';
 
@@ -46,7 +48,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     View.GIFTSHOP_DASHBOARD,
     View.MAINTENANCE_LOG,
     View.EXTERNAL_MAINTENANCE_DASHBOARD,
-    View.SERVICE_DASHBOARD
+    View.SERVICE_DASHBOARD,
+    View.LOGISTICS_PO,
+    View.LOGISTICS_RESTOCK,
+    View.LOGISTICS_MANUAL,
+    View.LOGISTICS_INCIDENT,
+    View.LOGISTICS_AUDIT
   ];
 
   const allNavItems = [
@@ -68,6 +75,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     { id: View.CHECK_IN_LOG, label: 'Check-In Log', icon: History },
     { id: View.GIFTSHOP_DASHBOARD, label: 'Retail Control', icon: Package },
     { id: View.EXTERNAL_MAINTENANCE_DASHBOARD, label: 'Vendor Portal', icon: Wrench },
+    { id: View.LOGISTICS_PO, label: 'Inbound Logistics', icon: Truck },
+    { id: View.LOGISTICS_RESTOCK, label: 'Restock Tasks', icon: Package },
+    { id: View.LOGISTICS_MANUAL, label: 'Ad-hoc Logging', icon: PackageOpen },
+    { id: View.LOGISTICS_INCIDENT, label: 'Discrepancies', icon: ShieldAlert },
+    { id: View.LOGISTICS_AUDIT, label: 'Inventory Audit', icon: ClipboardList },
     { id: View.ANNOUNCEMENTS, label: 'Announcements', icon: Megaphone },
     { id: View.SETTINGS, label: 'Settings', icon: Settings },
   ];

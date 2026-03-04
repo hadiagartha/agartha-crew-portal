@@ -16,7 +16,9 @@ import {
     Sparkles,
     Package,
     Users,
-    LayoutDashboard
+    LayoutDashboard,
+    ClipboardList,
+    PackageOpen
 } from 'lucide-react';
 import { View, AppMode, allowedViewsForMode } from '../types';
 
@@ -32,7 +34,11 @@ const Home: React.FC<HomeProps> = ({ appMode, onViewChange }) => {
         { id: View.ZONE_CHECK_IN, label: 'Zone Check-In', icon: MapPin, color: 'text-blue-400', bg: 'bg-blue-400/10' },
         { id: View.SERVICE_DASHBOARD, label: 'Service Dashboard', icon: Users, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
         { id: View.FNB_DASHBOARD, label: 'F&B Dashboard', icon: Coffee, color: 'text-orange-400', bg: 'bg-orange-400/10' },
-        { id: View.RUNNER_DASHBOARD, label: 'Runner Dashboard', icon: Truck, color: 'text-purple-400', bg: 'bg-purple-400/10' },
+        { id: View.LOGISTICS_PO, label: 'Inbound Logistics', icon: Truck, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+        { id: View.LOGISTICS_RESTOCK, label: 'Restock Tasks', icon: Package, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
+        { id: View.LOGISTICS_MANUAL, label: 'Ad-hoc Logging', icon: PackageOpen, color: 'text-orange-400', bg: 'bg-orange-400/10' },
+        { id: View.LOGISTICS_INCIDENT, label: 'Discrepancies', icon: ShieldAlert, color: 'text-red-400', bg: 'bg-red-400/10' },
+        { id: View.LOGISTICS_AUDIT, label: 'Inventory Audit', icon: ClipboardList, color: 'text-purple-400', bg: 'bg-purple-400/10' },
         { id: View.SECURITY_DASHBOARD, label: 'Security Tactical', icon: ShieldAlert, color: 'text-red-400', bg: 'bg-red-400/10' },
         { id: View.HEALTH_DASHBOARD, label: 'Medical Triage', icon: HeartPulse, color: 'text-rose-400', bg: 'bg-rose-400/10' },
         { id: View.EXPERIENCE_DASHBOARD, label: 'Experience Control', icon: Sparkles, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },

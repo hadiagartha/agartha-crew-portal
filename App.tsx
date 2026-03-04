@@ -23,6 +23,10 @@ import ExternalMaintenanceDashboard from './components/ExternalMaintenanceDashbo
 import ServiceDashboard from './components/ServiceDashboard';
 import MaintenanceManagerDashboard from './components/MaintenanceManagerDashboard';
 import Home from './components/Home';
+import POTab from './components/POTab';
+import RestockTab from './components/RestockTab';
+import { ManualRestockTab, IncidentReportTab } from './components/LogisticsTabs';
+import AuditTab from './components/AuditTab';
 import { View, Incident, IncidentSeverity, CheckInRecord, StaffMember, Alert, AuthResponse, AppMode, deriveModeFromStaff, defaultViewForMode, isViewAllowed, RestockTask } from './types';
 
 // Mock data moved to App level for persistence
@@ -114,6 +118,7 @@ const App: React.FC = () => {
   const [incidents, setIncidents] = useState<Incident[]>(INITIAL_INCIDENTS);
   const [checkInLogs, setCheckInLogs] = useState<CheckInRecord[]>(INITIAL_LOGS);
   const [incidentDefaultTab, setIncidentDefaultTab] = useState<'REPORT' | 'LOG' | undefined>(undefined);
+  const [logisticsIncidentData, setLogisticsIncidentData] = useState<Partial<Incident> | null>(null);
 
   // Global Zone Statuses
   const [zoneStatuses, setZoneStatuses] = useState<Record<string, 'Ready' | 'Cleaning'>>({
@@ -129,6 +134,7 @@ const App: React.FC = () => {
       id: 'RSTK-001',
       item: 'Bottled Water',
       quantity: 200,
+      unit: 'pcs',
       standLocation: 'Crystal Caves Cafe',
       zoneId: 'Z-01',
       status: 'PENDING',
@@ -142,6 +148,7 @@ const App: React.FC = () => {
       id: 'RSTK-002',
       item: 'Energy Snacks',
       quantity: 50,
+      unit: 'pcs',
       standLocation: 'Biolume Forest Gift Shop',
       zoneId: 'Z-02',
       status: 'PENDING',
@@ -155,6 +162,7 @@ const App: React.FC = () => {
       id: 'RSTK-003',
       item: 'Napkins',
       quantity: 500,
+      unit: 'boxes',
       standLocation: 'Steam Vents Kiosk',
       zoneId: 'Z-03',
       status: 'PENDING',
@@ -424,12 +432,18 @@ const App: React.FC = () => {
     setIncidents(prev => prev.map(inc => inc.id === id ? { ...inc, arrivalTimestamp: timestamp } : inc));
   };
 
+  const handleTriggerLogisticsIncident = (data: Partial<Incident>) => {
+    setLogisticsIncidentData(data);
+    setCurrentView(View.LOGISTICS_INCIDENT);
+  };
+
   // Restock Task Handlers
   const handleRequestRestock = (item: string, isUrgent: boolean) => {
     const newTask: RestockTask = {
       id: `RSTK-${Date.now()}`,
       item,
       quantity: 50, // Default bulk restock amount
+      unit: 'pcs',
       standLocation: staff?.current_zone_id ? `Zone ${staff.current_zone_id.replace('Z-', '')} Kiosk` : 'Central Plaza Kiosk',
       status: 'PENDING',
       requestedAt: new Date(),
@@ -516,7 +530,12 @@ const App: React.FC = () => {
       View.MAINTENANCE_LOG,
       View.MAINTENANCE_MANAGER_DASHBOARD,
       View.EXTERNAL_MAINTENANCE_DASHBOARD,
-      View.SERVICE_DASHBOARD
+      View.SERVICE_DASHBOARD,
+      View.LOGISTICS_PO,
+      View.LOGISTICS_RESTOCK,
+      View.LOGISTICS_MANUAL,
+      View.LOGISTICS_INCIDENT,
+      View.LOGISTICS_AUDIT
     ];
 
     if (!isOnShift && shiftRequiredViews.includes(activeView)) {
@@ -555,8 +574,16 @@ const App: React.FC = () => {
         );
       case View.FNB_DASHBOARD:
         return <FNBDashboard onRequestRestock={handleRequestRestock} restockTasks={restockTasks} />;
-      case View.RUNNER_DASHBOARD:
-        return <RunnerDashboard tasks={restockTasks} onPickupTask={handlePickupTask} onCompleteTask={handleCompleteTask} />;
+      case View.LOGISTICS_PO:
+        return <POTab onTriggerIncident={handleTriggerLogisticsIncident} />;
+      case View.LOGISTICS_RESTOCK:
+        return <RestockTab />;
+      case View.LOGISTICS_MANUAL:
+        return <ManualRestockTab />;
+      case View.LOGISTICS_INCIDENT:
+        return <IncidentReportTab initialData={logisticsIncidentData || undefined} />;
+      case View.LOGISTICS_AUDIT:
+        return <AuditTab />;
       case View.SECURITY_DASHBOARD:
         return (
           <SecurityDashboard
@@ -709,6 +736,9 @@ const App: React.FC = () => {
               return;
             }
             setCurrentView(view);
+            if (view !== View.LOGISTICS_INCIDENT) {
+              setLogisticsIncidentData(null);
+            }
             setIncidentDefaultTab(undefined); // Reset default tab on manual navigation
 
             // Clear unread indicator when visiting announcements
