@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PackageOpen, MapPin, QrCode, Camera, AlertTriangle, History, ShieldAlert, Check, ArrowRight, Play, CheckCircle2, QrCode as QrCodeIcon } from 'lucide-react';
-import { useGlobalState } from './GlobalStateContext';
-import { Incident, IncidentSeverity, ManualRestockLog } from '../types';
+import { useGlobalState } from '../GlobalStateContext';
+import { Incident, IncidentSeverity, ManualRestockLog } from '../../types';
 
 export const ManualRestockTab: React.FC = () => {
     const { central_storage, updateCentralStorage, manual_restock_logs, addManualRestockLog } = useGlobalState();

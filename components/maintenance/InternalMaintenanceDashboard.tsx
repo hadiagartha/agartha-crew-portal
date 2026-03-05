@@ -5,8 +5,8 @@ import {
     Terminal, ShieldCheck, Camera, CheckSquare, ClipboardList,
     Settings2
 } from 'lucide-react';
-import { Incident, Alert, StaffMember } from '../types';
-import { useGlobalState } from './GlobalStateContext';
+import { Incident, Alert, StaffMember } from '../../types';
+import { useGlobalState } from '../GlobalStateContext';
 
 interface InternalMaintenanceProps {
     redAlerts: Alert[];

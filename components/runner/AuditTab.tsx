@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ClipboardCheck, EyeOff, CheckCircle2, AlertCircle, RefreshCw, ShieldAlert, Lock, UserCheck, ArrowRight } from 'lucide-react';
-import { useGlobalState } from './GlobalStateContext';
+import { useGlobalState } from '../GlobalStateContext';
 
 const AuditTab: React.FC = () => {
     const { audit_requests, updateAuditRequest } = useGlobalState();

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Package, Check, AlertTriangle, Camera, ArrowRight, Truck } from 'lucide-react';
-import { useGlobalState } from './GlobalStateContext';
+import { useGlobalState } from '../GlobalStateContext';
 
 interface POTabProps {
     onTriggerIncident: (data: any) => void;
@@ -118,7 +118,7 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                                 <tr className="bg-white/5 border-b border-white/10">
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">PO Number & Status</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Supplier Name</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Items & Barcodes</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Total Items</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -136,11 +136,9 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                                         </td>
                                         <td className="px-6 py-6">
                                             <div className="flex flex-wrap gap-2">
-                                                {po.items.map((item, idx) => (
-                                                    <span key={idx} className="px-2 py-0.5 rounded-md text-[9px] font-black border bg-blue-500/10 text-blue-400 border-blue-500/20">
-                                                        {item.barcode || 'N/A'}: {item.item}
-                                                    </span>
-                                                ))}
+                                                <span className="px-3 py-1 rounded-md text-[10px] font-black border bg-blue-500/10 text-blue-400 border-blue-500/20">
+                                                    {po.items.length} {po.items.length === 1 ? 'Item' : 'Items'}
+                                                </span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-6 text-right">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldAlert, Crosshair, QrCode as QrCodeIcon, Camera, Siren, CheckCircle2, AlertTriangle, Eye, Image as ImageIcon, Map, Search, Lock, Unlock } from 'lucide-react';
-import { Incident } from '../types';
-import { useGlobalState } from './GlobalStateContext';
+import { Incident } from '../../types';
+import { useGlobalState } from '../GlobalStateContext';
 
 interface SecurityDashboardProps {
     incidents: Incident[];

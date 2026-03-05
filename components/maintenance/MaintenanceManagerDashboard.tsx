@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGlobalState } from './GlobalStateContext';
+import { useGlobalState } from '../GlobalStateContext';
 import {
     Activity,
     Ticket,

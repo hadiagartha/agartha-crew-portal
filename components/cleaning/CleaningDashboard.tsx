@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, CheckCircle2, QrCode as QrCodeIcon, AlertTriangle, PackagePlus, Trash2, Droplet, ArrowRightLeft, Clock } from 'lucide-react';
-import { StaffMember, Incident, IncidentSeverity } from '../types';
-import { useGlobalState } from './GlobalStateContext';
+import { StaffMember, Incident, IncidentSeverity } from '../../types';
+import { useGlobalState } from '../GlobalStateContext';
 
 interface CleaningDashboardProps {
     staff: StaffMember;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { HeartPulse, Activity, Syringe, Bandage, PhoneCall, QrCode as QrCodeIcon, Camera, AlertCircle } from 'lucide-react';
-import { Incident } from '../types';
-import { useGlobalState } from './GlobalStateContext';
+import { Incident } from '../../types';
+import { useGlobalState } from '../GlobalStateContext';
 
 interface HealthDashboardProps {
     incidents: Incident[];

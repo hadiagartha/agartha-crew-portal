@@ -4,7 +4,7 @@ import {
     MapPin, Camera, CheckSquare, Settings2, Download, QrCode, X,
     Wrench
 } from 'lucide-react';
-import { StaffMember } from '../types';
+import { StaffMember } from '../../types';
 
 interface ExternalMaintenanceProps {
     staff: StaffMember;

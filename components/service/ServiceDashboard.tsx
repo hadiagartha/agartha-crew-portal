@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useGlobalState } from './GlobalStateContext';
+import { useGlobalState } from '../GlobalStateContext';
 import { Users, Ticket, AlertTriangle, CheckCircle, BarChart3, Fingerprint } from 'lucide-react';
 
 const ServiceDashboard: React.FC = () => {

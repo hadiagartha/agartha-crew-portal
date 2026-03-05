@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Truck, MapPin, Package, Camera, QrCode, CheckCircle2, QrCode as QrCodeIcon, AlertCircle, ArrowRight, Play } from 'lucide-react';
-import { useGlobalState } from './GlobalStateContext';
-import { RestockTask } from '../types';
+import { useGlobalState } from '../GlobalStateContext';
+import { RestockTask } from '../../types';
 
 const RestockTab: React.FC = () => {
     const { restock_tasks, updateRestockTask, updateCentralStorage } = useGlobalState();
@@ -56,10 +56,13 @@ const RestockTab: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {restock_tasks.filter(t => t.status === 'PENDING').map(task => (
+                                {restock_tasks.filter(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS').map(task => (
                                     <tr key={task.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
                                         <td className="px-6 py-6 font-bold">
                                             <div className="text-white group-hover:text-yellow-400 transition-colors">{task.id}</div>
+                                            <div className={`text-[10px] font-black uppercase tracking-widest mt-1 ${task.status === 'IN_PROGRESS' ? 'text-blue-400' : 'text-yellow-500'}`}>
+                                                {task.status === 'IN_PROGRESS' ? 'ACCEPTED - PENDING' : 'PENDING'}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-6">
                                             <div className="text-sm font-bold text-gray-200">{task.item}</div>
@@ -76,9 +79,9 @@ const RestockTab: React.FC = () => {
                                         <td className="px-6 py-6 text-right">
                                             <button
                                                 onClick={() => handleAcceptTask(task.id)}
-                                                className="bg-yellow-500 hover:bg-yellow-400 text-black text-xs font-black px-4 py-2 rounded-lg transition-all flex items-center gap-2 ml-auto shadow-lg shadow-yellow-500/10"
+                                                className={`${task.status === 'IN_PROGRESS' ? 'bg-blue-500 hover:bg-blue-400' : 'bg-yellow-500 hover:bg-yellow-400'} text-black text-xs font-black px-4 py-2 rounded-lg transition-all flex items-center gap-2 ml-auto shadow-lg shadow-yellow-500/10`}
                                             >
-                                                ACCEPT <Play size={14} fill="currentColor" />
+                                                {task.status === 'IN_PROGRESS' ? 'RESUME' : 'ACCEPT'} <Play size={14} fill="currentColor" />
                                             </button>
                                         </td>
                                     </tr>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Sparkles, Users, Wrench, Siren, HeartPulse, CheckCircle2, QrCode as QrCodeIcon, MessageSquare, AlertTriangle } from 'lucide-react';
-import { Incident, StaffMember, IncidentSeverity } from '../types';
+import { Incident, StaffMember, IncidentSeverity } from '../../types';
 
 interface ExperienceDashboardProps {
     handleAddIncident: (incident: Incident) => void;

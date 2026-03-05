@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Thermometer, Package, Map, QrCode as QrCodeIcon, AlertTriangle, CheckCircle, Coffee, Navigation, ClipboardCheck, Trash2, Ticket } from 'lucide-react';
-import { RestockTask } from '../types';
-import { useGlobalState } from './GlobalStateContext';
+import { RestockTask } from '../../types';
+import { useGlobalState } from '../GlobalStateContext';
 
 interface FNBDashboardProps {
     onRequestRestock: (item: string, isUrgent: boolean) => void;

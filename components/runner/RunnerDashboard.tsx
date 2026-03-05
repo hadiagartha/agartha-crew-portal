@@ -4,7 +4,7 @@ import POTab from './POTab';
 import RestockTab from './RestockTab';
 import { ManualRestockTab, IncidentReportTab } from './LogisticsTabs';
 import AuditTab from './AuditTab';
-import { Incident } from '../types';
+import { Incident } from '../../types';
 
 const RunnerDashboard: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'PO' | 'RESTOCK' | 'MANUAL' | 'INCIDENT' | 'AUDIT'>('PO');

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Send, List, Plus, Search, Filter, MoreHorizontal, Clock, User, X, FileText, Activity } from 'lucide-react';
-import { IncidentSeverity, Incident } from '../types';
+import { IncidentSeverity, Incident } from '../../types';
 
 interface IncidentsProps {
   incidents: Incident[];
