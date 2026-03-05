@@ -27,6 +27,11 @@ export enum View {
   LOGISTICS_MANUAL = 'LOGISTICS_MANUAL',
   LOGISTICS_INCIDENT = 'LOGISTICS_INCIDENT',
   LOGISTICS_AUDIT = 'LOGISTICS_AUDIT',
+  RETAIL_RECEIVING = 'RETAIL_RECEIVING',
+  RETAIL_STATUS = 'RETAIL_STATUS',
+  RETAIL_RESTOCK = 'RETAIL_RESTOCK',
+  RETAIL_DAMAGE_LOG = 'RETAIL_DAMAGE_LOG',
+  RETAIL_AUDIT = 'RETAIL_AUDIT',
   HOME = 'HOME'
 }
 
@@ -179,6 +184,7 @@ export function defaultViewForMode(mode: AppMode): View {
     case 'RUNNER':
     case 'EXPERIENCE_CREW':
     case 'GIFTSHOP_CREW':
+      return View.RETAIL_STATUS;
     case 'EXTERNAL_MAINTENANCE':
       return View.HOME;
     default:
@@ -231,7 +237,17 @@ export function allowedViewsForMode(mode: AppMode): View[] {
     case 'EXPERIENCE_CREW':
       return [View.HOME, View.ZONE_CHECK_IN, View.EXPERIENCE_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'GIFTSHOP_CREW':
-      return [View.HOME, View.ZONE_CHECK_IN, View.GIFTSHOP_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [
+        View.HOME,
+        View.ZONE_CHECK_IN,
+        View.RETAIL_RECEIVING,
+        View.RETAIL_STATUS,
+        View.RETAIL_RESTOCK,
+        View.RETAIL_DAMAGE_LOG,
+        View.RETAIL_AUDIT,
+        View.SETTINGS,
+        View.ANNOUNCEMENTS
+      ];
     case 'EXTERNAL_MAINTENANCE':
       // Very restricted view
       return [View.HOME, View.ZONE_CHECK_IN, View.EXTERNAL_MAINTENANCE_DASHBOARD];

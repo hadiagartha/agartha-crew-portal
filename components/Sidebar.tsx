@@ -58,7 +58,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     View.FNB_STOCK_STATUS,
     View.FNB_RESTOCK_REQUESTS,
     View.FNB_WASTE_LOG,
-    View.FNB_PREP_BATCHES
+    View.FNB_PREP_BATCHES,
+    View.RETAIL_RECEIVING,
+    View.RETAIL_STATUS,
+    View.RETAIL_RESTOCK,
+    View.RETAIL_DAMAGE_LOG,
+    View.RETAIL_AUDIT
   ];
 
   const allNavItems = [
@@ -89,7 +94,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     { id: View.MAINTENANCE_LOG, label: 'Maintenance Tactical', icon: Wrench },
     { id: View.MAINTENANCE_MANAGER_DASHBOARD, label: 'Maintenance Command', icon: ShieldAlert },
     { id: View.CHECK_IN_LOG, label: 'Check-In Log', icon: History },
-    { id: View.GIFTSHOP_DASHBOARD, label: 'Retail Control', icon: Package },
+    { id: View.RETAIL_RECEIVING, label: 'Inbound Shipments', icon: Truck },
+    { id: View.RETAIL_STATUS, label: 'Retail Status', icon: Package },
+    { id: View.RETAIL_RESTOCK, label: 'Restock Requests', icon: PackageOpen },
+    { id: View.RETAIL_DAMAGE_LOG, label: 'Damage & Return Log', icon: AlertTriangle },
+    { id: View.RETAIL_AUDIT, label: 'Cycle Counts (Audit)', icon: ClipboardList },
+
     { id: View.EXTERNAL_MAINTENANCE_DASHBOARD, label: 'Vendor Portal', icon: Wrench },
     { id: View.ANNOUNCEMENTS, label: 'Announcements', icon: Megaphone },
     { id: View.SETTINGS, label: 'Settings', icon: Settings },

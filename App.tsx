@@ -22,7 +22,11 @@ import SecurityDashboard from './components/security/SecurityDashboard';
 import HealthDashboard from './components/health/HealthDashboard';
 import ExperienceDashboard from './components/service/ExperienceDashboard';
 import CleaningDashboard from './components/cleaning/CleaningDashboard';
-import GiftShopDashboard from './components/service/GiftShopDashboard';
+import ReceivingTab from './components/giftshop/ReceivingTab';
+import RetailStatusTab from './components/giftshop/RetailStatusTab';
+import RetailRestockTab from './components/giftshop/RetailRestockTab';
+import DamageReturnTab from './components/giftshop/DamageReturnTab';
+import RetailAuditTab from './components/giftshop/RetailAuditTab';
 import ExternalMaintenanceDashboard from './components/maintenance/ExternalMaintenanceDashboard';
 import ServiceDashboard from './components/service/ServiceDashboard';
 import MaintenanceManagerDashboard from './components/maintenance/MaintenanceManagerDashboard';
@@ -543,7 +547,12 @@ const App: React.FC = () => {
       View.FNB_STOCK_STATUS,
       View.FNB_RESTOCK_REQUESTS,
       View.FNB_WASTE_LOG,
-      View.FNB_PREP_BATCHES
+      View.FNB_PREP_BATCHES,
+      View.RETAIL_RECEIVING,
+      View.RETAIL_STATUS,
+      View.RETAIL_RESTOCK,
+      View.RETAIL_DAMAGE_LOG,
+      View.RETAIL_AUDIT
     ];
 
     if (!isOnShift && shiftRequiredViews.includes(activeView)) {
@@ -637,8 +646,16 @@ const App: React.FC = () => {
             handleAddIncident={handleAddIncident}
           />
         );
-      case View.GIFTSHOP_DASHBOARD:
-        return <GiftShopDashboard onRequestRestock={handleRequestRestock} />;
+      case View.RETAIL_RECEIVING:
+        return <ReceivingTab />;
+      case View.RETAIL_STATUS:
+        return <RetailStatusTab />;
+      case View.RETAIL_RESTOCK:
+        return <RetailRestockTab />;
+      case View.RETAIL_DAMAGE_LOG:
+        return <DamageReturnTab />;
+      case View.RETAIL_AUDIT:
+        return <RetailAuditTab />;
       case View.SERVICE_DASHBOARD:
         return <ServiceDashboard />;
       case View.MAINTENANCE_LOG:
