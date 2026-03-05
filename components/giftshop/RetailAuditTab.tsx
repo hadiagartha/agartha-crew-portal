@@ -38,43 +38,60 @@ const RetailAuditTab: React.FC = () => {
         setInputCount('');
     };
 
+    // This function now handles the blind audit submission
     const handleSubmitCount = () => {
         if (!inputCount || !activeItem) return;
 
         const count = parseInt(inputCount, 10);
 
-        const updatedQueue = [...queue];
-        const itemIndex = queue.findIndex(i => i.id === activeItem.id);
+        setQueue(prevQueue => {
+            const updatedQueue = [...prevQueue];
+            const itemIndex = updatedQueue.findIndex(i => i.id === activeItem.id);
 
-        if (itemIndex !== -1) {
-            const hasDiscrepancy = count !== activeItem.expectedQty;
-            updatedQueue[itemIndex] = {
-                ...activeItem,
-                actualQty: count,
-                status: hasDiscrepancy ? 'DISCREPANCY' : 'COUNTED'
-            };
-            setQueue(updatedQueue);
-            setAuditState('REVIEW');
-        }
+            if (itemIndex !== -1) {
+                const hasDiscrepancy = count !== activeItem.expectedQty;
+                updatedQueue[itemIndex] = {
+                    ...activeItem,
+                    actualQty: count,
+                    status: hasDiscrepancy ? 'DISCREPANCY' : 'COUNTED'
+                };
+
+                // Immediately switch to the next pending item
+                const nextPendingIndex = updatedQueue.findIndex(item => item.status === 'PENDING');
+
+                // Use a short timeout so state can batch and update correctly
+                setTimeout(() => {
+                    // setAuditState('INPUT'); // No longer needed
+                    setInputCount('');
+                    if (nextPendingIndex !== -1) {
+                        setActiveAuditIndex(nextPendingIndex);
+                    } else {
+                        setActiveAuditIndex(null); // All done
+                    }
+                }, 0);
+            }
+            return updatedQueue;
+        });
     };
 
-    const handleNext = () => {
-        setAuditState('INPUT');
-        setInputCount('');
+    // handleNext and handleRecount are no longer needed as the audit is blind and proceeds automatically
+    // const handleNext = () => {
+    //     setAuditState('INPUT');
+    //     setInputCount('');
 
-        // Find next pending
-        const nextPendingIndex = queue.findIndex(item => item.status === 'PENDING');
-        if (nextPendingIndex !== -1) {
-            setActiveAuditIndex(nextPendingIndex);
-        } else {
-            setActiveAuditIndex(null); // All done
-        }
-    };
+    //     // Find next pending
+    //     const nextPendingIndex = queue.findIndex(item => item.status === 'PENDING');
+    //     if (nextPendingIndex !== -1) {
+    //         setActiveAuditIndex(nextPendingIndex);
+    //     } else {
+    //         setActiveAuditIndex(null); // All done
+    //     }
+    // };
 
-    const handleRecount = () => {
-        setAuditState('INPUT');
-        setInputCount('');
-    };
+    // const handleRecount = () => {
+    //     setAuditState('INPUT');
+    //     setInputCount('');
+    // };
 
     if (activeItem) {
         return (
@@ -102,106 +119,58 @@ const RetailAuditTab: React.FC = () => {
                         </div>
                     </div>
 
-                    {auditState === 'INPUT' ? (
-                        <>
-                            {/* Display */}
-                            <div className="bg-[#1a1d29] border-2 border-[#2d3142] rounded-3xl p-6 flex flex-col items-center justify-center mb-6 shrink-0">
-                                <span className="text-xs text-gray-500 font-black uppercase tracking-[0.2em] mb-2">Count Input</span>
-                                <div className={`text-6xl font-black font-mono tracking-wider h-16 ${inputCount ? 'text-white' : 'text-gray-700'}`}>
-                                    {inputCount || '0'}
-                                </div>
+                    {/* Always show INPUT state for blind audit */}
+                    <>
+                        {/* Display */}
+                        <div className="bg-[#1a1d29] border-2 border-[#2d3142] rounded-3xl p-6 flex flex-col items-center justify-center mb-6 shrink-0">
+                            <span className="text-xs text-gray-500 font-black uppercase tracking-[0.2em] mb-2">Count Input</span>
+                            <div className={`text-6xl font-black font-mono tracking-wider h-16 ${inputCount ? 'text-white' : 'text-gray-700'}`}>
+                                {inputCount || '0'}
                             </div>
+                        </div>
 
-                            {/* Keypad */}
-                            <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6 flex-1 max-h-[400px]">
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                                    <button
-                                        key={num}
-                                        onClick={() => handleKeypadPress(num.toString())}
-                                        className="bg-[#2d3142] hover:bg-gray-700 active:bg-gray-600 rounded-2xl text-2xl font-bold font-mono text-white flex items-center justify-center transition-colors border border-gray-700/50 shadow-lg active:scale-95"
-                                    >
-                                        {num}
-                                    </button>
-                                ))}
+                        {/* Keypad */}
+                        <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6 flex-1 max-h-[400px]">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
                                 <button
-                                    onClick={handleClear}
-                                    className="bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 text-red-400 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center transition-colors border border-red-500/20 active:scale-95"
-                                >
-                                    Clr
-                                </button>
-                                <button
-                                    onClick={() => handleKeypadPress('0')}
+                                    key={num}
+                                    onClick={() => handleKeypadPress(num.toString())}
                                     className="bg-[#2d3142] hover:bg-gray-700 active:bg-gray-600 rounded-2xl text-2xl font-bold font-mono text-white flex items-center justify-center transition-colors border border-gray-700/50 shadow-lg active:scale-95"
                                 >
-                                    0
+                                    {num}
                                 </button>
-                                <button
-                                    onClick={handleDelete}
-                                    className="bg-gray-600/20 hover:bg-gray-600/30 active:bg-gray-600/40 text-gray-300 rounded-2xl flex items-center justify-center transition-colors border border-gray-600/30 active:scale-95"
-                                >
-                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" /><line x1="18" y1="9" x2="12" y2="15" /><line x1="12" y1="9" x2="18" y2="15" /></svg>
-                                </button>
-                            </div>
-
+                            ))}
                             <button
-                                onClick={handleSubmitCount}
-                                disabled={!inputCount}
-                                className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shrink-0 mb-6 ${inputCount
-                                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/40 hover:-translate-y-1 active:scale-95'
-                                        : 'bg-gray-800 text-gray-600 cursor-not-allowed'
-                                    }`}
+                                onClick={handleClear}
+                                className="bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 text-red-400 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center transition-colors border border-red-500/20 active:scale-95"
                             >
-                                <CheckCircle2 size={24} /> Submit Count
+                                Clr
                             </button>
-                        </>
-                    ) : (
-                        <div className="flex-1 flex flex-col justify-center items-center space-y-6">
-                            {/* Review Screen */}
-                            {activeItem.status === 'DISCREPANCY' ? (
-                                <div className="text-center w-full">
-                                    <div className="w-24 h-24 rounded-full bg-red-500/20 border-4 border-red-500/30 flex items-center justify-center mx-auto mb-6">
-                                        <XCircle size={48} className="text-red-400" />
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">Count Mismatch</h3>
-                                    <p className="text-gray-400 mb-8 max-w-sm mx-auto">
-                                        Your count does not match the expected system quantity. Please verify the shelf and try again.
-                                    </p>
-
-                                    <div className="flex flex-col gap-4 w-full">
-                                        <button
-                                            onClick={handleRecount}
-                                            className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.1em] shadow-lg shadow-blue-900/20 transition-all hover:-translate-y-1 active:scale-95"
-                                        >
-                                            RE-COUNT ITEM
-                                        </button>
-                                        <button
-                                            onClick={handleNext}
-                                            className="w-full py-5 rounded-2xl bg-[#2d3142] hover:bg-gray-700 text-gray-300 font-bold uppercase tracking-wider border border-gray-600 transition-colors"
-                                        >
-                                            Skip for now
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="text-center w-full">
-                                    <div className="w-24 h-24 rounded-full bg-green-500/20 border-4 border-green-500/30 flex items-center justify-center mx-auto mb-6">
-                                        <CheckCircle2 size={48} className="text-green-400" />
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">Count Verified</h3>
-                                    <p className="text-gray-400 mb-8 max-w-sm mx-auto">
-                                        Inventory levels are accurate. Thank you.
-                                    </p>
-
-                                    <button
-                                        onClick={handleNext}
-                                        className="w-full py-5 rounded-2xl bg-green-600 hover:bg-green-500 text-white font-black uppercase tracking-[0.1em] shadow-lg shadow-green-900/20 transition-all flex justify-center items-center gap-2 hover:-translate-y-1 active:scale-95"
-                                    >
-                                        Next Item <ChevronRight size={24} />
-                                    </button>
-                                </div>
-                            )}
+                            <button
+                                onClick={() => handleKeypadPress('0')}
+                                className="bg-[#2d3142] hover:bg-gray-700 active:bg-gray-600 rounded-2xl text-2xl font-bold font-mono text-white flex items-center justify-center transition-colors border border-gray-700/50 shadow-lg active:scale-95"
+                            >
+                                0
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                className="bg-gray-600/20 hover:bg-gray-600/30 active:bg-gray-600/40 text-gray-300 rounded-2xl flex items-center justify-center transition-colors border border-gray-600/30 active:scale-95"
+                            >
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" /><line x1="18" y1="9" x2="12" y2="15" /><line x1="12" y2="9" x2="18" y2="15" /></svg>
+                            </button>
                         </div>
-                    )}
+
+                        <button
+                            onClick={handleSubmitCount}
+                            disabled={!inputCount}
+                            className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shrink-0 mb-6 ${inputCount
+                                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/40 hover:-translate-y-1 active:scale-95'
+                                : 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                                }`}
+                        >
+                            <CheckCircle2 size={24} /> Submit Count
+                        </button>
+                    </>
                 </div>
             </div>
         );
@@ -231,13 +200,13 @@ const RetailAuditTab: React.FC = () => {
                             key={item.id}
                             onClick={() => item.status === 'PENDING' ? setActiveAuditIndex(idx) : null}
                             className={`bg-[#2d3142] rounded-2xl p-5 border transition-all relative overflow-hidden group ${item.status === 'PENDING'
-                                    ? 'border-gray-600 hover:border-blue-500/50 cursor-pointer shadow-xl hover:shadow-blue-900/20 hover:-translate-y-1'
-                                    : 'border-gray-700 opacity-60'
+                                ? 'border-gray-600 hover:border-blue-500/50 cursor-pointer shadow-xl hover:shadow-blue-900/20 hover:-translate-y-1'
+                                : 'border-gray-700 opacity-60'
                                 }`}
                         >
                             <div className={`absolute left-0 top-0 bottom-0 w-1 ${item.status === 'COUNTED' ? 'bg-green-500' :
-                                    item.status === 'DISCREPANCY' ? 'bg-red-500' :
-                                        'bg-transparent'
+                                item.status === 'DISCREPANCY' ? 'bg-red-500' :
+                                    'bg-transparent'
                                 }`} />
 
                             <div className="flex justify-between items-start mb-4">
