@@ -5,6 +5,7 @@ import { Incident, IncidentSeverity, ManualRestockLog } from '../types';
 
 export const ManualRestockTab: React.FC = () => {
     const { central_storage, updateCentralStorage, manual_restock_logs, addManualRestockLog } = useGlobalState();
+    const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
     const [item, setItem] = useState('');
     const [barcode, setBarcode] = useState('');
@@ -14,6 +15,17 @@ export const ManualRestockTab: React.FC = () => {
     const [showCamera, setShowCamera] = useState(false);
     const [showQrScan, setShowQrScan] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
+
+    const handleBarcodeChange = (val: string) => {
+        setBarcode(val);
+        if (val.length >= 3) {
+            setItem('Detected Item ' + val.substring(0, 3).toUpperCase());
+            setUnit('pcs');
+        } else {
+            setItem('');
+            setUnit('');
+        }
+    };
 
     const availableStock = central_storage[item] || 0;
     const requestedAmount = parseInt(qty, 10) || 0;
@@ -30,8 +42,9 @@ export const ManualRestockTab: React.FC = () => {
         const amountToDeduct = requestedAmount;
         updateCentralStorage(item, -amountToDeduct);
 
-        const newLog: ManualRestockLog = {
+        const newLog: any = {
             id: `MAN-${Date.now()}`,
+            origin,
             destination,
             item,
             barcode,
@@ -44,6 +57,7 @@ export const ManualRestockTab: React.FC = () => {
         addManualRestockLog(newLog);
 
         window.alert(`Manual Restock Finalized & Logged to Audit Trail.`);
+        setOrigin('');
         setDestination('');
         setItem('');
         setBarcode('');
@@ -76,17 +90,28 @@ export const ManualRestockTab: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Destination */}
+                        {/* Route */}
                         <div className="space-y-3">
-                            <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest ml-1">Destination Node</label>
-                            <div className="relative group">
-                                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400/50 group-focus-within:text-orange-400 transition-colors" size={20} />
-                                <input
-                                    placeholder="e.g. Zone D Medical Room"
-                                    className="w-full bg-black/30 border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-white focus:outline-none focus:border-orange-500/50 transition-all font-bold"
-                                    value={destination}
-                                    onChange={e => setDestination(e.target.value)}
-                                />
+                            <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest ml-1">Route</label>
+                            <div className="flex gap-3">
+                                <div className="relative group flex-1">
+                                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400/50 group-focus-within:text-orange-400 transition-colors" size={20} />
+                                    <input
+                                        placeholder="From"
+                                        className="w-full bg-black/30 border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-white focus:outline-none focus:border-orange-500/50 transition-all font-bold"
+                                        value={origin}
+                                        onChange={e => setOrigin(e.target.value)}
+                                    />
+                                </div>
+                                <div className="relative group flex-1">
+                                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400/50 group-focus-within:text-orange-400 transition-colors" size={20} />
+                                    <input
+                                        placeholder="To"
+                                        className="w-full bg-black/30 border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-white focus:outline-none focus:border-orange-500/50 transition-all font-bold"
+                                        value={destination}
+                                        onChange={e => setDestination(e.target.value)}
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -94,29 +119,26 @@ export const ManualRestockTab: React.FC = () => {
                         <div className="space-y-3">
                             <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest ml-1">Item Identification</label>
                             <div className="grid grid-cols-2 gap-3">
-                                <input
-                                    placeholder="Item Name"
-                                    className="bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-orange-500/50 transition-all font-bold"
-                                    value={item}
-                                    onChange={e => setItem(e.target.value)}
-                                />
                                 <div className="relative">
                                     <input
-                                        placeholder="Barcode"
+                                        placeholder="Scan Barcode"
                                         className="w-full bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-orange-500/50 transition-all font-mono text-sm"
                                         value={barcode}
-                                        onChange={e => setBarcode(e.target.value)}
+                                        onChange={e => handleBarcodeChange(e.target.value)}
                                     />
                                     <button className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-400 hover:text-white transition-colors">
                                         <QrCode size={18} />
                                     </button>
+                                </div>
+                                <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 flex items-center text-gray-400 font-bold overflow-hidden whitespace-nowrap text-xs">
+                                    {item || 'Scan to detect name'}
                                 </div>
                             </div>
                         </div>
 
                         {/* Qty & Unit */}
                         <div className="space-y-3">
-                            <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest ml-1">Quantity & Unit of Measure</label>
+                            <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest ml-1">Quantity</label>
                             <div className="flex gap-3">
                                 <div className="relative flex-1">
                                     <input
@@ -127,16 +149,9 @@ export const ManualRestockTab: React.FC = () => {
                                         onChange={e => setQty(e.target.value)}
                                     />
                                 </div>
-                                <select
-                                    className="bg-black/30 border border-white/5 rounded-2xl px-6 py-4 text-white font-black uppercase tracking-widest text-xs outline-none focus:border-orange-500/50 transition-all"
-                                    value={unit}
-                                    onChange={e => setUnit(e.target.value)}
-                                >
-                                    <option>pcs</option>
-                                    <option>kgs</option>
-                                    <option>liters</option>
-                                    <option>boxes</option>
-                                </select>
+                                <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center justify-center text-gray-500 font-black uppercase tracking-widest text-xs min-w-[80px]">
+                                    {item ? unit : '---'}
+                                </div>
                             </div>
                         </div>
 
@@ -154,7 +169,7 @@ export const ManualRestockTab: React.FC = () => {
 
                     <div className="pt-4">
                         <button
-                            disabled={!destination || !item || !qty || !hasPhoto}
+                            disabled={!origin || !destination || !item || !qty || !hasPhoto}
                             onClick={handleSubmit}
                             className="w-full bg-gradient-to-r from-orange-600 to-amber-500 text-white font-black uppercase tracking-widest py-5 rounded-[1.5rem] shadow-xl shadow-orange-900/20 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-30 disabled:grayscale transition-all flex items-center justify-center gap-3"
                         >
@@ -170,7 +185,7 @@ export const ManualRestockTab: React.FC = () => {
                             <tr className="bg-white/5 border-b border-white/10">
                                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Timestamp & ID</th>
                                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Item & Barcode</th>
-                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Destination</th>
+                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Route</th>
                                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-center">Qty</th>
                                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Verification</th>
                             </tr>
@@ -187,9 +202,11 @@ export const ManualRestockTab: React.FC = () => {
                                         <div className="text-[10px] text-orange-400 font-mono mt-0.5">{log.barcode}</div>
                                     </td>
                                     <td className="px-6 py-6">
-                                        <div className="flex items-center gap-2 text-xs font-medium text-gray-300">
+                                        <div className="flex items-center gap-2 text-xs font-medium text-gray-400">
                                             <MapPin size={12} className="text-red-400" />
-                                            {log.destination}
+                                            <span className="text-gray-500">{log.origin || 'Warehouse'}</span>
+                                            <ArrowRight size={10} className="mx-1 text-gray-600" />
+                                            <span className="text-white">{log.destination}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-6 text-center">
@@ -264,23 +281,16 @@ export const ManualRestockTab: React.FC = () => {
 
 export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = ({ initialData }) => {
     const { logistics_incidents, addLogisticsIncident } = useGlobalState();
-    const [type, setType] = useState('Warehouse/PO Shortage');
+    const [type, setType] = useState('Damaged/Broken');
     const [item, setItem] = useState(initialData?.item_id || '');
-    const [expected, setExpected] = useState(initialData?.expected_qty?.toString() || '');
-    const [actual, setActual] = useState(initialData?.actual_qty?.toString() || '');
     const [desc, setDesc] = useState(initialData?.description || '');
     const [hasEvidence, setHasEvidence] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
 
-    // Context-aware logic
-    const isShortage = type === 'Warehouse/PO Shortage';
-
     useEffect(() => {
         if (initialData) {
-            setType('Warehouse/PO Shortage');
+            setType('Damaged/Broken');
             setItem(initialData.item_id || '');
-            setExpected(initialData.expected_qty?.toString() || '');
-            setActual(initialData.actual_qty?.toString() || '');
             setDesc(initialData.description || '');
         }
     }, [initialData]);
@@ -300,9 +310,7 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
             description: desc,
             status: 'OPEN',
             reportedBy: 'Runner-Alpha',
-            item_id: item,
-            expected_qty: isShortage ? parseInt(expected, 10) : undefined,
-            actual_qty: isShortage ? parseInt(actual, 10) : undefined
+            item_id: item
         };
         addLogisticsIncident(newIncident);
         window.alert('HIGH-PRIORITY ALERT: Incident broadcasted to Ops & Compliance.');
@@ -310,8 +318,6 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
         // Reset
         setHasEvidence(false);
         setItem('');
-        setExpected('');
-        setActual('');
         setDesc('');
     };
 
@@ -339,8 +345,8 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
                                     value={type}
                                     onChange={e => setType(e.target.value)}
                                 >
-                                    <option>Warehouse/PO Shortage</option>
                                     <option>Damaged/Broken</option>
+                                    <option>Degraded Items</option>
                                     <option>System Discrepancy</option>
                                 </select>
                             </div>
@@ -359,29 +365,7 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
                             </div>
                         </div>
 
-                        {/* CONDITIONAL QUANTITY FIELDS */}
-                        {isShortage && (
-                            <div className="grid grid-cols-2 gap-6 animate-slideDown">
-                                <div className="space-y-3">
-                                    <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Expected System Qty</label>
-                                    <input
-                                        type="number"
-                                        className="w-full bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-white text-center text-xl font-black outline-none focus:border-red-500/50 transition-all"
-                                        value={expected}
-                                        onChange={e => setExpected(e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-3">
-                                    <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Physical Physical Qty</label>
-                                    <input
-                                        type="number"
-                                        className="w-full bg-black/30 border border-white/5 rounded-2xl px-5 py-4 text-red-400 text-center text-xl font-black outline-none border-red-500/30 transition-all bg-red-500/5"
-                                        value={actual}
-                                        onChange={e => setActual(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        )}
+                        {/* Removed CONDITIONAL QUANTITY FIELDS */}
 
                         <div className="space-y-3">
                             <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Visual Evidence & Description</label>
@@ -393,7 +377,7 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
                                 >
                                     <Camera size={32} />
                                     <span className="text-[10px] font-black uppercase tracking-widest">
-                                        {hasEvidence ? 'Evidence Locked' : isShortage ? 'Photo of Empty Shelf' : 'Photo of Damage'}
+                                        {hasEvidence ? 'Evidence Locked' : 'Photo of Damage/Degradation'}
                                     </span>
                                 </button>
                                 <textarea

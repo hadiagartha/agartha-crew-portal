@@ -71,6 +71,7 @@ export interface RestockTask {
   pickedUpQuantity?: number;
   priority?: 'NORMAL' | 'HIGH' | 'CRITICAL';
   destination?: string;
+  origin?: string;
 }
 
 export interface ZoneData {
@@ -246,7 +247,8 @@ export interface PurchaseOrder {
   createdAt: Date;
   items: {
     item: string;
-    category: 'RETAIL' | 'SAFETY' | 'F&B' | 'MAINTENANCE';
+    barcode?: string;
+    unit?: string;
     expected: number;
     received: number;
     photoProof?: string;

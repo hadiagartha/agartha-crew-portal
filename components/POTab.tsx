@@ -85,15 +85,7 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
         po.supplier.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const getCategoryStyles = (category: string) => {
-        switch (category) {
-            case 'RETAIL': return 'bg-pink-500/10 text-pink-400 border-pink-500/20';
-            case 'SAFETY': return 'bg-red-500/10 text-red-400 border-red-500/20';
-            case 'F&B': return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
-            case 'MAINTENANCE': return 'bg-teal-500/10 text-teal-400 border-teal-500/20';
-            default: return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
-        }
-    };
+    // End Category Styles hook
 
     return (
         <div className="flex flex-col gap-6 animate-fadeIn pb-20 text-white">
@@ -126,7 +118,7 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                                 <tr className="bg-white/5 border-b border-white/10">
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">PO Number & Status</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Supplier Name</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Items & Categories</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Items & Barcodes</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -145,8 +137,8 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                                         <td className="px-6 py-6">
                                             <div className="flex flex-wrap gap-2">
                                                 {po.items.map((item, idx) => (
-                                                    <span key={idx} className={`px-2 py-0.5 rounded-md text-[9px] font-black border ${getCategoryStyles(item.category)}`}>
-                                                        {item.category}: {item.item}
+                                                    <span key={idx} className="px-2 py-0.5 rounded-md text-[9px] font-black border bg-blue-500/10 text-blue-400 border-blue-500/20">
+                                                        {item.barcode || 'N/A'}: {item.item}
                                                     </span>
                                                 ))}
                                             </div>
@@ -192,22 +184,21 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                             <table className="w-full text-left">
                                 <thead className="bg-white/5 border-b border-white/10">
                                     <tr>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Expected Item</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Category</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-center">Expected</th>
+                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Item Name & Barcode</th>
+                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-center">Expected Qty</th>
+                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-center">Unit</th>
                                         <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Actual Received</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {selectedPO.items.map(item => (
                                         <tr key={item.item} className="border-b border-white/5">
-                                            <td className="px-6 py-6 font-bold">{item.item}</td>
                                             <td className="px-6 py-6">
-                                                <span className={`px-2 py-1 rounded-md text-[9px] font-black border ${getCategoryStyles(item.category)}`}>
-                                                    {item.category}
-                                                </span>
+                                                <div className="font-bold text-white">{item.item}</div>
+                                                <div className="text-[10px] text-gray-400 font-mono mt-0.5">{item.barcode || 'N/A'}</div>
                                             </td>
                                             <td className="px-6 py-6 text-center text-blue-400 font-black">{item.expected}</td>
+                                            <td className="px-6 py-6 text-center text-gray-400 font-bold text-xs uppercase">{item.unit || 'pcs'}</td>
                                             <td className="px-6 py-6 text-right">
                                                 <input
                                                     type="number"

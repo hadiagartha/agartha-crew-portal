@@ -26,28 +26,27 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ staff_id: staffId, password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        onLogin(data);
-      } else {
-        if (data.error === 'ACCOUNT_LOCKED') {
-          setLockInfo({ locked_until: data.locked_until });
-          setError(`Account locked until ${new Date(data.locked_until).toLocaleTimeString()}`);
-        } else {
-          setError(data.error || 'Login failed');
+
+    // MOCK LOGIN - Auto-login to Runner mode
+    setTimeout(() => {
+      onLogin({
+        token: 'mock-token-xyz',
+        staff: {
+          id: '1',
+          staff_id: staffId || '1234',
+          name: 'Chief Runner',
+          role: 'runner_crew',
+          current_zone_id: 'Z-01',
+          isOnShift: true,
+          phone_number: '555-0199',
+          failed_login_attempts: 0,
+          last_failed_login: null,
+          locked_until: null,
+          last_login_at: new Date().toISOString()
         }
-      }
-    } catch (err) {
-      setError('Connection error');
-    } finally {
+      });
       setIsLoading(false);
-    }
+    }, 500);
   };
 
   const handleRequestReset = async (e: React.FormEvent) => {

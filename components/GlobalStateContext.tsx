@@ -57,7 +57,8 @@ interface POEntry {
     status: 'PENDING' | 'RECONCILED';
     items: {
         item: string;
-        category: 'RETAIL' | 'SAFETY' | 'F&B' | 'MAINTENANCE';
+        barcode?: string;
+        unit?: string;
         expected: number;
         received: number;
         photoProof?: string;
@@ -147,9 +148,9 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
             supplier: 'Galactic Supplies Co.',
             status: 'PENDING',
             items: [
-                { item: 'Napkins', category: 'F&B', expected: 500, received: 0 },
-                { item: 'Bottled Water', category: 'F&B', expected: 200, received: 0 },
-                { item: 'Safety Vests', category: 'SAFETY', expected: 50, received: 0 }
+                { item: 'Napkins', barcode: 'NPK-001', unit: 'packs', expected: 500, received: 0 },
+                { item: 'Bottled Water', barcode: 'H2O-500', unit: 'bottles', expected: 200, received: 0 },
+                { item: 'Safety Vests', barcode: 'SFT-VST', unit: 'pcs', expected: 50, received: 0 }
             ]
         },
         {
@@ -157,8 +158,8 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
             supplier: 'Terra Retail Group',
             status: 'PENDING',
             items: [
-                { item: 'Souvenir Magnets', category: 'RETAIL', expected: 100, received: 0 },
-                { item: 'Themed T-Shirts', category: 'RETAIL', expected: 75, received: 0 }
+                { item: 'Souvenir Magnets', barcode: 'MAG-001', unit: 'pcs', expected: 100, received: 0 },
+                { item: 'Themed T-Shirts', barcode: 'TSH-001', unit: 'pcs', expected: 75, received: 0 }
             ]
         }
     ]);
@@ -186,8 +187,8 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         'Z-04': 'Green',
     });
     const [restockTasks, setRestockTasks] = useState<RestockTask[]>([
-        { id: 'RT-101', item: 'Cola Syrup', quantity: 2, unit: 'boxes', standLocation: 'Zone A - Snack Bar', status: 'PENDING', requestedAt: new Date(), isUrgent: true, zoneId: 'Z-01', priority: 'CRITICAL', barcode: 'SYN-001' },
-        { id: 'RT-102', item: 'Paper Cups', quantity: 500, unit: 'pcs', standLocation: 'Zone B - Cafe', status: 'PENDING', requestedAt: new Date(), isUrgent: false, zoneId: 'Z-02', priority: 'NORMAL', barcode: 'CUP-500' }
+        { id: 'RT-101', item: 'Cola Syrup', quantity: 2, unit: 'boxes', origin: 'Main Warehouse', standLocation: 'Snack Bar', status: 'PENDING', requestedAt: new Date(), isUrgent: true, zoneId: 'Z-01', priority: 'CRITICAL', barcode: 'SYN-001' },
+        { id: 'RT-102', item: 'Paper Cups', quantity: 500, unit: 'pcs', origin: 'Cafe Storage', standLocation: 'Cafe', status: 'PENDING', requestedAt: new Date(), isUrgent: false, zoneId: 'Z-02', priority: 'NORMAL', barcode: 'CUP-500' }
     ]);
     const [logisticsIncidents, setLogisticsIncidents] = useState<Incident[]>([]);
     const [auditRequests, setAuditRequests] = useState<AuditRequest[]>([

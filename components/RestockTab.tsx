@@ -31,13 +31,7 @@ const RestockTab: React.FC = () => {
         setShowQrScan(false);
     };
 
-    const getPriorityStyles = (priority: string | undefined) => {
-        switch (priority) {
-            case 'CRITICAL': return 'bg-red-500/10 text-red-500 border-red-500/20';
-            case 'HIGH': return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
-            default: return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-        }
-    };
+    // Priority styles removed
 
     return (
         <div className="flex flex-col gap-6 animate-fadeIn pb-20 text-white">
@@ -55,9 +49,9 @@ const RestockTab: React.FC = () => {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-white/5 border-b border-white/10">
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">ID & Priority</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Task ID</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Item Details</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Destination</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Route (From &rarr; To)</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -66,9 +60,6 @@ const RestockTab: React.FC = () => {
                                     <tr key={task.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
                                         <td className="px-6 py-6 font-bold">
                                             <div className="text-white group-hover:text-yellow-400 transition-colors">{task.id}</div>
-                                            <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase border mt-1 inline-block ${getPriorityStyles(task.priority)}`}>
-                                                {task.priority || 'NORMAL'}
-                                            </span>
                                         </td>
                                         <td className="px-6 py-6">
                                             <div className="text-sm font-bold text-gray-200">{task.item}</div>
@@ -77,7 +68,9 @@ const RestockTab: React.FC = () => {
                                         <td className="px-6 py-6">
                                             <div className="flex items-center gap-2 text-xs font-medium text-gray-400">
                                                 <MapPin size={14} className="text-red-400" />
-                                                {task.standLocation}
+                                                <span className="text-gray-500">{task.origin || 'Warehouse'}</span>
+                                                <ArrowRight size={12} className="mx-1 text-gray-600" />
+                                                <span className="text-white font-bold">{task.standLocation}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-6 text-right">
@@ -114,9 +107,6 @@ const RestockTab: React.FC = () => {
                                             Task {activeTask.id} • Assigned to You
                                         </p>
                                     </div>
-                                    <div className={`px-4 py-2 rounded-xl border ${getPriorityStyles(activeTask.priority)}`}>
-                                        <span className="text-xs font-black uppercase tracking-widest">{activeTask.priority || 'NORMAL'} Priority</span>
-                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -129,17 +119,19 @@ const RestockTab: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="bg-black/40 p-6 rounded-2xl border border-white/5 space-y-4">
-                                        <div className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Destination Zone</div>
-                                        <div className="space-y-2">
+                                        <div className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Route Details</div>
+                                        <div className="space-y-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="p-3 bg-red-500/10 rounded-xl">
-                                                    <MapPin className="text-red-500" size={24} />
+                                                <div className="p-2 bg-gray-500/10 rounded-lg">
+                                                    <MapPin className="text-gray-400" size={16} />
                                                 </div>
-                                                <div className="text-lg font-black text-white">{activeTask.standLocation}</div>
+                                                <div className="text-sm font-medium text-gray-400">From: <span className="text-white font-bold">{activeTask.origin || 'Warehouse'}</span></div>
                                             </div>
-                                            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-2 flex items-center gap-2">
-                                                <CheckCircle2 size={12} className="text-green-500" />
-                                                <span className="text-[9px] font-black text-green-400 uppercase">Pre-Cleared by Logistics Mgr</span>
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-red-500/10 rounded-lg">
+                                                    <MapPin className="text-red-500" size={16} />
+                                                </div>
+                                                <div className="text-sm font-medium text-gray-400">To: <span className="text-white font-bold">{activeTask.standLocation}</span></div>
                                             </div>
                                         </div>
                                     </div>
