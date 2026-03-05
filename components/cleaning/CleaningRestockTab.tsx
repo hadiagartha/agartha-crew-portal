@@ -124,8 +124,8 @@ const CleaningRestockTab: React.FC = () => {
                             </button>
                         </div>
 
-                        <div className="flex gap-4">
-                            <div className="flex-1">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex-1 w-full sm:w-auto">
                                 <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Quantity</label>
                                 <input
                                     type="number"
@@ -136,7 +136,7 @@ const CleaningRestockTab: React.FC = () => {
                                     className="w-full bg-[#1a1d29] border border-gray-700 rounded-xl py-3 px-4 text-white font-mono focus:outline-none focus:border-blue-500 transition-colors"
                                 />
                             </div>
-                            <div className="flex-1">
+                            <div className="flex-1 w-full sm:w-auto">
                                 <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Unit</label>
                                 <select
                                     value={unit}
@@ -177,8 +177,8 @@ const CleaningRestockTab: React.FC = () => {
                             type="submit"
                             disabled={!item || !quantity}
                             className={`w-full py-4 rounded-xl font-black uppercase tracking-widest transition-all mt-4 flex justify-center items-center gap-2 ${item && quantity
-                                    ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/40 hover:-translate-y-1 active:scale-95'
-                                    : 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/40 hover:-translate-y-1 active:scale-95'
+                                : 'bg-gray-800 text-gray-600 cursor-not-allowed'
                                 }`}
                         >
                             <Send size={18} /> Dispatch Request
@@ -201,7 +201,7 @@ const CleaningRestockTab: React.FC = () => {
                             requests.map(req => (
                                 <div key={req.id} className="bg-[#2d3142] border border-gray-700 rounded-2xl p-4 shadow-lg flex flex-col sm:flex-row gap-4 sm:items-center">
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-2">
+                                        <div className="flex flex-wrap items-center gap-2 mb-2">
                                             <span className="font-mono text-xs font-black tracking-widest bg-[#1a1d29] px-2 py-1 rounded text-white border border-gray-700">
                                                 {req.id}
                                             </span>
@@ -217,8 +217,8 @@ const CleaningRestockTab: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center sm:flex-col sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 sm:border-l border-gray-700/50 pt-3 sm:pt-0 sm:pl-4 mt-1 sm:mt-0">
-                                        <span className={`text-xs uppercase tracking-widest font-black px-3 py-1.5 rounded-lg border flex items-center gap-1.5 mb-1 ${getStatusColor(req.status)}`}>
+                                    <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 sm:border-l border-gray-700/50 pt-3 sm:pt-0 sm:pl-4 mt-1 sm:mt-0 w-full sm:w-auto">
+                                        <span className={`text-[10px] sm:text-xs uppercase tracking-widest font-black px-3 py-1.5 rounded-lg border flex items-center gap-1.5 mb-0 sm:mb-1 ${getStatusColor(req.status)}`}>
                                             {getStatusIcon(req.status)}
                                             {req.status}
                                         </span>

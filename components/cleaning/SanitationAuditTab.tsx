@@ -137,8 +137,8 @@ const SanitationAuditTab: React.FC = () => {
                                     onClick={handleSubmit}
                                     disabled={!atpReading || !hasPhoto}
                                     className={`w-full py-4 rounded-xl font-black uppercase tracking-widest transition-all mt-4 flex justify-center items-center gap-2 ${atpReading && hasPhoto
-                                            ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-900/40 hover:-translate-y-1 active:scale-95'
-                                            : 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                                        ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-900/40 hover:-translate-y-1 active:scale-95'
+                                        : 'bg-gray-800 text-gray-600 cursor-not-allowed'
                                         }`}
                                 >
                                     <ShieldAlert size={18} /> Submit Blind Audit
@@ -173,12 +173,12 @@ const SanitationAuditTab: React.FC = () => {
                         ) : (
                             pendingAudits.map(audit => (
                                 <div key={audit.id} className="bg-[#2d3142] border-l-4 border-l-purple-500 border-t border-r border-b border-gray-700 rounded-r-2xl p-4 shadow-lg hover:bg-[#34394c] transition-colors cursor-pointer group" onClick={() => handleStartAudit(audit)}>
-                                    <div className="flex justify-between items-start mb-2">
+                                    <div className="flex flex-col sm:flex-row sm:justify-between items-start mb-2 gap-1 sm:gap-0">
                                         <div className="flex items-center gap-2">
-                                            <MapPin size={16} className="text-purple-400" />
-                                            <h4 className="font-bold text-lg text-white">{audit.location}</h4>
+                                            <MapPin size={16} className="text-purple-400 shrink-0" />
+                                            <h4 className="font-bold text-lg text-white leading-tight">{audit.location}</h4>
                                         </div>
-                                        <span className="font-mono text-xs font-black tracking-widest text-gray-500 group-hover:text-purple-400 transition-colors">
+                                        <span className="font-mono text-xs font-black tracking-widest text-gray-500 group-hover:text-purple-400 transition-colors sm:self-auto self-start ml-6 sm:ml-0">
                                             {audit.id}
                                         </span>
                                     </div>
@@ -203,15 +203,15 @@ const SanitationAuditTab: React.FC = () => {
                             </div>
                         ) : (
                             completedAudits.map(audit => (
-                                <div key={audit.id} className="bg-[#1a1d29] border border-gray-700 rounded-xl p-3 flex items-center justify-between opacity-60 hover:opacity-100 transition-opacity">
+                                <div key={audit.id} className="bg-[#1a1d29] border border-gray-700 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between opacity-60 hover:opacity-100 transition-opacity gap-2 sm:gap-0">
                                     <div className="flex items-center gap-3 text-sm">
-                                        <CheckCircle2 size={16} className="text-emerald-500" />
+                                        <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
                                         <div>
-                                            <div className="font-bold text-gray-300">{audit.location}</div>
-                                            <div className="text-[10px] uppercase tracking-widest font-bold text-gray-500">{audit.id}</div>
+                                            <div className="font-bold text-gray-300 leading-tight">{audit.location}</div>
+                                            <div className="text-[10px] uppercase tracking-widest font-bold text-gray-500 mt-0.5">{audit.id}</div>
                                         </div>
                                     </div>
-                                    <div className="text-[10px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20 sm:self-auto self-start ml-7 sm:ml-0 mt-1 sm:mt-0">
                                         Submitted
                                     </div>
                                 </div>

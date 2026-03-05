@@ -79,7 +79,7 @@ const CleaningStockTab: React.FC = () => {
                         <div key={item.id} className="bg-[#2d3142] border border-gray-700 rounded-2xl p-5 shadow-lg relative overflow-hidden group">
                             {/* Status Indicator Bar */}
                             <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${item.status === 'EMPTY' ? 'bg-red-500' :
-                                    item.status === 'LOW' ? 'bg-amber-400' : 'bg-emerald-400'
+                                item.status === 'LOW' ? 'bg-amber-400' : 'bg-emerald-400'
                                 }`} />
 
                             <div className="flex justify-between items-start mb-4">
@@ -125,7 +125,7 @@ const CleaningStockTab: React.FC = () => {
                                 <div className="w-full bg-[#1a1d29] rounded-full h-2 mb-4 overflow-hidden border border-gray-700">
                                     <div
                                         className={`h-full transition-all duration-500 ${item.status === 'EMPTY' ? 'bg-red-500 w-0' :
-                                                item.status === 'LOW' ? 'bg-amber-400' : 'bg-emerald-400'
+                                            item.status === 'LOW' ? 'bg-amber-400' : 'bg-emerald-400'
                                             }`}
                                         style={{ width: `${Math.max(0, Math.min(100, item.currentVolume))}%` }}
                                     />
@@ -137,30 +137,32 @@ const CleaningStockTab: React.FC = () => {
                                     <label className="block text-[10px] uppercase font-black tracking-widest text-gray-500 mb-2">
                                         Usage Amount ({item.unit})
                                     </label>
-                                    <div className="flex gap-2">
+                                    <div className="flex flex-col sm:flex-row gap-2">
                                         <input
                                             type="number"
                                             value={usageAmount}
                                             onChange={(e) => setUsageAmount(e.target.value)}
                                             placeholder="Amt"
-                                            className="flex-1 bg-[#2d3142] border border-gray-600 rounded-lg px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-emerald-500"
+                                            className="w-full sm:flex-1 bg-[#2d3142] border border-gray-600 rounded-lg px-3 py-3 sm:py-2 text-white font-mono text-sm focus:outline-none focus:border-emerald-500"
                                         />
-                                        <button
-                                            onClick={() => handleLogUsage(item.id)}
-                                            disabled={!usageAmount}
-                                            className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-colors"
-                                        >
-                                            Submit
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setActiveInputId(null);
-                                                setUsageAmount('');
-                                            }}
-                                            className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-colors"
-                                        >
-                                            Cancel
-                                        </button>
+                                        <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                                            <button
+                                                onClick={() => handleLogUsage(item.id)}
+                                                disabled={!usageAmount}
+                                                className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-3 sm:py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-colors"
+                                            >
+                                                Submit
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setActiveInputId(null);
+                                                    setUsageAmount('');
+                                                }}
+                                                className="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-3 sm:py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-colors"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             )}

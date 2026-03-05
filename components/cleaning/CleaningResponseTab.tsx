@@ -99,7 +99,7 @@ const CleaningResponseTab: React.FC = () => {
 
     return (
         <div className="flex flex-col h-full bg-[#1a1d29] animate-fadeIn p-4 md:p-6 text-white overflow-hidden relative">
-            <div className="mb-6 flex justify-between items-start shrink-0">
+            <div className="mb-6 flex flex-col sm:flex-row justify-between items-start shrink-0 gap-4 sm:gap-0">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-widest text-white flex items-center gap-3 mb-1">
                         <AlertTriangle className="text-red-500" size={32} /> Response Queue
@@ -109,7 +109,7 @@ const CleaningResponseTab: React.FC = () => {
                 {syncPending && (
                     <button
                         onClick={handleSync}
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-emerald-900/40 animate-pulse flex items-center gap-2 transition-all hover:scale-105 uppercase text-xs tracking-wider"
+                        className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 sm:py-2 px-4 rounded-xl shadow-lg shadow-emerald-900/40 animate-pulse flex items-center justify-center gap-2 transition-all hover:scale-105 uppercase text-xs tracking-wider"
                     >
                         Accept All Logs
                     </button>
@@ -139,14 +139,19 @@ const CleaningResponseTab: React.FC = () => {
                             </div>
 
                             <div className="flex-1 min-w-0">
-                                <div className="flex flex-wrap items-center gap-2 border-b border-gray-700/50 pb-2 mb-2">
-                                    <span className="font-mono text-xs font-black tracking-widest bg-[#1a1d29] px-2 py-1 rounded text-white flex items-center gap-1.5 opacity-80">
-                                        {task.id}
-                                    </span>
-                                    <span className="text-[10px] uppercase tracking-widest font-black opacity-80">
-                                        {task.type}
-                                    </span>
-                                    <span className={`ml-auto font-mono text-sm font-black flex items-center gap-1.5 ${isOverdue ? 'text-red-400 animate-pulse' : 'text-gray-300'}`}>
+                                <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-2 border-b border-gray-700/50 pb-2 mb-2">
+                                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                                        <span className="font-mono text-xs font-black tracking-widest bg-[#1a1d29] px-2 py-1 rounded text-white flex items-center gap-1.5 opacity-80 shrink-0">
+                                            {task.id}
+                                        </span>
+                                        <span className="text-[10px] uppercase tracking-widest font-black opacity-80">
+                                            {task.type}
+                                        </span>
+                                        <span className={`sm:hidden ml-auto font-mono text-sm font-black flex items-center gap-1.5 ${isOverdue ? 'text-red-400 animate-pulse' : 'text-gray-300'}`}>
+                                            <Clock size={14} /> {formatDuration(elapsedMs)}
+                                        </span>
+                                    </div>
+                                    <span className={`hidden sm:flex ml-auto font-mono text-sm font-black flex items-center gap-1.5 ${isOverdue ? 'text-red-400 animate-pulse' : 'text-gray-300'}`}>
                                         <Clock size={14} /> {formatDuration(elapsedMs)}
                                     </span>
                                 </div>
@@ -160,7 +165,7 @@ const CleaningResponseTab: React.FC = () => {
                                 {task.status === 'PENDING' && (
                                     <button
                                         onClick={() => handleAcknowledge(task.id)}
-                                        className="flex-1 sm:w-36 py-2.5 px-4 rounded-xl font-black uppercase text-xs tracking-wider border-2 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white transition-all flex justify-center items-center gap-2 active:scale-95"
+                                        className="flex-1 w-full sm:w-36 py-3 sm:py-2.5 px-4 rounded-xl font-black uppercase text-xs tracking-wider border-2 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white transition-all flex justify-center items-center gap-2 active:scale-95"
                                     >
                                         <Navigation size={16} /> Acknowledge
                                     </button>
@@ -188,7 +193,7 @@ const CleaningResponseTab: React.FC = () => {
                                     : 0;
 
                                 return (
-                                    <div key={task.id} className="bg-[#1a1d29] border border-gray-700 rounded-xl p-3 flex items-center justify-between opacity-70 hover:opacity-100 transition-opacity">
+                                    <div key={task.id} className="bg-[#1a1d29] border border-gray-700 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between opacity-70 hover:opacity-100 transition-opacity gap-3 sm:gap-0">
                                         <div className="flex items-center gap-3 text-sm">
                                             {getTypeIcon(task.type)}
                                             <div>
@@ -196,7 +201,7 @@ const CleaningResponseTab: React.FC = () => {
                                                 <div className="text-[10px] uppercase tracking-widest font-bold text-gray-500">{task.id} • {task.type}</div>
                                             </div>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-left sm:text-right flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto border-t sm:border-t-0 border-gray-700/50 pt-2 sm:pt-0">
                                             <div className="font-mono font-bold text-emerald-400 text-sm flex items-center gap-1"><CheckCircle2 size={14} /> Completed</div>
                                             <div className="text-[10px] text-gray-500 font-mono">Response: {formatDuration(responseTime)}</div>
                                         </div>
