@@ -21,7 +21,11 @@ import RunnerDashboard from './components/runner/RunnerDashboard';
 import SecurityDashboard from './components/security/SecurityDashboard';
 import HealthDashboard from './components/health/HealthDashboard';
 import ExperienceDashboard from './components/service/ExperienceDashboard';
-import CleaningDashboard from './components/cleaning/CleaningDashboard';
+import CleaningResponseTab from './components/cleaning/CleaningResponseTab';
+import MedicalLogTab from './components/cleaning/MedicalLogTab';
+import CleaningStockTab from './components/cleaning/CleaningStockTab';
+import CleaningRestockTab from './components/cleaning/CleaningRestockTab';
+import SanitationAuditTab from './components/cleaning/SanitationAuditTab';
 import ReceivingTab from './components/giftshop/ReceivingTab';
 import RetailStatusTab from './components/giftshop/RetailStatusTab';
 import RetailRestockTab from './components/giftshop/RetailRestockTab';
@@ -532,7 +536,11 @@ const App: React.FC = () => {
       View.SECURITY_DASHBOARD,
       View.HEALTH_DASHBOARD,
       View.EXPERIENCE_DASHBOARD,
-      View.CLEANING_DASHBOARD,
+      View.CLEANING_RESPONSE_QUEUE,
+      View.CLEANING_MEDICAL_LOG,
+      View.CLEANING_STOCK,
+      View.CLEANING_RESTOCK,
+      View.CLEANING_AUDIT,
       View.GIFTSHOP_DASHBOARD,
       View.MAINTENANCE_LOG,
       View.MAINTENANCE_MANAGER_DASHBOARD,
@@ -638,14 +646,16 @@ const App: React.FC = () => {
             zoneStatuses={zoneStatuses}
           />
         );
-      case View.CLEANING_DASHBOARD:
-        return (
-          <CleaningDashboard
-            staff={staff!}
-            onRequestRestock={handleRequestRestock}
-            handleAddIncident={handleAddIncident}
-          />
-        );
+      case View.CLEANING_RESPONSE_QUEUE:
+        return <CleaningResponseTab />;
+      case View.CLEANING_MEDICAL_LOG:
+        return <MedicalLogTab />;
+      case View.CLEANING_STOCK:
+        return <CleaningStockTab />;
+      case View.CLEANING_RESTOCK:
+        return <CleaningRestockTab />;
+      case View.CLEANING_AUDIT:
+        return <SanitationAuditTab />;
       case View.RETAIL_RECEIVING:
         return <ReceivingTab />;
       case View.RETAIL_STATUS:

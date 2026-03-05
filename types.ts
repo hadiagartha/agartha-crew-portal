@@ -32,6 +32,11 @@ export enum View {
   RETAIL_RESTOCK = 'RETAIL_RESTOCK',
   RETAIL_DAMAGE_LOG = 'RETAIL_DAMAGE_LOG',
   RETAIL_AUDIT = 'RETAIL_AUDIT',
+  CLEANING_RESPONSE_QUEUE = 'CLEANING_RESPONSE_QUEUE',
+  CLEANING_MEDICAL_LOG = 'CLEANING_MEDICAL_LOG',
+  CLEANING_STOCK = 'CLEANING_STOCK',
+  CLEANING_RESTOCK = 'CLEANING_RESTOCK',
+  CLEANING_AUDIT = 'CLEANING_AUDIT',
   HOME = 'HOME'
 }
 
@@ -180,9 +185,11 @@ export function defaultViewForMode(mode: AppMode): View {
     case 'SERVICE_CREW':
     case 'SECURITY_CREW':
     case 'HEALTH_CREW':
-    case 'CLEANING_CREW':
     case 'RUNNER':
     case 'EXPERIENCE_CREW':
+      return View.HOME;
+    case 'CLEANING_CREW':
+      return View.CLEANING_RESPONSE_QUEUE;
     case 'GIFTSHOP_CREW':
       return View.RETAIL_STATUS;
     case 'EXTERNAL_MAINTENANCE':
@@ -209,7 +216,17 @@ export function allowedViewsForMode(mode: AppMode): View[] {
     case 'HEALTH_CREW':
       return [View.HOME, View.ZONE_CHECK_IN, View.HEALTH_DASHBOARD, View.INCIDENTS, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'CLEANING_CREW':
-      return [View.HOME, View.ZONE_CHECK_IN, View.CLEANING_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [
+        View.HOME,
+        View.ZONE_CHECK_IN,
+        View.CLEANING_RESPONSE_QUEUE,
+        View.CLEANING_MEDICAL_LOG,
+        View.CLEANING_STOCK,
+        View.CLEANING_RESTOCK,
+        View.CLEANING_AUDIT,
+        View.SETTINGS,
+        View.ANNOUNCEMENTS
+      ];
     case 'FNB':
       return [
         View.HOME,
