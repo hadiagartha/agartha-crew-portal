@@ -124,8 +124,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
       case 'CLEANING_CREW': return 'Sanitation Specialist';
       case 'FNB': return 'F&B Specialist';
       case 'RUNNER': return 'Logistics Runner';
-      case 'EXPERIENCE_CREW': return 'Experience Lead';
-      case 'GIFTSHOP_CREW': return 'Retail Specialist';
+      case 'EXPERIENCE_CREW': return 'Experience Guide';
+      case 'GIFTSHOP_CREW': return 'Gift Shop Crew';
       default: return 'Staff Member';
     }
   };

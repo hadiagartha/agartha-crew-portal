@@ -79,7 +79,7 @@ const Home: React.FC<HomeProps> = ({ appMode, onViewChange }) => {
             case 'FNB': return 'F&B Operations Command';
             case 'RUNNER': return 'Logistics Runner Hub';
             case 'EXPERIENCE_CREW': return 'Experience Control Center';
-            case 'GIFTSHOP_CREW': return 'Retail Specialist Hub';
+            case 'GIFTSHOP_CREW': return 'Gift Shop Crew Hub';
             default: return 'Welcome back, explorer';
         }
     };
