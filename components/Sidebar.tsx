@@ -89,7 +89,14 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     { id: View.FNB_PREP_BATCHES, label: 'Prep Batches', icon: RefreshCcw },
 
     { id: View.SECURITY_DASHBOARD, label: 'Security Tactical', icon: ShieldAlert },
-    { id: View.HEALTH_DASHBOARD, label: 'Medical Triage', icon: HeartPulse },
+
+    // Health Crew Specific Tabs
+    { id: View.HEALTH_INCIDENT_LOG, label: 'Incident Log (Medical)', icon: HeartPulse },
+    { id: View.HEALTH_RESPONSE_TRACKER, label: 'Response Tracker', icon: AlertTriangle },
+    { id: View.HEALTH_CONSUMABLES, label: 'Medical Consumables', icon: Package },
+    { id: View.HEALTH_RESTOCK, label: 'Restock Requests', icon: Truck },
+    { id: View.HEALTH_EQUIPMENT_AUDIT, label: 'Equipment Audit', icon: ShieldAlert },
+
     { id: View.EXPERIENCE_DASHBOARD, label: 'Experience Control', icon: Sparkles },
     { id: View.CLEANING_RESPONSE_QUEUE, label: 'Response Queue', icon: AlertTriangle },
     { id: View.CLEANING_MEDICAL_LOG, label: 'Medical Incident Log', icon: HeartPulse },

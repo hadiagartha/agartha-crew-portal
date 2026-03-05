@@ -42,6 +42,12 @@ import { ManualRestockTab, IncidentReportTab } from './components/runner/Logisti
 import AuditTab from './components/runner/AuditTab';
 import { View, Incident, IncidentSeverity, CheckInRecord, StaffMember, Alert, AuthResponse, AppMode, deriveModeFromStaff, defaultViewForMode, isViewAllowed, RestockTask } from './types';
 
+import HealthIncidentLogTab from './components/health/HealthIncidentLogTab';
+import HealthResponseTrackerTab from './components/health/HealthResponseTrackerTab';
+import HealthConsumablesTab from './components/health/HealthConsumablesTab';
+import HealthRestockTab from './components/health/HealthRestockTab';
+import HealthEquipmentAuditTab from './components/health/HealthEquipmentAuditTab';
+
 // Mock data moved to App level for persistence
 const INITIAL_INCIDENTS: Incident[] = [
   {
@@ -548,7 +554,11 @@ const App: React.FC = () => {
     const shiftRequiredViews = [
       View.RUNNER_DASHBOARD,
       View.SECURITY_DASHBOARD,
-      View.HEALTH_DASHBOARD,
+      View.HEALTH_INCIDENT_LOG,
+      View.HEALTH_RESPONSE_TRACKER,
+      View.HEALTH_CONSUMABLES,
+      View.HEALTH_RESTOCK,
+      View.HEALTH_EQUIPMENT_AUDIT,
       View.EXPERIENCE_DASHBOARD,
       View.CLEANING_RESPONSE_QUEUE,
       View.CLEANING_MEDICAL_LOG,
@@ -644,14 +654,16 @@ const App: React.FC = () => {
             onLogEvidence={handleSecurityLogEvidence}
           />
         );
-      case View.HEALTH_DASHBOARD:
-        return (
-          <HealthDashboard
-            incidents={incidents}
-            onScanArrival={handleSecurityScanArrival}
-            onRequestRestock={handleRequestRestock}
-          />
-        );
+      case View.HEALTH_INCIDENT_LOG:
+        return <HealthIncidentLogTab />;
+      case View.HEALTH_RESPONSE_TRACKER:
+        return <HealthResponseTrackerTab />;
+      case View.HEALTH_CONSUMABLES:
+        return <HealthConsumablesTab />;
+      case View.HEALTH_RESTOCK:
+        return <HealthRestockTab />;
+      case View.HEALTH_EQUIPMENT_AUDIT:
+        return <HealthEquipmentAuditTab />;
       case View.EXPERIENCE_DASHBOARD:
         return (
           <ExperienceDashboard
