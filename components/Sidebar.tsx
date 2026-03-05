@@ -79,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     { id: View.LOGISTICS_MANUAL, label: 'Manual Restock', icon: PackageOpen },
     { id: View.LOGISTICS_INCIDENT, label: 'Report Incident', icon: ShieldAlert },
     { id: View.LOGISTICS_AUDIT, label: 'Stock Counting (Audit)', icon: ClipboardList },
-    { id: View.SERVICE_ENTRY_VALIDATION, label: 'Entry Validation (Universal)', icon: QrCode },
+    { id: View.SERVICE_ENTRY_VALIDATION, label: 'Entry Validation', icon: QrCode },
 
     // F&B Specific Tabs
     { id: View.FNB_POS_LITE, label: 'POS-Lite (Fulfillment)', icon: Coffee },

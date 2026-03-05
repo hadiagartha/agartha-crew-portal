@@ -205,7 +205,6 @@ const EntryValidationTab: React.FC = () => {
                         <QrCode size={48} className="mb-1" />
                         <span className="font-bold">SCAN QR</span>
                     </button>
-                    <p className="text-gray-400 text-sm font-medium">Primary Entry Method</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -307,7 +306,7 @@ const EntryValidationTab: React.FC = () => {
                     </p>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
