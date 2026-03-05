@@ -193,11 +193,12 @@ export function defaultViewForMode(mode: AppMode): View {
     case 'SERVICE_CREW':
     case 'SECURITY_CREW':
     case 'HEALTH_CREW':
+      return View.HEALTH_INCIDENT_LOG;
     case 'RUNNER':
     case 'EXPERIENCE_CREW':
       return View.HOME;
     case 'CLEANING_CREW':
-      return View.CLEANING_RESPONSE_QUEUE;
+      return View.HOME;
     case 'GIFTSHOP_CREW':
       return View.RETAIL_STATUS;
     case 'EXTERNAL_MAINTENANCE':
@@ -222,16 +223,21 @@ export function allowedViewsForMode(mode: AppMode): View[] {
     case 'SECURITY_CREW':
       return [View.HOME, View.ZONE_CHECK_IN, View.SECURITY_DASHBOARD, View.INCIDENTS, View.ZONE_SURVEILLANCE, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'HEALTH_CREW':
-      return [View.HOME, View.ZONE_CHECK_IN, View.HEALTH_DASHBOARD, View.INCIDENTS, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [
+        View.HOME,
+        View.ZONE_CHECK_IN,
+        View.HEALTH_INCIDENT_LOG,
+        View.HEALTH_RESPONSE_TRACKER,
+        View.HEALTH_CONSUMABLES,
+        View.HEALTH_RESTOCK,
+        View.HEALTH_EQUIPMENT_AUDIT,
+        View.SETTINGS,
+        View.ANNOUNCEMENTS
+      ];
     case 'CLEANING_CREW':
       return [
         View.HOME,
         View.ZONE_CHECK_IN,
-        View.CLEANING_RESPONSE_QUEUE,
-        View.CLEANING_MEDICAL_LOG,
-        View.CLEANING_STOCK,
-        View.CLEANING_RESTOCK,
-        View.CLEANING_AUDIT,
         View.SETTINGS,
         View.ANNOUNCEMENTS
       ];
