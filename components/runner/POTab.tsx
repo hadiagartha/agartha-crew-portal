@@ -185,14 +185,42 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
 
                                     <div className="flex gap-4 items-end">
                                         <div className="flex-1">
-                                            <label className="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Actual Received</label>
-                                            <input
-                                                type="number"
-                                                placeholder="0"
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-bold focus:outline-none focus:border-blue-500 transition-all text-center text-lg"
-                                                value={receivedQtys[item.item] || ''}
-                                                onChange={(e) => handleQtyChange(item.item, e.target.value)}
-                                            />
+                                            <label className="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 flex justify-between">
+                                                <span>Actual Received</span>
+                                                <button
+                                                    onClick={() => handleQtyChange(item.item, item.expected.toString())}
+                                                    className="text-blue-400 hover:text-blue-300 underline"
+                                                >
+                                                    Match Expected
+                                                </button>
+                                            </label>
+                                            <div className="flex h-[52px]">
+                                                <button
+                                                    onClick={() => {
+                                                        const current = parseInt(receivedQtys[item.item] || '0');
+                                                        handleQtyChange(item.item, Math.max(0, current - 1).toString());
+                                                    }}
+                                                    className="w-12 bg-white/5 border border-white/10 rounded-l-xl flex items-center justify-center text-white hover:bg-white/10 transition-colors font-bold text-xl active:bg-white/20"
+                                                >
+                                                    -
+                                                </button>
+                                                <input
+                                                    type="number"
+                                                    placeholder="0"
+                                                    className="w-full bg-white/5 border-y border-white/10 px-2 py-3 text-white font-bold focus:outline-none focus:bg-white/10 transition-all text-center text-lg hide-arrows"
+                                                    value={receivedQtys[item.item] || ''}
+                                                    onChange={(e) => handleQtyChange(item.item, e.target.value)}
+                                                />
+                                                <button
+                                                    onClick={() => {
+                                                        const current = parseInt(receivedQtys[item.item] || '0');
+                                                        handleQtyChange(item.item, (current + 1).toString());
+                                                    }}
+                                                    className="w-12 bg-white/5 border border-white/10 rounded-r-xl flex items-center justify-center text-white hover:bg-white/10 transition-colors font-bold text-xl active:bg-white/20"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
                                         </div>
                                         <div className="w-24">
                                             <label className="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 text-center">Unit</label>

@@ -394,7 +394,7 @@ export const IncidentReportTab: React.FC<{ initialData?: Partial<Incident> }> = 
                             className="group relative w-full bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-[0.2em] py-6 rounded-[2rem] shadow-2xl shadow-red-900/30 transition-all hover:-translate-y-1 active:translate-y-0"
                         >
                             <span className="flex items-center justify-center gap-3">
-                                <ShieldAlert size={20} className="group-hover:animate-bounce" /> FLASH HIGH-PRIORITY ALERT
+                                <ShieldAlert size={20} className="group-hover:animate-bounce" /> REPORT INCIDENT
                             </span>
                         </button>
                     </form>
