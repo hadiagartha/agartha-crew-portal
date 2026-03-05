@@ -83,11 +83,11 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
                             ) : (
                                 activeMedicalIncidents.map(inc => (
                                     <div key={inc.id} className={`bg-[#2d3142]/90 border rounded-xl p-5 shadow-xl transition-all ${inc.severity === 'High' ? 'border-red-500/50 shadow-red-500/10' : 'border-gray-700/50 hover:border-red-500/30'}`}>
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className={`p-2.5 rounded-lg ${inc.severity === 'High' ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                                        <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-2 sm:gap-0">
+                                            <div className={`p-2.5 rounded-lg self-start ${inc.severity === 'High' ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-500'}`}>
                                                 {inc.severity === 'High' ? <AlertCircle size={20} className="animate-pulse" /> : <Activity size={20} />}
                                             </div>
-                                            <span className={`text-[10px] font-mono font-bold px-2 py-1 rounded border ${inc.severity === 'High' ? 'border-red-500/30 text-red-400 bg-red-500/5' : 'border-blue-500/30 text-blue-400 bg-blue-500/5'}`}>
+                                            <span className={`text-[10px] font-mono font-bold px-2 py-1 rounded border self-start sm:self-auto ${inc.severity === 'High' ? 'border-red-500/30 text-red-400 bg-red-500/5' : 'border-blue-500/30 text-blue-400 bg-blue-500/5'}`}>
                                                 {inc.id}
                                             </span>
                                         </div>
@@ -158,17 +158,17 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({
 
                                 return (
                                     <div key={item.name} className="bg-[#2d3142]/50 p-5 rounded-xl border border-gray-700/50">
-                                        <div className="flex justify-between items-start mb-4">
+                                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-2 sm:gap-0">
                                             <div className="flex items-center gap-3">
-                                                <div className={`p-2 rounded-lg bg-black/20 ${item.iconColor}`}>
+                                                <div className={`p-2 rounded-lg bg-black/20 ${item.iconColor} shrink-0`}>
                                                     <item.icon size={18} />
                                                 </div>
                                                 <div>
                                                     <p className="text-sm text-white font-bold">{item.name}</p>
-                                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">PAR LEVEL: {item.par}</p>
+                                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5">PAR LEVEL: {item.par}</p>
                                                 </div>
                                             </div>
-                                            <div className={`text-xl font-mono font-bold ${isCritical ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+                                            <div className={`text-xl font-mono font-bold self-start sm:self-auto ${isCritical ? 'text-red-400 animate-pulse' : 'text-white'}`}>
                                                 {count}
                                             </div>
                                         </div>

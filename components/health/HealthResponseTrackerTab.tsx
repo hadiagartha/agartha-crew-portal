@@ -64,21 +64,21 @@ const HealthResponseTrackerTab: React.FC = () => {
                             <div className="absolute top-0 left-0 w-1 h-full bg-red-500 animate-pulse"></div>
                         )}
 
-                        <div className="flex justify-between items-start mb-3 pl-2">
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start mb-3 pl-2 gap-3">
                             <div>
                                 <span className="text-xs font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded uppercase tracking-wider">
                                     {dispatch.id}
                                 </span>
                                 <h3 className="text-white font-bold text-lg mt-2 flex items-center gap-2">
-                                    <MapPin size={16} className="text-gray-400" />
+                                    <MapPin size={16} className="text-gray-400 shrink-0" />
                                     {dispatch.location}
                                 </h3>
                                 <p className="text-gray-400 text-sm mt-1">{dispatch.description}</p>
                             </div>
 
-                            <div className="flex flex-col items-end">
+                            <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
                                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Time to Scene</span>
-                                <div className={`flex items-center gap-2 font-mono text-xl font-bold px-3 py-1 rounded-lg ${dispatch.status === 'EN_ROUTE' ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'}`}>
+                                <div className={`flex items-center gap-2 font-mono text-xl font-bold px-3 py-1 rounded-lg w-full sm:w-auto justify-center sm:justify-start ${dispatch.status === 'EN_ROUTE' ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'}`}>
                                     <Clock size={16} className={dispatch.status === 'EN_ROUTE' ? 'animate-pulse' : ''} />
                                     {getElapsedTime(dispatch.receivedAt)}
                                 </div>
@@ -86,7 +86,7 @@ const HealthResponseTrackerTab: React.FC = () => {
                         </div>
 
                         {/* Status Toggles */}
-                        <div className="flex bg-[#1a1d29] rounded-xl p-1 border border-gray-700/50 ml-2">
+                        <div className="flex flex-col sm:flex-row bg-[#1a1d29] rounded-xl p-1 border border-gray-700/50 ml-0 sm:ml-2 gap-1 sm:gap-0">
                             <button
                                 onClick={() => updateStatus(dispatch.id, 'EN_ROUTE')}
                                 className={`flex-1 py-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${dispatch.status === 'EN_ROUTE' ? 'bg-red-600 text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
@@ -115,15 +115,15 @@ const HealthResponseTrackerTab: React.FC = () => {
                 <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest pl-2 mb-3">Recent Completed Dispatches</h3>
                 <div className="space-y-3">
                     {dispatches.filter(d => d.status === 'TREATMENT_COMPLETE').map(dispatch => (
-                        <div key={dispatch.id} className="bg-[#1a1d29] border border-gray-800 rounded-xl p-3 flex justify-between items-center opacity-70">
+                        <div key={dispatch.id} className="bg-[#1a1d29] border border-gray-800 rounded-xl p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center opacity-70 gap-2 sm:gap-0">
                             <div>
-                                <span className="text-xs font-bold text-gray-500">{dispatch.id} - {dispatch.location}</span>
+                                <span className="text-xs font-bold text-gray-500 block sm:inline">{dispatch.id} - {dispatch.location}</span>
                                 <p className="text-xs text-green-500 flex items-center gap-1 mt-1 font-bold">
                                     <CheckCircle2 size={12} /> Treatment Complete
                                 </p>
                             </div>
-                            <div className="text-right">
-                                <span className="text-[10px] text-gray-600 uppercase font-bold block">Total Response Time</span>
+                            <div className="text-left sm:text-right w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-800">
+                                <span className="text-[10px] text-gray-600 uppercase font-bold sm:block inline mr-2 sm:mr-0">Total Response Time</span>
                                 <span className="font-mono text-gray-400 font-bold">{getElapsedTime(dispatch.receivedAt, dispatch.completedAt)}</span>
                             </div>
                         </div>

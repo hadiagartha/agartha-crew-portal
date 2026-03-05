@@ -112,19 +112,19 @@ const HealthRestockTab: React.FC = () => {
                                 )}
                             </div>
                         ) : (
-                            <div className="flex items-center justify-between bg-purple-500/20 border border-purple-500/50 p-3 rounded-xl">
-                                <div>
-                                    <span className="block text-white font-bold text-sm">{selectedItem.name}</span>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-purple-500/20 border border-purple-500/50 p-3 rounded-xl gap-2 sm:gap-0">
+                                <div className="pr-2">
+                                    <span className="block text-white font-bold text-sm leading-tight">{selectedItem.name}</span>
                                     <span className="text-xs font-mono text-gray-400">{selectedItem.id}</span>
                                 </div>
-                                <button type="button" onClick={() => setSelectedItem(null)} className="text-xs text-purple-400 font-bold uppercase hover:underline">Change</button>
+                                <button type="button" onClick={() => setSelectedItem(null)} className="text-xs text-purple-400 font-bold uppercase hover:underline self-start sm:self-auto">Change</button>
                             </div>
                         )}
                     </div>
 
                     {/* Quantity & Urgency */}
                     {selectedItem && (
-                        <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
                             <div className="flex flex-col gap-2">
                                 <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Quantity</label>
                                 <div className="flex items-center justify-between bg-[#1a1d29] border border-gray-700 rounded-xl p-1">
@@ -140,7 +140,7 @@ const HealthRestockTab: React.FC = () => {
 
                             <div className="flex flex-col gap-2">
                                 <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Urgency</label>
-                                <div className="flex bg-[#1a1d29] border border-gray-700 rounded-xl overflow-hidden h-full">
+                                <div className="flex bg-[#1a1d29] border border-gray-700 rounded-xl overflow-hidden h-12 sm:h-full">
                                     <button type="button" onClick={() => setUrgency('STANDARD')} className={`flex-1 text-xs font-bold transition-colors ${urgency === 'STANDARD' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}>STD</button>
                                     <button type="button" onClick={() => setUrgency('URGENT')} className={`flex-1 text-xs font-bold transition-colors ${urgency === 'URGENT' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}>URGENT</button>
                                 </div>
@@ -170,14 +170,14 @@ const HealthRestockTab: React.FC = () => {
                         <div key={req.id} className="bg-[#2d3142]/60 border border-gray-700/50 p-4 rounded-2xl flex flex-col gap-3 relative overflow-hidden">
                             {req.urgency === 'URGENT' && <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>}
 
-                            <div className="flex justify-between items-start">
+                            <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-2 sm:gap-0">
                                 <div>
                                     <span className="font-mono text-xs font-bold text-gray-400 block mb-1">{req.id}</span>
                                     <span className="text-[10px] text-gray-500">{req.timestamp.toLocaleTimeString()}</span>
                                 </div>
-                                <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider border ${req.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' :
-                                        req.status === 'DISPATCHED' ? 'bg-blue-500/20 text-blue-400 border-blue-500/50' :
-                                            'bg-green-500/20 text-green-400 border-green-500/50'
+                                <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider border self-start sm:self-auto ${req.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' :
+                                    req.status === 'DISPATCHED' ? 'bg-blue-500/20 text-blue-400 border-blue-500/50' :
+                                        'bg-green-500/20 text-green-400 border-green-500/50'
                                     }`}>
                                     {req.status}
                                 </span>

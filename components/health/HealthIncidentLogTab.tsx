@@ -72,7 +72,7 @@ const HealthIncidentLogTab: React.FC = () => {
                 <form onSubmit={handleSaveDraft} className="space-y-4">
 
                     {/* Selectors */}
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="flex flex-col gap-2">
                             <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Category</label>
                             <div className="flex border border-gray-700 rounded-lg overflow-hidden font-bold text-xs bg-[#1a1d29]">
@@ -105,7 +105,7 @@ const HealthIncidentLogTab: React.FC = () => {
                             <Activity size={14} className="text-red-400" />
                             Vitals Log
                         </label>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="relative">
                                 <HeartPulse className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-400" size={16} />
                                 <input type="number" placeholder="HR mbp" value={vitals.hr} onChange={e => setVitals({ ...vitals, hr: e.target.value })} className="w-full bg-[#2d3142] border border-gray-700 text-white text-sm rounded-lg pl-9 pr-3 py-2 outline-none focus:border-red-500" />
@@ -144,13 +144,13 @@ const HealthIncidentLogTab: React.FC = () => {
 
             {/* Sync Hub & History */}
             <div className="px-4">
-                <div className="bg-[#2d3142]/80 border border-blue-500/20 p-5 rounded-2xl shadow-xl">
-                    <div className="flex items-center justify-between mb-4">
+                <div className="bg-[#2d3142]/80 border border-blue-500/20 p-5 rounded-2xl shadow-xl flex flex-col h-full">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                         <div className="flex items-center gap-2">
                             <CheckSquare className="text-blue-400" size={20} />
                             <h3 className="text-white font-bold">Repository Sync</h3>
                         </div>
-                        <span className={`text-xs font-bold px-2 py-1 rounded-lg ${readyToSyncCount > 0 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-400'}`}>
+                        <span className={`text-xs font-bold px-2 py-1 rounded-lg self-start sm:self-auto ${readyToSyncCount > 0 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-400'}`}>
                             {readyToSyncCount} Pending
                         </span>
                     </div>
@@ -165,12 +165,12 @@ const HealthIncidentLogTab: React.FC = () => {
                     <div className="space-y-3">
                         {logs.map((log) => (
                             <div key={log.id} className="bg-[#1a1d29] p-3 rounded-xl border border-gray-700/50">
-                                <div className="flex justify-between items-start mb-2">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                                     <div className="flex items-center gap-2">
                                         <span className="font-mono text-xs font-bold text-gray-400">{log.id}</span>
                                         <span className="text-[10px] text-gray-500">{log.timestamp.toLocaleTimeString()}</span>
                                     </div>
-                                    <div className="flex gap-1">
+                                    <div className="flex gap-1 flex-wrap">
                                         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase ${log.severity === 'MINOR' ? 'bg-green-500/20 text-green-400 border-green-500/50' : log.severity === 'MODERATE' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' : 'bg-red-500/20 text-red-400 border-red-500/50'}`}>
                                             {log.severity}
                                         </span>
@@ -180,7 +180,7 @@ const HealthIncidentLogTab: React.FC = () => {
                                     </div>
                                 </div>
                                 <p className="text-sm text-gray-300 line-clamp-2 mb-2">{log.summary}</p>
-                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-800">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-2 pt-2 border-t border-gray-800">
                                     <div className="flex gap-3 text-xs text-gray-500 font-mono">
                                         <span>HR:{log.vitals.hr || '-'}</span>
                                         <span>BP:{log.vitals.bp || '-'}</span>

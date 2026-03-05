@@ -83,14 +83,14 @@ const HealthEquipmentAuditTab: React.FC = () => {
 
                         {target.status === 'AUDITING' && <div className="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>}
 
-                        <div className="flex justify-between items-start">
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-3 sm:gap-0">
                             <div className="flex items-start gap-3">
                                 {target.type === 'AED_STATION' ? (
-                                    <div className="bg-red-500/20 p-2 rounded-lg">
+                                    <div className="bg-red-500/20 p-2 rounded-lg shrink-0">
                                         <HeartPulse className="text-red-400 w-5 h-5" />
                                     </div>
                                 ) : (
-                                    <div className="bg-blue-500/20 p-2 rounded-lg">
+                                    <div className="bg-blue-500/20 p-2 rounded-lg shrink-0">
                                         <Building2 className="text-blue-400 w-5 h-5" />
                                     </div>
                                 )}
@@ -98,14 +98,14 @@ const HealthEquipmentAuditTab: React.FC = () => {
                                     <h3 className="text-white font-bold text-lg leading-tight">
                                         {target.type.replace('_', ' ')}
                                     </h3>
-                                    <span className="font-mono text-xs text-gray-400">{target.id}</span>
+                                    <span className="font-mono text-xs text-gray-400 block mt-0.5">{target.id}</span>
                                     <p className="text-gray-300 text-sm mt-1">{target.location}</p>
                                 </div>
                             </div>
 
-                            <div className="text-right">
+                            <div className="text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-700/50 sm:border-none">
                                 <span className="block text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Last Audit</span>
-                                <span className="text-xs text-gray-300 font-mono bg-gray-800 px-2 py-1 rounded border border-gray-700">
+                                <span className="text-xs text-gray-300 font-mono bg-gray-800 px-2 py-1 rounded border border-gray-700 inline-block">
                                     {target.lastAudited}
                                 </span>
                             </div>
@@ -128,14 +128,14 @@ const HealthEquipmentAuditTab: React.FC = () => {
             {activeAudit && (
                 <div className="fixed bottom-0 left-0 w-full bg-[#1a1d29] border-t border-teal-500/30 z-50 p-6 rounded-t-3xl shadow-[0_-10px_40px_rgba(20,184,166,0.15)] animate-in slide-in-from-bottom-5">
 
-                    <div className="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 className="text-teal-400 font-bold text-lg flex items-center gap-2">
-                                <ShieldCheck size={20} /> Blind Safety Gate
+                    <div className="flex justify-between items-start mb-4 gap-4">
+                        <div className="pr-2">
+                            <h3 className="text-teal-400 font-bold text-lg flex items-center gap-2 leading-tight">
+                                <ShieldCheck size={20} className="shrink-0" /> Blind Safety Gate
                             </h3>
-                            <p className="text-gray-400 text-xs">Target: <span className="text-white font-mono">{activeAudit.id}</span></p>
+                            <p className="text-gray-400 text-xs mt-1">Target: <span className="text-white font-mono">{activeAudit.id}</span></p>
                         </div>
-                        <button onClick={handleCancel} className="text-gray-500 hover:text-white text-sm font-bold bg-gray-800 px-3 py-1 rounded-lg">Cancel</button>
+                        <button onClick={handleCancel} className="text-gray-500 hover:text-white text-sm font-bold bg-gray-800 px-3 py-2 rounded-lg shrink-0">Cancel</button>
                     </div>
 
                     <form onSubmit={handleSubmitAudit} className="space-y-5">
@@ -164,8 +164,8 @@ const HealthEquipmentAuditTab: React.FC = () => {
                                 onClick={handleSimulatePhotoUpload}
                                 disabled={uploading || isPhotoUploaded}
                                 className={`w-full py-6 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-all ${isPhotoUploaded ? 'bg-green-500/10 border-green-500/50 text-green-400' :
-                                        uploading ? 'bg-blue-500/10 border-blue-500/50 text-blue-400 animate-pulse' :
-                                            'bg-[#1a1d29] border-gray-600 text-gray-400 hover:border-teal-500 hover:text-teal-400 hover:bg-teal-500/5'
+                                    uploading ? 'bg-blue-500/10 border-blue-500/50 text-blue-400 animate-pulse' :
+                                        'bg-[#1a1d29] border-gray-600 text-gray-400 hover:border-teal-500 hover:text-teal-400 hover:bg-teal-500/5'
                                     }`}
                             >
                                 {isPhotoUploaded ? (
@@ -203,14 +203,14 @@ const HealthEquipmentAuditTab: React.FC = () => {
                 <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest pl-2 mb-3">Completed Today</h3>
                 <div className="space-y-2">
                     {targets.filter(t => t.status === 'COMPLETED').map(target => (
-                        <div key={target.id} className="bg-[#1a1d29] border border-gray-800 p-3 rounded-xl flex justify-between items-center opacity-70">
+                        <div key={target.id} className="bg-[#1a1d29] border border-gray-800 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center opacity-70 gap-2 sm:gap-0">
                             <div>
                                 <span className="text-white text-sm font-bold">{target.id}</span>
                                 <p className="text-green-500 text-[10px] font-bold uppercase flex items-center gap-1 mt-1">
                                     <CheckCircle size={12} /> Verified
                                 </p>
                             </div>
-                            <span className="text-xs text-gray-500 border border-gray-700 rounded px-2 py-1 font-mono">
+                            <span className="text-xs text-gray-500 border border-gray-700 rounded px-2 py-1 font-mono self-start sm:self-auto">
                                 {target.lastAudited}
                             </span>
                         </div>

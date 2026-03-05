@@ -44,24 +44,24 @@ const HealthConsumablesTab: React.FC = () => {
                 </div>
             </div>
 
-            <div className="grid gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {inventory.map(item => {
                     const isLowStock = item.currentQty <= item.criticalThreshold;
 
                     return (
                         <div key={item.id} className={`bg-[#2d3142]/80 border rounded-2xl p-4 shadow-lg transition-colors ${isLowStock ? 'border-red-500/50' : 'border-gray-700/50'}`}>
 
-                            <div className="flex justify-between items-start mb-3">
-                                <div>
-                                    <h3 className="text-white font-bold text-lg">{item.name}</h3>
-                                    <p className="text-gray-400 text-xs">{item.description}</p>
+                            <div className="flex flex-col sm:flex-row sm:justify-between items-start mb-3 gap-2 sm:gap-0">
+                                <div className="pr-2">
+                                    <h3 className="text-white font-bold text-lg leading-tight">{item.name}</h3>
+                                    <p className="text-gray-400 text-xs mt-0.5">{item.description}</p>
                                 </div>
                                 {isLowStock ? (
-                                    <span className="text-[10px] flex items-center gap-1 font-bold text-red-400 bg-red-500/20 px-2 py-1 rounded-full uppercase tracking-wider">
-                                        <AlertOctagon size={12} /> Low Stock Flag
+                                    <span className="text-[10px] flex items-center gap-1 font-bold text-red-400 bg-red-500/20 px-2 py-1 rounded-full uppercase tracking-wider whitespace-nowrap self-start sm:self-auto shrink-0">
+                                        <AlertOctagon size={12} /> Low Stock
                                     </span>
                                 ) : (
-                                    <span className="text-[10px] flex items-center gap-1 font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded-full uppercase tracking-wider">
+                                    <span className="text-[10px] flex items-center gap-1 font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded-full uppercase tracking-wider whitespace-nowrap self-start sm:self-auto shrink-0">
                                         <CheckCircle2 size={12} /> Adequate
                                     </span>
                                 )}
