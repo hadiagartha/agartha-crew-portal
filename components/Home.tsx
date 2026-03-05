@@ -36,7 +36,6 @@ const Home: React.FC<HomeProps> = ({ appMode, onViewChange }) => {
     const allWidgets: { id: View; label: string; icon: any; color: string; bg: string }[] = [
         { id: View.ZONE_CHECK_IN, label: 'Zone Check-In', icon: MapPin, color: 'text-blue-400', bg: 'bg-blue-400/10' },
         { id: View.SERVICE_ENTRY_VALIDATION, label: 'Entry Validation', icon: QrCode, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-        { id: View.SERVICE_DASHBOARD, label: 'Service Dashboard', icon: Users, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
         { id: View.FNB_POS_LITE, label: 'POS-Lite', icon: Coffee, color: 'text-amber-400', bg: 'bg-amber-400/10' },
         { id: View.FNB_STOCK_STATUS, label: 'Stock Status', icon: ClipboardList, color: 'text-blue-400', bg: 'bg-blue-400/10' },
         { id: View.FNB_RESTOCK_REQUESTS, label: 'Restock Requests', icon: Truck, color: 'text-purple-400', bg: 'bg-purple-400/10' },

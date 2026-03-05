@@ -559,7 +559,6 @@ const App: React.FC = () => {
       View.MAINTENANCE_LOG,
       View.MAINTENANCE_MANAGER_DASHBOARD,
       View.EXTERNAL_MAINTENANCE_DASHBOARD,
-      View.SERVICE_DASHBOARD,
       View.SERVICE_ENTRY_VALIDATION,
       View.LOGISTICS_PO,
       View.LOGISTICS_RESTOCK,
@@ -683,8 +682,6 @@ const App: React.FC = () => {
         return <RetailAuditTab />;
       case View.SERVICE_ENTRY_VALIDATION:
         return <EntryValidationTab />;
-      case View.SERVICE_DASHBOARD:
-        return <ServiceDashboard />;
       case View.MAINTENANCE_LOG:
         return (
           <InternalMaintenanceDashboard
