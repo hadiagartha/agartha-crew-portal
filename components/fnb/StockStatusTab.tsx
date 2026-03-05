@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useGlobalState } from '../GlobalStateContext';
-import { ToggleLeft, ToggleRight, Search, ListFilter } from 'lucide-react';
+import { ToggleLeft, ToggleRight, Search, ListFilter, ArrowRight } from 'lucide-react';
 
 const StockStatusTab: React.FC = () => {
     const { fnb_menu_items, toggleFNBItemStatus } = useGlobalState();
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('ALL');
+    const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
 
     const filteredItems = fnb_menu_items
         .filter(item => categoryFilter === 'ALL' || item.category === categoryFilter)
@@ -49,57 +50,60 @@ const StockStatusTab: React.FC = () => {
             </div>
 
             <div className="flex-1 overflow-auto px-4 md:px-6 pb-6">
-                <div className="bg-[#2d3142] rounded-xl border border-gray-700 overflow-hidden">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-[#1a1d29] border-b border-gray-700 text-xs uppercase tracking-wider text-gray-400">
-                                <th className="p-4 font-semibold">Menu Item</th>
-                                <th className="p-4 font-semibold">Category</th>
-                                <th className="p-4 font-semibold text-center">Current Stock</th>
-                                <th className="p-4 font-semibold text-center">Status</th>
-                                <th className="p-4 font-semibold text-right">Manual Toggle</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-700/50">
-                            {filteredItems.map(item => (
-                                <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="p-4 text-white font-medium">{item.name}</td>
-                                    <td className="p-4">
-                                        <span className="text-xs font-mono text-gray-300 bg-[#1a1d29] px-2 py-1 rounded">
-                                            {item.category}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-center">
-                                        <span className={`font-mono font-bold ${item.currentStock <= item.lowStockThreshold ? 'text-red-400' : 'text-green-400'}`}>
-                                            {item.currentStock}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-center">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${item.status === 'Available' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                                            }`}>
-                                            {item.status}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-right">
-                                        <button
-                                            onClick={() => toggleFNBItemStatus(item.id, item.status === 'Available' ? 'Out of Stock' : 'Available')}
-                                            className={`transition-colors ${item.status === 'Available' ? 'text-green-400 hover:text-green-300' : 'text-red-400 hover:text-red-300'}`}
-                                            title="Toggle Visibility"
-                                        >
-                                            {item.status === 'Available' ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            {filteredItems.length === 0 && (
-                                <tr>
-                                    <td colSpan={5} className="p-8 text-center text-gray-500">
-                                        No menu items found.
-                                    </td>
-                                </tr>
+                <div className="flex flex-col gap-4">
+                    {filteredItems.map(item => (
+                        <div key={item.id} className="bg-[#2d3142] rounded-2xl border border-gray-700 overflow-hidden shadow-lg transition-all">
+                            {/* Always visible header */}
+                            <div
+                                className="p-5 cursor-pointer flex items-center justify-between hover:bg-white/[0.02] transition-colors"
+                                onClick={() => setExpandedItemId(expandedItemId === item.id ? null : item.id)}
+                            >
+                                <div className="flex gap-4 items-center">
+                                    <div>
+                                        <div className="text-lg font-bold text-white leading-tight">{item.name}</div>
+                                        <div className="text-sm text-gray-400 mt-1 font-medium">Stock: <span className={`font-mono font-bold ${item.currentStock <= item.lowStockThreshold ? 'text-red-400' : 'text-green-400'}`}>{item.currentStock}</span></div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${item.status === 'Available' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                        {item.status}
+                                    </span>
+                                    <div className={`text-gray-500 transition-transform ${expandedItemId === item.id ? 'rotate-90' : ''}`}>
+                                        <ArrowRight size={20} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Expanded details */}
+                            {expandedItemId === item.id && (
+                                <div className="px-5 pb-5 pt-3 border-t border-gray-700/50 bg-black/20 animate-fadeIn flex flex-col gap-4">
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Category</div>
+                                            <span className="text-xs font-bold text-gray-300 bg-[#1a1d29] border border-gray-700 px-3 py-1.5 rounded-lg">
+                                                {item.category}
+                                            </span>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Manual Toggle</div>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); toggleFNBItemStatus(item.id, item.status === 'Available' ? 'Out of Stock' : 'Available'); }}
+                                                className={`transition-colors flex items-center justify-end w-full ${item.status === 'Available' ? 'text-green-400 hover:text-green-300' : 'text-red-400 hover:text-red-300'}`}
+                                                title="Toggle Visibility"
+                                            >
+                                                {item.status === 'Available' ? <ToggleRight size={40} /> : <ToggleLeft size={40} />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             )}
-                        </tbody>
-                    </table>
+                        </div>
+                    ))}
+                    {filteredItems.length === 0 && (
+                        <div className="p-8 text-center text-gray-500 bg-[#2d3142] rounded-2xl border border-gray-700">
+                            No menu items found.
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
