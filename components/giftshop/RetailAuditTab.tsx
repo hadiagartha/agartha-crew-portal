@@ -120,57 +120,55 @@ const RetailAuditTab: React.FC = () => {
                     </div>
 
                     {/* Always show INPUT state for blind audit */}
-                    <>
-                        {/* Display */}
-                        <div className="bg-[#1a1d29] border-2 border-[#2d3142] rounded-3xl p-6 flex flex-col items-center justify-center mb-6 shrink-0">
-                            <span className="text-xs text-gray-500 font-black uppercase tracking-[0.2em] mb-2">Count Input</span>
-                            <div className={`text-6xl font-black font-mono tracking-wider h-16 ${inputCount ? 'text-white' : 'text-gray-700'}`}>
-                                {inputCount || '0'}
-                            </div>
+                    {/* Display */}
+                    <div className="bg-[#1a1d29] border-2 border-[#2d3142] rounded-3xl p-6 flex flex-col items-center justify-center mb-6 shrink-0">
+                        <span className="text-xs text-gray-500 font-black uppercase tracking-[0.2em] mb-2">Count Input</span>
+                        <div className={`text-6xl font-black font-mono tracking-wider h-16 ${inputCount ? 'text-white' : 'text-gray-700'}`}>
+                            {inputCount || '0'}
                         </div>
+                    </div>
 
-                        {/* Keypad */}
-                        <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6 flex-1 max-h-[400px]">
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                                <button
-                                    key={num}
-                                    onClick={() => handleKeypadPress(num.toString())}
-                                    className="bg-[#2d3142] hover:bg-gray-700 active:bg-gray-600 rounded-2xl text-2xl font-bold font-mono text-white flex items-center justify-center transition-colors border border-gray-700/50 shadow-lg active:scale-95"
-                                >
-                                    {num}
-                                </button>
-                            ))}
+                    {/* Keypad */}
+                    <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6 flex-1 max-h-[400px]">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
                             <button
-                                onClick={handleClear}
-                                className="bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 text-red-400 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center transition-colors border border-red-500/20 active:scale-95"
-                            >
-                                Clr
-                            </button>
-                            <button
-                                onClick={() => handleKeypadPress('0')}
+                                key={num}
+                                onClick={() => handleKeypadPress(num.toString())}
                                 className="bg-[#2d3142] hover:bg-gray-700 active:bg-gray-600 rounded-2xl text-2xl font-bold font-mono text-white flex items-center justify-center transition-colors border border-gray-700/50 shadow-lg active:scale-95"
                             >
-                                0
+                                {num}
                             </button>
-                            <button
-                                onClick={handleDelete}
-                                className="bg-gray-600/20 hover:bg-gray-600/30 active:bg-gray-600/40 text-gray-300 rounded-2xl flex items-center justify-center transition-colors border border-gray-600/30 active:scale-95"
-                            >
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" /><line x1="18" y1="9" x2="12" y2="15" /><line x1="12" y2="9" x2="18" y2="15" /></svg>
-                            </button>
-                        </div>
-
+                        ))}
                         <button
-                            onClick={handleSubmitCount}
-                            disabled={!inputCount}
-                            className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shrink-0 mb-6 ${inputCount
-                                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/40 hover:-translate-y-1 active:scale-95'
-                                : 'bg-gray-800 text-gray-600 cursor-not-allowed'
-                                }`}
+                            onClick={handleClear}
+                            className="bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 text-red-400 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center transition-colors border border-red-500/20 active:scale-95"
                         >
-                            <CheckCircle2 size={24} /> Submit Count
+                            Clr
                         </button>
-                    </>
+                        <button
+                            onClick={() => handleKeypadPress('0')}
+                            className="bg-[#2d3142] hover:bg-gray-700 active:bg-gray-600 rounded-2xl text-2xl font-bold font-mono text-white flex items-center justify-center transition-colors border border-gray-700/50 shadow-lg active:scale-95"
+                        >
+                            0
+                        </button>
+                        <button
+                            onClick={handleDelete}
+                            className="bg-gray-600/20 hover:bg-gray-600/30 active:bg-gray-600/40 text-gray-300 rounded-2xl flex items-center justify-center transition-colors border border-gray-600/30 active:scale-95"
+                        >
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" /><line x1="18" y1="9" x2="12" y2="15" /><line x1="12" y1="9" x2="18" y2="15" /></svg>
+                        </button>
+                    </div>
+
+                    <button
+                        onClick={handleSubmitCount}
+                        disabled={!inputCount}
+                        className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shrink-0 mb-6 flex-none ${inputCount
+                            ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/40 hover:-translate-y-1 active:scale-95'
+                            : 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                            }`}
+                    >
+                        <CheckCircle2 size={24} /> Submit Count
+                    </button>
                 </div>
             </div>
         );
