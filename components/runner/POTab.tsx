@@ -111,48 +111,39 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                         </div>
                     </div>
 
-                    {/* PO TABLE VIEW */}
-                    <div className="bg-black/20 rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-white/5 border-b border-white/10">
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">PO Number & Status</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Supplier Name</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Total Items</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredPos.map(po => (
-                                    <tr key={po.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                                        <td className="px-6 py-6">
-                                            <div className="font-bold text-white group-hover:text-blue-400 transition-colors">{po.id}</div>
-                                            <div className={`text-[10px] font-black uppercase tracking-widest mt-1 ${po.status === 'PENDING' ? 'text-yellow-400' : 'text-green-400'}`}>
-                                                {po.status}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-6">
-                                            <div className="text-sm font-medium text-gray-300">{po.supplier}</div>
-                                        </td>
-                                        <td className="px-6 py-6">
-                                            <div className="flex flex-wrap gap-2">
-                                                <span className="px-3 py-1 rounded-md text-[10px] font-black border bg-blue-500/10 text-blue-400 border-blue-500/20">
-                                                    {po.items.length} {po.items.length === 1 ? 'Item' : 'Items'}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-6 text-right">
-                                            <button
-                                                onClick={() => setSelectedPoId(po.id)}
-                                                className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-black px-4 py-2 rounded-lg transition-all flex items-center gap-2 ml-auto"
-                                            >
-                                                SELECT <ArrowRight size={14} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    {/* PO CARDS VIEW (Mobile-Friendly) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {filteredPos.map(po => (
+                            <div key={po.id} className="bg-black/20 rounded-3xl border border-white/5 p-6 hover:bg-white/5 transition-colors flex flex-col gap-4 shadow-xl">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <div className="font-bold text-xl text-white group-hover:text-blue-400 transition-colors">{po.id}</div>
+                                        <div className={`text-[10px] font-black uppercase tracking-widest mt-1 ${po.status === 'PENDING' ? 'text-yellow-400' : 'text-green-400'}`}>
+                                            {po.status}
+                                        </div>
+                                    </div>
+                                    <span className="px-3 py-1 rounded-lg text-xs font-black border bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm">
+                                        {po.items.length} {po.items.length === 1 ? 'Item' : 'Items'}
+                                    </span>
+                                </div>
+                                <div className="text-sm font-medium text-gray-300 bg-white/5 px-4 py-3 rounded-2xl flex items-center gap-2">
+                                    <Truck size={16} className="text-gray-500" />
+                                    {po.supplier}
+                                </div>
+                                <button
+                                    onClick={() => setSelectedPoId(po.id)}
+                                    className="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-black px-4 py-4 rounded-2xl transition-all flex items-center justify-center gap-2 mt-auto shadow-lg shadow-blue-500/20 active:scale-[0.98]"
+                                >
+                                    SELECT ORDER <ArrowRight size={16} />
+                                </button>
+                            </div>
+                        ))}
+                        {filteredPos.length === 0 && (
+                            <div className="col-span-full text-center text-gray-500 py-12 bg-black/20 rounded-3xl border border-white/5 border-dashed">
+                                <Package className="mx-auto mb-4 opacity-50" size={32} />
+                                No Active Purchase Orders found.
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
@@ -178,8 +169,8 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                         </div>
 
                         {/* RECONCILIATION TABLE */}
-                        <div className="bg-black/40 rounded-2xl border border-white/5 overflow-hidden">
-                            <table className="w-full text-left">
+                        <div className="bg-black/40 rounded-2xl border border-white/5 overflow-hidden overflow-x-auto">
+                            <table className="w-full text-left min-w-[600px]">
                                 <thead className="bg-white/5 border-b border-white/10">
                                     <tr>
                                         <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Item Name & Barcode</th>
