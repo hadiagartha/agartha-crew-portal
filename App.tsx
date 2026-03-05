@@ -33,6 +33,7 @@ import DamageReturnTab from './components/giftshop/DamageReturnTab';
 import RetailAuditTab from './components/giftshop/RetailAuditTab';
 import ExternalMaintenanceDashboard from './components/maintenance/ExternalMaintenanceDashboard';
 import ServiceDashboard from './components/service/ServiceDashboard';
+import EntryValidationTab from './components/service/EntryValidationTab';
 import MaintenanceManagerDashboard from './components/maintenance/MaintenanceManagerDashboard';
 import Home from './components/Home';
 import POTab from './components/runner/POTab';
@@ -546,6 +547,7 @@ const App: React.FC = () => {
       View.MAINTENANCE_MANAGER_DASHBOARD,
       View.EXTERNAL_MAINTENANCE_DASHBOARD,
       View.SERVICE_DASHBOARD,
+      View.SERVICE_ENTRY_VALIDATION,
       View.LOGISTICS_PO,
       View.LOGISTICS_RESTOCK,
       View.LOGISTICS_MANUAL,
@@ -666,6 +668,8 @@ const App: React.FC = () => {
         return <DamageReturnTab />;
       case View.RETAIL_AUDIT:
         return <RetailAuditTab />;
+      case View.SERVICE_ENTRY_VALIDATION:
+        return <EntryValidationTab />;
       case View.SERVICE_DASHBOARD:
         return <ServiceDashboard />;
       case View.MAINTENANCE_LOG:

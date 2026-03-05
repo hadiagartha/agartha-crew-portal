@@ -20,7 +20,8 @@ import {
     ClipboardList,
     PackageOpen,
     RefreshCcw,
-    Trash2
+    Trash2,
+    QrCode
 } from 'lucide-react';
 import { View, AppMode, allowedViewsForMode } from '../types';
 
@@ -34,6 +35,7 @@ const Home: React.FC<HomeProps> = ({ appMode, onViewChange }) => {
 
     const allWidgets: { id: View; label: string; icon: any; color: string; bg: string }[] = [
         { id: View.ZONE_CHECK_IN, label: 'Zone Check-In', icon: MapPin, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+        { id: View.SERVICE_ENTRY_VALIDATION, label: 'Entry Validation', icon: QrCode, color: 'text-blue-400', bg: 'bg-blue-400/10' },
         { id: View.SERVICE_DASHBOARD, label: 'Service Dashboard', icon: Users, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
         { id: View.FNB_POS_LITE, label: 'POS-Lite', icon: Coffee, color: 'text-amber-400', bg: 'bg-amber-400/10' },
         { id: View.FNB_STOCK_STATUS, label: 'Stock Status', icon: ClipboardList, color: 'text-blue-400', bg: 'bg-blue-400/10' },
