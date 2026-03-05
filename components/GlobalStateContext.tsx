@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Incident, RestockTask, IncidentSeverity, AuditRequest } from '../types';
+import { Incident, RestockTask, IncidentSeverity, AuditRequest, FNBMenuItem, FNBOrder, FNBPrepBatch, FNBWasteLog } from '../types';
 
 interface HardwareChecklistEntry {
     id: string;
@@ -124,6 +124,17 @@ export interface GlobalState {
     service_tickets: ServiceTicket[];
     reportTechnicalFailure: (zoneId: string, item: string, reason: string, severity: 'Low' | 'High') => void;
     resolveTechnicalFailure: (incidentId: string) => void;
+
+    // F&B Types
+    fnb_menu_items: FNBMenuItem[];
+    fnb_orders: FNBOrder[];
+    fnb_prep_batches: FNBPrepBatch[];
+    fnb_waste_logs: FNBWasteLog[];
+    toggleFNBItemStatus: (id: string, status: 'Available' | 'Out of Stock') => void;
+    completeFNBOrder: (orderId: string) => void;
+    addFNBWasteLog: (log: FNBWasteLog) => void;
+    addFNBPrepBatch: (batch: FNBPrepBatch) => void;
+    updateFNBPrepBatchStatus: (id: string, status: 'In Progress' | 'Cooling' | 'Completed') => void;
 }
 
 const GlobalStateContext = createContext<GlobalState | undefined>(undefined);
@@ -196,6 +207,43 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         { id: 'AUD-002', item: 'Napkins (Bulk)', section: 'Storage B2', unit: 'boxes', status: 'PENDING', expectedQty: 45, lastUpdated: new Date() }
     ]);
     const [serviceTickets, setServiceTickets] = useState<ServiceTicket[]>([]);
+
+    // F&B Initial Data
+    const [fnbMenuItems, setFNBMenuItems] = useState<FNBMenuItem[]>([
+        { id: 'ITM-001', name: 'Bottled Water', category: 'DRINK', status: 'Available', currentStock: 150, lowStockThreshold: 20 },
+        { id: 'ITM-002', name: 'Pre-packaged Meals', category: 'PREPARED ITEM', status: 'Available', currentStock: 45, lowStockThreshold: 20 },
+        { id: 'ITM-003', name: 'Energy Snacks', category: 'RETAIL', status: 'Available', currentStock: 15, lowStockThreshold: 20 },
+        { id: 'ITM-004', name: 'Slush Mix', category: 'RAW INGREDIENT', status: 'Available', currentStock: 10, lowStockThreshold: 5 },
+        { id: 'ITM-005', name: 'Napkins (F&B)', category: 'RETAIL', status: 'Available', currentStock: 500, lowStockThreshold: 100 },
+        { id: 'ITM-006', name: 'Croissant', category: 'PREPARED ITEM', status: 'Out of Stock', currentStock: 0, lowStockThreshold: 10 },
+    ]);
+
+    const [fnbOrders, setFNBOrders] = useState<FNBOrder[]>([
+        {
+            id: 'ORD-8821', priority: true, status: 'PENDING', createdAt: new Date(Date.now() - 1000 * 60 * 5),
+            items: [
+                { menuItemId: 'ITM-001', name: 'Bottled Water', category: 'DRINK', quantity: 2 },
+                { menuItemId: 'ITM-002', name: 'Pre-packaged Meals', category: 'PREPARED ITEM', quantity: 1 }
+            ]
+        },
+        {
+            id: 'ORD-8822', priority: false, status: 'PENDING', createdAt: new Date(Date.now() - 1000 * 60 * 2),
+            items: [
+                { menuItemId: 'ITM-003', name: 'Energy Snacks', category: 'RETAIL', quantity: 3 }
+            ]
+        }
+    ]);
+
+    const [fnbPrepBatches, setFNBPrepBatches] = useState<FNBPrepBatch[]>([
+        {
+            id: 'BAT-001', recipeName: 'Slushy Batch (Berry)', status: 'In Progress', yieldQuantity: 20, unit: 'Liters',
+            rawIngredientsUsed: [{ menuItemId: 'ITM-004', quantity: 2 }], startedAt: new Date(Date.now() - 1000 * 60 * 30)
+        }
+    ]);
+
+    const [fnbWasteLogs, setFNBWasteLogs] = useState<FNBWasteLog[]>([
+        { id: 'WST-001', item: 'Croissant', category: 'PREPARED ITEM', reasonCode: 'Expired / EOD', quantity: 5, costImpact: 45.0, timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2) }
+    ]);
 
     const addPromoCode = (code: string, scannedBy: string) => {
         setPromoCodes(prev => [...prev, { code, scannedAt: new Date(), scannedBy }]);
@@ -321,7 +369,71 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
         zone_statuses: zoneStatuses,
         service_tickets: serviceTickets,
         reportTechnicalFailure,
-        resolveTechnicalFailure
+        resolveTechnicalFailure,
+
+        // F&B
+        fnb_menu_items: fnbMenuItems,
+        fnb_orders: fnbOrders,
+        fnb_prep_batches: fnbPrepBatches,
+        fnb_waste_logs: fnbWasteLogs,
+        toggleFNBItemStatus: (id, status) => {
+            setFNBMenuItems(prev => prev.map(item => item.id === id ? { ...item, status } : item));
+        },
+        completeFNBOrder: (orderId) => {
+            // First mark as completed
+            setFNBOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'COMPLETED' } : o));
+
+            // Deduce inventory
+            const order = fnbOrders.find(o => o.id === orderId);
+            if (order) {
+                order.items.forEach(orderItem => {
+                    setFNBMenuItems(prev => prev.map(menuItem => {
+                        if (menuItem.id === orderItem.menuItemId) {
+                            const newStock = Math.max(0, menuItem.currentStock - orderItem.quantity);
+                            // Auto-stock logic
+                            const newStatus = newStock === 0 ? 'Out of Stock' : menuItem.status;
+                            return { ...menuItem, currentStock: newStock, status: newStatus };
+                        }
+                        return menuItem;
+                    }));
+                });
+            }
+        },
+        addFNBWasteLog: (log) => setFNBWasteLogs(prev => [log, ...prev]),
+        addFNBPrepBatch: (batch) => {
+            setFNBPrepBatches(prev => [batch, ...prev]);
+            // Backflush raw ingredients if completed
+            if (batch.status === 'Completed') {
+                batch.rawIngredientsUsed.forEach(ing => {
+                    setFNBMenuItems(prev => prev.map(m => {
+                        if (m.id === ing.menuItemId) {
+                            const newStock = Math.max(0, m.currentStock - ing.quantity);
+                            return { ...m, currentStock: newStock, status: newStock === 0 ? 'Out of Stock' : m.status };
+                        }
+                        return m;
+                    }));
+                });
+                // Add the yielded item to stock
+                setFNBMenuItems(prev => {
+                    const yieldedItem = prev.find(m => m.name === batch.recipeName);
+                    if (yieldedItem) {
+                        return prev.map(m => m.id === yieldedItem.id ? { ...m, currentStock: m.currentStock + batch.yieldQuantity, status: 'Available' } : m);
+                    } else {
+                        // Create generic item if it didn't exist
+                        const newItem: FNBMenuItem = {
+                            id: `ITM-PREP-${Date.now()}`,
+                            name: batch.recipeName,
+                            category: 'PREPARED ITEM',
+                            status: 'Available',
+                            currentStock: batch.yieldQuantity,
+                            lowStockThreshold: 10
+                        };
+                        return [...prev, newItem];
+                    }
+                });
+            }
+        },
+        updateFNBPrepBatchStatus: (id, status) => setFNBPrepBatches(prev => prev.map(b => b.id === id ? { ...b, status } : b))
     };
 
     return <GlobalStateContext.Provider value={value}>{children}</GlobalStateContext.Provider>;

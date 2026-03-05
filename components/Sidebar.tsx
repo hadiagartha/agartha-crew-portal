@@ -20,7 +20,9 @@ import {
   Users,
   LayoutDashboard,
   PackageOpen,
-  ClipboardList
+  ClipboardList,
+  RefreshCcw,
+  Trash2
 } from 'lucide-react';
 import { View, AppMode, allowedViewsForMode } from '../types';
 
@@ -39,7 +41,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
 
   // Dashboards that require a shift check-in
   const shiftRequiredViews = [
-    View.FNB_DASHBOARD,
     View.RUNNER_DASHBOARD,
     View.SECURITY_DASHBOARD,
     View.HEALTH_DASHBOARD,
@@ -47,13 +48,17 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     View.CLEANING_DASHBOARD,
     View.GIFTSHOP_DASHBOARD,
     View.MAINTENANCE_LOG,
-    View.EXTERNAL_MAINTENANCE_DASHBOARD,
     View.SERVICE_DASHBOARD,
     View.LOGISTICS_PO,
     View.LOGISTICS_RESTOCK,
     View.LOGISTICS_MANUAL,
     View.LOGISTICS_INCIDENT,
-    View.LOGISTICS_AUDIT
+    View.LOGISTICS_AUDIT,
+    View.FNB_POS_LITE,
+    View.FNB_STOCK_STATUS,
+    View.FNB_RESTOCK_REQUESTS,
+    View.FNB_WASTE_LOG,
+    View.FNB_PREP_BATCHES
   ];
 
   const allNavItems = [
@@ -65,7 +70,14 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     { id: View.LOGISTICS_INCIDENT, label: 'Report Incident', icon: ShieldAlert },
     { id: View.LOGISTICS_AUDIT, label: 'Stock Counting (Audit)', icon: ClipboardList },
     { id: View.SERVICE_DASHBOARD, label: 'Service Dashboard', icon: Users },
-    { id: View.FNB_DASHBOARD, label: 'F&B Dashboard', icon: Coffee },
+
+    // F&B Specific Tabs
+    { id: View.FNB_POS_LITE, label: 'POS-Lite (Fulfillment)', icon: Coffee },
+    { id: View.FNB_STOCK_STATUS, label: 'Stock Status', icon: ClipboardList },
+    { id: View.FNB_RESTOCK_REQUESTS, label: 'Restock Requests', icon: Truck },
+    { id: View.FNB_WASTE_LOG, label: 'Waste Log', icon: Trash2 },
+    { id: View.FNB_PREP_BATCHES, label: 'Prep Batches', icon: RefreshCcw },
+
     { id: View.SECURITY_DASHBOARD, label: 'Security Tactical', icon: ShieldAlert },
     { id: View.HEALTH_DASHBOARD, label: 'Medical Triage', icon: HeartPulse },
     { id: View.EXPERIENCE_DASHBOARD, label: 'Experience Control', icon: Sparkles },

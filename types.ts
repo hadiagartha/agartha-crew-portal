@@ -8,7 +8,11 @@ export enum View {
   CHECK_IN_LOG = 'CHECK_IN_LOG',
   ANNOUNCEMENTS = 'ANNOUNCEMENTS',
   SETTINGS = 'SETTINGS',
-  FNB_DASHBOARD = 'FNB_DASHBOARD',
+  FNB_POS_LITE = 'FNB_POS_LITE',
+  FNB_STOCK_STATUS = 'FNB_STOCK_STATUS',
+  FNB_RESTOCK_REQUESTS = 'FNB_RESTOCK_REQUESTS',
+  FNB_WASTE_LOG = 'FNB_WASTE_LOG',
+  FNB_PREP_BATCHES = 'FNB_PREP_BATCHES',
   RUNNER_DASHBOARD = 'RUNNER_DASHBOARD',
   SECURITY_DASHBOARD = 'SECURITY_DASHBOARD',
   HEALTH_DASHBOARD = 'HEALTH_DASHBOARD',
@@ -165,12 +169,13 @@ export function deriveModeFromStaff(staff: StaffMember): AppMode {
 
 export function defaultViewForMode(mode: AppMode): View {
   switch (mode) {
+    case 'FNB':
+      return View.FNB_POS_LITE;
     case 'INTERNAL_MAINTENANCE':
     case 'SERVICE_CREW':
     case 'SECURITY_CREW':
     case 'HEALTH_CREW':
     case 'CLEANING_CREW':
-    case 'FNB':
     case 'RUNNER':
     case 'EXPERIENCE_CREW':
     case 'GIFTSHOP_CREW':
@@ -200,7 +205,17 @@ export function allowedViewsForMode(mode: AppMode): View[] {
     case 'CLEANING_CREW':
       return [View.HOME, View.ZONE_CHECK_IN, View.CLEANING_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'FNB':
-      return [View.HOME, View.ZONE_CHECK_IN, View.FNB_DASHBOARD, View.DAILY_CHECKLIST, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [
+        View.HOME,
+        View.ZONE_CHECK_IN,
+        View.FNB_POS_LITE,
+        View.FNB_STOCK_STATUS,
+        View.FNB_RESTOCK_REQUESTS,
+        View.FNB_WASTE_LOG,
+        View.FNB_PREP_BATCHES,
+        View.SETTINGS,
+        View.ANNOUNCEMENTS
+      ];
     case 'RUNNER':
       return [
         View.HOME,
@@ -265,4 +280,51 @@ export interface ManualRestockLog {
   timestamp: Date;
   photoProof: string;
   zoneQrVerified: boolean;
+}
+
+// --- F&B specific types ---
+export interface FNBMenuItem {
+  id: string;
+  name: string;
+  category: 'RAW INGREDIENT' | 'PREPARED ITEM' | 'RETAIL' | 'DRINK';
+  status: 'Available' | 'Out of Stock';
+  currentStock: number;
+  lowStockThreshold: number;
+}
+
+export interface FNBOrder {
+  id: string;
+  priority: boolean;
+  items: {
+    menuItemId: string;
+    name: string;
+    category: 'RAW INGREDIENT' | 'PREPARED ITEM' | 'RETAIL' | 'DRINK';
+    quantity: number;
+  }[];
+  status: 'PENDING' | 'PREPARING' | 'COMPLETED';
+  createdAt: Date;
+}
+
+export interface FNBPrepBatch {
+  id: string;
+  recipeName: string;
+  status: 'In Progress' | 'Cooling' | 'Completed';
+  yieldQuantity: number;
+  unit: string;
+  rawIngredientsUsed: {
+    menuItemId: string;
+    quantity: number;
+  }[];
+  startedAt: Date;
+  bestBefore?: Date;
+}
+
+export interface FNBWasteLog {
+  id: string;
+  item: string;
+  category: string;
+  reasonCode: 'Expired / EOD' | 'Dropped / Spilled' | 'Contaminated' | 'Prep Error';
+  quantity: number;
+  costImpact: number; // hidden from crew
+  timestamp: Date;
 }

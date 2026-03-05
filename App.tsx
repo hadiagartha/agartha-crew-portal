@@ -12,7 +12,11 @@ import CheckInLog from './components/CheckInLog';
 import ZoneSurveillance from './components/security/ZoneSurveillance';
 import Settings from './components/Settings';
 import Broadcasts from './components/Broadcasts';
-import FNBDashboard from './components/service/FNBDashboard';
+import POSLiteTab from './components/fnb/POSLiteTab';
+import StockStatusTab from './components/fnb/StockStatusTab';
+import FNBRestockTab from './components/fnb/FNBRestockTab';
+import WasteLogTab from './components/fnb/WasteLogTab';
+import PrepBatchesTab from './components/fnb/PrepBatchesTab';
 import RunnerDashboard from './components/runner/RunnerDashboard';
 import SecurityDashboard from './components/security/SecurityDashboard';
 import HealthDashboard from './components/health/HealthDashboard';
@@ -520,7 +524,6 @@ const App: React.FC = () => {
 
     // List of Operational Dashboards that require an active shift
     const shiftRequiredViews = [
-      View.FNB_DASHBOARD,
       View.RUNNER_DASHBOARD,
       View.SECURITY_DASHBOARD,
       View.HEALTH_DASHBOARD,
@@ -535,7 +538,12 @@ const App: React.FC = () => {
       View.LOGISTICS_RESTOCK,
       View.LOGISTICS_MANUAL,
       View.LOGISTICS_INCIDENT,
-      View.LOGISTICS_AUDIT
+      View.LOGISTICS_AUDIT,
+      View.FNB_POS_LITE,
+      View.FNB_STOCK_STATUS,
+      View.FNB_RESTOCK_REQUESTS,
+      View.FNB_WASTE_LOG,
+      View.FNB_PREP_BATCHES
     ];
 
     if (!isOnShift && shiftRequiredViews.includes(activeView)) {
@@ -572,8 +580,16 @@ const App: React.FC = () => {
             onCheckOutComplete={handleCheckOutComplete}
           />
         );
-      case View.FNB_DASHBOARD:
-        return <FNBDashboard onRequestRestock={handleRequestRestock} restockTasks={restockTasks} />;
+      case View.FNB_POS_LITE:
+        return <POSLiteTab />;
+      case View.FNB_STOCK_STATUS:
+        return <StockStatusTab />;
+      case View.FNB_RESTOCK_REQUESTS:
+        return <FNBRestockTab />;
+      case View.FNB_WASTE_LOG:
+        return <WasteLogTab />;
+      case View.FNB_PREP_BATCHES:
+        return <PrepBatchesTab />;
       case View.LOGISTICS_PO:
         return <POTab onTriggerIncident={handleTriggerLogisticsIncident} />;
       case View.LOGISTICS_RESTOCK:
