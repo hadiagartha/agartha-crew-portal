@@ -9,6 +9,7 @@ const RestockTab: React.FC = () => {
     const [hasPhoto, setHasPhoto] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
     const [showQrScan, setShowQrScan] = useState(false);
+    const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
     const activeTask = restock_tasks.find(t => t.id === activeTaskId);
 
@@ -45,49 +46,64 @@ const RestockTab: React.FC = () => {
                         </h3>
                     </div>
 
-                    <div className="bg-black/20 rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-white/5 border-b border-white/10">
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Task ID</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Item Details</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Route (From &rarr; To)</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {restock_tasks.filter(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS').map(task => (
-                                    <tr key={task.id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                                        <td className="px-6 py-6 font-bold">
-                                            <div className="text-white group-hover:text-yellow-400 transition-colors">{task.id}</div>
+                    <div className="flex flex-col gap-4">
+                        {restock_tasks.filter(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS').map(task => (
+                            <div key={task.id} className="bg-black/20 rounded-[1.5rem] border border-white/5 overflow-hidden shadow-xl transition-all">
+                                {/* Always visible header */}
+                                <div
+                                    className="p-6 cursor-pointer flex items-center justify-between hover:bg-white/5 transition-colors"
+                                    onClick={() => setExpandedTaskId(expandedTaskId === task.id ? null : task.id)}
+                                >
+                                    <div className="flex gap-4 items-center">
+                                        <div className={`p-3 rounded-xl border ${task.status === 'IN_PROGRESS' ? 'bg-blue-500/10 border-blue-500/30' : 'bg-yellow-500/10 border-yellow-500/30'} flex items-center justify-center`}>
+                                            <Package size={20} className={task.status === 'IN_PROGRESS' ? 'text-blue-400' : 'text-yellow-400'} />
+                                        </div>
+                                        <div>
+                                            <div className="text-xl font-black text-white">{task.id}</div>
                                             <div className={`text-[10px] font-black uppercase tracking-widest mt-1 ${task.status === 'IN_PROGRESS' ? 'text-blue-400' : 'text-yellow-500'}`}>
-                                                {task.status === 'IN_PROGRESS' ? 'ACCEPTED - PENDING' : 'PENDING'}
+                                                {task.status === 'IN_PROGRESS' ? 'ACCEPTED' : 'PENDING'}
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-6">
-                                            <div className="text-sm font-bold text-gray-200">{task.item}</div>
-                                            <div className="text-[10px] text-gray-500 font-mono mt-0.5">{task.barcode} • {task.quantity} {task.unit}</div>
-                                        </td>
-                                        <td className="px-6 py-6">
-                                            <div className="flex items-center gap-2 text-xs font-medium text-gray-400">
-                                                <MapPin size={14} className="text-red-400" />
-                                                <span className="text-gray-500">{task.origin || 'Warehouse'}</span>
-                                                <ArrowRight size={12} className="mx-1 text-gray-600" />
-                                                <span className="text-white font-bold">{task.standLocation}</span>
+                                        </div>
+                                    </div>
+                                    <div className={`text-gray-500 transition-transform ${expandedTaskId === task.id ? 'rotate-90' : ''}`}>
+                                        <ArrowRight size={20} />
+                                    </div>
+                                </div>
+
+                                {/* Expanded details */}
+                                {expandedTaskId === task.id && (
+                                    <div className="px-6 pb-6 pt-2 border-t border-white/5 bg-black/40 animate-fadeIn">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                            <div className="space-y-1">
+                                                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Item Details</div>
+                                                <div className="text-lg font-bold text-white mb-1">{task.item}</div>
+                                                <div className="inline-block text-[10px] border border-white/10 px-2 py-0.5 bg-white/5 rounded text-gray-400 font-mono mb-2">{task.barcode || 'NO-BC'}</div>
+                                                <div className="text-sm font-bold text-gray-300 bg-white/5 py-1 px-3 rounded inline-flex">Qty: {task.quantity} {task.unit}</div>
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-6 text-right">
-                                            <button
-                                                onClick={() => handleAcceptTask(task.id)}
-                                                className={`${task.status === 'IN_PROGRESS' ? 'bg-blue-500 hover:bg-blue-400' : 'bg-yellow-500 hover:bg-yellow-400'} text-black text-xs font-black px-4 py-2 rounded-lg transition-all flex items-center gap-2 ml-auto shadow-lg shadow-yellow-500/10`}
-                                            >
-                                                {task.status === 'IN_PROGRESS' ? 'RESUME' : 'ACCEPT'} <Play size={14} fill="currentColor" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+
+                                            <div className="space-y-3">
+                                                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Route</div>
+                                                <div className="flex items-center gap-3">
+                                                    <MapPin size={16} className="text-red-400 shrink-0" />
+                                                    <span className="text-sm text-gray-400">From: <span className="text-white font-medium">{task.origin || 'Warehouse'}</span></span>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <MapPin size={16} className="text-green-400 shrink-0" />
+                                                    <span className="text-sm text-gray-400">To: <span className="text-white font-medium">{task.standLocation}</span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleAcceptTask(task.id); }}
+                                            className={`w-full py-4 text-black text-sm font-black rounded-xl transition-all flex justify-center items-center gap-2 shadow-lg ${task.status === 'IN_PROGRESS' ? 'bg-blue-500 hover:bg-blue-400 shadow-blue-500/20' : 'bg-yellow-500 hover:bg-yellow-400 shadow-yellow-500/20'}`}
+                                        >
+                                            {task.status === 'IN_PROGRESS' ? 'RESUME TASK' : 'ACCEPT TASK'} <Play size={16} fill="currentColor" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 </div>
             )}

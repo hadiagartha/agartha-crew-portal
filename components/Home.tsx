@@ -18,7 +18,9 @@ import {
     Users,
     LayoutDashboard,
     ClipboardList,
-    PackageOpen
+    PackageOpen,
+    RefreshCcw,
+    Trash2
 } from 'lucide-react';
 import { View, AppMode, allowedViewsForMode } from '../types';
 
@@ -33,7 +35,12 @@ const Home: React.FC<HomeProps> = ({ appMode, onViewChange }) => {
     const allWidgets: { id: View; label: string; icon: any; color: string; bg: string }[] = [
         { id: View.ZONE_CHECK_IN, label: 'Zone Check-In', icon: MapPin, color: 'text-blue-400', bg: 'bg-blue-400/10' },
         { id: View.SERVICE_DASHBOARD, label: 'Service Dashboard', icon: Users, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
-        { id: View.FNB_DASHBOARD, label: 'F&B Dashboard', icon: Coffee, color: 'text-orange-400', bg: 'bg-orange-400/10' },
+        { id: View.FNB_POS_LITE, label: 'POS-Lite', icon: Coffee, color: 'text-amber-400', bg: 'bg-amber-400/10' },
+        { id: View.FNB_STOCK_STATUS, label: 'Stock Status', icon: ClipboardList, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+        { id: View.FNB_RESTOCK_REQUESTS, label: 'Restock Requests', icon: Truck, color: 'text-purple-400', bg: 'bg-purple-400/10' },
+        { id: View.FNB_WASTE_LOG, label: 'Waste Log', icon: Trash2, color: 'text-red-400', bg: 'bg-red-400/10' },
+        { id: View.FNB_PREP_BATCHES, label: 'Prep Batches', icon: RefreshCcw, color: 'text-green-400', bg: 'bg-green-400/10' },
+
         { id: View.LOGISTICS_PO, label: 'Purchase Orders (Inbound)', icon: Truck, color: 'text-blue-400', bg: 'bg-blue-400/10' },
         { id: View.LOGISTICS_RESTOCK, label: 'Dispatch Queue', icon: Package, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
         { id: View.LOGISTICS_MANUAL, label: 'Manual Restock', icon: PackageOpen, color: 'text-orange-400', bg: 'bg-orange-400/10' },

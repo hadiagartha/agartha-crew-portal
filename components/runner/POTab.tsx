@@ -168,39 +168,41 @@ const POTab: React.FC<POTabProps> = ({ onTriggerIncident }) => {
                             </div>
                         </div>
 
-                        {/* RECONCILIATION TABLE */}
-                        <div className="bg-black/40 rounded-2xl border border-white/5 overflow-hidden overflow-x-auto">
-                            <table className="w-full text-left min-w-[600px]">
-                                <thead className="bg-white/5 border-b border-white/10">
-                                    <tr>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Item Name & Barcode</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-center">Expected Qty</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-center">Unit</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Actual Received</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {selectedPO.items.map(item => (
-                                        <tr key={item.item} className="border-b border-white/5">
-                                            <td className="px-6 py-6">
-                                                <div className="font-bold text-white">{item.item}</div>
-                                                <div className="text-[10px] text-gray-400 font-mono mt-0.5">{item.barcode || 'N/A'}</div>
-                                            </td>
-                                            <td className="px-6 py-6 text-center text-blue-400 font-black">{item.expected}</td>
-                                            <td className="px-6 py-6 text-center text-gray-400 font-bold text-xs uppercase">{item.unit || 'pcs'}</td>
-                                            <td className="px-6 py-6 text-right">
-                                                <input
-                                                    type="number"
-                                                    placeholder="0"
-                                                    className="w-24 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-center font-bold focus:outline-none focus:border-blue-500 transition-all"
-                                                    value={receivedQtys[item.item] || ''}
-                                                    onChange={(e) => handleQtyChange(item.item, e.target.value)}
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        {/* RECONCILIATION LIST FOR MOBILE */}
+                        <div className="flex flex-col gap-4">
+                            {selectedPO.items.map(item => (
+                                <div key={item.item} className="bg-black/40 rounded-2xl border border-white/5 p-5 flex flex-col gap-4">
+                                    <div className="flex justify-between items-start border-b border-white/5 pb-4">
+                                        <div>
+                                            <div className="font-bold text-lg text-white">{item.item}</div>
+                                            <div className="text-xs text-gray-500 font-mono mt-1 border border-white/10 inline-block px-2 py-0.5 bg-white/5 rounded">{item.barcode || 'N/A'}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1">Expected</div>
+                                            <div className="text-xl text-blue-400 font-black">{item.expected}</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-4 items-end">
+                                        <div className="flex-1">
+                                            <label className="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Actual Received</label>
+                                            <input
+                                                type="number"
+                                                placeholder="0"
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-bold focus:outline-none focus:border-blue-500 transition-all text-center text-lg"
+                                                value={receivedQtys[item.item] || ''}
+                                                onChange={(e) => handleQtyChange(item.item, e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="w-24">
+                                            <label className="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 text-center">Unit</label>
+                                            <div className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-gray-400 text-center font-bold text-sm uppercase flex items-center justify-center h-[52px]">
+                                                {item.unit || 'pcs'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
                         {/* FINALIZATION ACTIONS */}
