@@ -112,13 +112,25 @@ const INITIAL_LOGS: CheckInRecord[] = [
 ];
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [staff, setStaff] = useState<StaffMember | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [staff, setStaff] = useState<StaffMember | null>({
+    id: 'staff-999',
+    staff_id: 'SRV-TEST-01',
+    name: 'Service Test User',
+    role: 'service_crew',
+    current_zone_id: 'Z-01',
+    isOnShift: true,
+    phone_number: '555-0199',
+    failed_login_attempts: 0,
+    last_failed_login: null,
+    locked_until: null,
+    last_login_at: new Date().toISOString()
+  });
+  const [token, setToken] = useState<string | null>('test-token');
   const [broadcasts, setBroadcasts] = useState<Alert[]>([]);
   const [localAlerts, setLocalAlerts] = useState<Alert[]>([]);
   const [pendingStationaryAlert, setPendingStationaryAlert] = useState<Alert | null>(null);
-  const [appMode, setAppMode] = useState<AppMode>('UNKNOWN');
+  const [appMode, setAppMode] = useState<AppMode>('SERVICE_CREW');
   const isTechOpsRole = ['INTERNAL_MAINTENANCE', 'TECH_SUPPORT'].includes(appMode);
 
   // Global Maintenance State
@@ -127,7 +139,8 @@ const App: React.FC = () => {
   // Track if there are unread general announcements
   const [hasUnreadAnnouncements, setHasUnreadAnnouncements] = useState(false);
 
-  const [currentView, setCurrentView] = useState<View>(View.ZONE_CHECK_IN);
+  // For testing, default to Home or the Entry Validation view
+  const [currentView, setCurrentView] = useState<View>(View.HOME);
   const [incidents, setIncidents] = useState<Incident[]>(INITIAL_INCIDENTS);
   const [checkInLogs, setCheckInLogs] = useState<CheckInRecord[]>(INITIAL_LOGS);
   const [incidentDefaultTab, setIncidentDefaultTab] = useState<'REPORT' | 'LOG' | undefined>(undefined);
@@ -187,8 +200,8 @@ const App: React.FC = () => {
     }
   ]);
 
-  // Shift state: Starts false, becomes true after Zone Check-In
-  const [isOnShift, setIsOnShift] = useState(false);
+  // Shift state: Starts true in testing mode
+  const [isOnShift, setIsOnShift] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
