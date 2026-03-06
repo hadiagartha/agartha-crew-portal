@@ -24,7 +24,6 @@ import ExperienceLostAndFoundTab from './components/service/ExperienceLostAndFou
 import CleaningResponseTab from './components/cleaning/CleaningResponseTab';
 import CleaningStockTab from './components/cleaning/CleaningStockTab';
 import CleaningRestockTab from './components/cleaning/CleaningRestockTab';
-import SanitationAuditTab from './components/cleaning/SanitationAuditTab';
 import ReceivingTab from './components/giftshop/ReceivingTab';
 import RetailStatusTab from './components/giftshop/RetailStatusTab';
 import RetailRestockTab from './components/giftshop/RetailRestockTab';
@@ -562,7 +561,6 @@ const App: React.FC = () => {
       View.CLEANING_RESPONSE_QUEUE,
       View.CLEANING_STOCK,
       View.CLEANING_RESTOCK,
-      View.CLEANING_AUDIT,
       View.GIFTSHOP_DASHBOARD,
       View.MAINTENANCE_LOG,
       View.MAINTENANCE_MANAGER_DASHBOARD,
@@ -670,8 +668,6 @@ const App: React.FC = () => {
         return <CleaningStockTab />;
       case View.CLEANING_RESTOCK:
         return <CleaningRestockTab />;
-      case View.CLEANING_AUDIT:
-        return <SanitationAuditTab />;
       case View.RETAIL_RECEIVING:
         return <ReceivingTab />;
       case View.RETAIL_STATUS:
