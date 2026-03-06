@@ -267,9 +267,9 @@ const ZoneSurveillance: React.FC<ZoneSurveillanceProps> = ({ hasHealthPulseAlert
 
             {/* Main Content Area */}
             <div className="flex-1 min-h-0 bg-[#000] rounded-xl border border-[#2d3142] shadow-2xl overflow-hidden relative">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 h-full w-full p-2 overflow-y-auto custom-scrollbar content-start">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 h-full w-full p-2 overflow-y-auto custom-scrollbar">
                     {cameras.map((cam) => (
-                        <div key={cam.id} className="relative bg-[#111] rounded overflow-hidden group cursor-pointer hover:ring-1 hover:ring-yellow-400 transition-all aspect-video">
+                        <div key={cam.id} className="relative bg-[#111] rounded overflow-hidden group cursor-pointer hover:ring-1 hover:ring-yellow-400 transition-all min-h-[140px] md:min-h-[180px] lg:min-h-[220px]">
                             <div className="absolute inset-0 bg-gradient-to-br from-[#1a1d29] to-[#0d0f14] opacity-80"></div>
                             <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-700 via-transparent to-black"></div>
                             <div className="absolute inset-x-0 h-[2px] bg-white/5 top-0 animate-[scan_3s_linear_infinite] pointer-events-none opacity-50"></div>
