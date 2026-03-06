@@ -25,6 +25,7 @@ const ZoneCheckIn: React.FC<ZoneCheckInProps> = ({ onViewChange, isOnShift, onCh
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState(0); // 0 = idle, 1 = permission/start scan, 2 = scanning, 3 = confirming
 
   // Real-time Clock State
   const [now, setNow] = useState(new Date());
@@ -117,13 +118,42 @@ const ZoneCheckIn: React.FC<ZoneCheckInProps> = ({ onViewChange, isOnShift, onCh
     }, 1400);
   };
 
-  const handleCheckOut = () => {
-    setIsCheckingOut(true);
-    // Simulate checkout network request
+  const startCheckoutScan = () => {
+    setCheckoutStep(1);
+  };
+
+  const processCheckoutScan = () => {
+    setIsCameraActive(true);
+    setCheckoutStep(2);
+    setScanProgress(0);
+
+    if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
+
+    scanIntervalRef.current = window.setInterval(() => {
+      setScanProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(scanIntervalRef.current!);
+          finishCheckoutScan();
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 40);
+  };
+
+  const finishCheckoutScan = () => {
+    setCheckoutStep(3);
+    setIsCameraActive(false);
+
+    // Auto-checkout after brief verification delay
     setTimeout(() => {
-      onCheckOutComplete();
-      setIsCheckingOut(false);
-    }, 2000);
+      setIsCheckingOut(true);
+      setTimeout(() => {
+        onCheckOutComplete();
+        setIsCheckingOut(false);
+        setCheckoutStep(0);
+      }, 1500);
+    }, 800);
   };
 
   // Render Functions for Different States
@@ -228,15 +258,75 @@ const ZoneCheckIn: React.FC<ZoneCheckInProps> = ({ onViewChange, isOnShift, onCh
           </div>
         </div>
 
-        <div className="w-full max-w-sm">
-          <p className="text-xs text-red-400/80 mb-3 font-bold uppercase tracking-widest">End of Shift Actions</p>
-          <button
-            onClick={handleCheckOut}
-            className="w-full bg-[#1a1d29] hover:bg-red-500/10 text-red-400 hover:text-red-500 border border-red-500/30 hover:border-red-500 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all group shadow-lg"
-          >
-            <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" /> Scan Out / End Shift
-          </button>
-        </div>
+        {checkoutStep === 0 ? (
+          <div className="w-full max-w-sm">
+            <p className="text-xs text-red-400/80 mb-3 font-bold uppercase tracking-widest">End of Shift Actions</p>
+            <button
+              onClick={startCheckoutScan}
+              className="w-full bg-[#1a1d29] hover:bg-red-500/10 text-red-400 hover:text-red-500 border border-red-500/30 hover:border-red-500 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all group shadow-lg"
+            >
+              <QrCode size={20} className="group-hover:scale-110 transition-transform" /> Scan Out / End Shift
+            </button>
+          </div>
+        ) : checkoutStep === 1 ? (
+          <div className="w-full max-w-sm bg-[#1a1d29] rounded-2xl p-6 border border-gray-700 shadow-xl">
+            <div className="flex flex-col items-center justify-center gap-4 text-center">
+              <div className="w-16 h-16 bg-[#2d3142] rounded-full flex items-center justify-center">
+                <Camera className="text-gray-400" size={32} />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">Scan Out Required</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Scan the Zone QR code to securely log out and end your shift.
+                </p>
+              </div>
+              <div className="flex gap-3 w-full mt-2">
+                <button
+                  onClick={() => setCheckoutStep(0)}
+                  className="flex-1 bg-transparent text-gray-400 border border-gray-700 hover:text-white py-2 rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={processCheckoutScan}
+                  className="flex-1 bg-red-500 text-white py-2 rounded-lg font-bold hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
+                >
+                  Start Scan
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : checkoutStep === 2 ? (
+          <div className="w-full max-w-sm rounded-xl overflow-hidden bg-black aspect-square flex flex-col items-center justify-center border border-[#2d3142] relative">
+            <div className="absolute inset-x-0 bottom-6 px-8 z-20">
+              <div className="flex justify-between text-xs text-yellow-400 font-mono mb-2 drop-shadow-md">
+                <span>SCANNING OUT...</span>
+                <span>{Math.round(scanProgress)}%</span>
+              </div>
+              <div className="h-1 bg-[#2d3142] rounded-full overflow-hidden shadow-lg">
+                <div
+                  className="h-full bg-gradient-to-r from-red-400 to-yellow-500 transition-all duration-100 ease-linear"
+                  style={{ width: `${scanProgress}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="relative z-10 w-48 h-48 border-2 border-red-500 rounded-lg flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+              <div className="absolute inset-x-0 h-0.5 bg-red-400 shadow-[0_0_15px_rgba(239,68,68,1)] animate-[scan_2s_ease-in-out_infinite] top-0" />
+              <QrCode className="text-white/50" size={48} />
+            </div>
+          </div>
+        ) : (
+          <div className="w-full max-w-sm bg-[#1a1d29] rounded-2xl p-6 border border-green-500/50 shadow-[0_0_30px_rgba(34,197,94,0.1)]">
+            <div className="flex flex-col items-center gap-4 text-center">
+              <CheckCircle className="text-green-500" size={48} />
+              <div>
+                <h3 className="text-lg font-bold text-white">Scan Verified</h3>
+                <p className="text-gray-400 text-sm">Processing checkout sequence...</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -250,7 +340,7 @@ const ZoneCheckIn: React.FC<ZoneCheckInProps> = ({ onViewChange, isOnShift, onCh
         {!isOnShift && (
           <>
             <div>
-              <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Zone Check-In</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Check-In</h2>
               <p className="text-sm md:text-base text-gray-400">Complete the validation sequence to begin your shift operations.</p>
             </div>
 

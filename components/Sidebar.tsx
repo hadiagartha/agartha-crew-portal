@@ -77,7 +77,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
 
   const allNavItems = [
     { id: View.HOME, label: 'Home', icon: LayoutDashboard },
-    { id: View.ZONE_CHECK_IN, label: 'Zone Check-In', icon: MapPin },
+    { id: View.ZONE_CHECK_IN, label: 'Check-In', icon: MapPin },
     { id: View.LOGISTICS_PO, label: 'Purchase Orders (Inbound)', icon: Truck },
     { id: View.LOGISTICS_RESTOCK, label: 'Dispatch Queue', icon: Package },
     { id: View.LOGISTICS_MANUAL, label: 'Manual Restock', icon: PackageOpen },
