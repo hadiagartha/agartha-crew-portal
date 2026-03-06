@@ -16,7 +16,6 @@ export enum View {
   RUNNER_DASHBOARD = 'RUNNER_DASHBOARD',
   SECURITY_DASHBOARD = 'SECURITY_DASHBOARD',
   HEALTH_DASHBOARD = 'HEALTH_DASHBOARD',
-  EXPERIENCE_DASHBOARD = 'EXPERIENCE_DASHBOARD',
   CLEANING_DASHBOARD = 'CLEANING_DASHBOARD',
   GIFTSHOP_DASHBOARD = 'GIFTSHOP_DASHBOARD',
   EXTERNAL_MAINTENANCE_DASHBOARD = 'EXTERNAL_MAINTENANCE_DASHBOARD',
@@ -60,7 +59,7 @@ export interface Incident {
   type: 'Missing Items' | 'Damaged on Arrival' | 'Quantity Mismatch' | string;
   severity: IncidentSeverity;
   description: string;
-  status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'IN_TRANSIT' | 'AT_GIFT_SHOP';
+  status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED';
   reportedBy: string;
   arrivalTimestamp?: Date; // Added for Security Arrival Verification
   evidenceLogged?: boolean; // Added for Security Evidence Logging
@@ -270,7 +269,7 @@ export function allowedViewsForMode(mode: AppMode): View[] {
         View.ANNOUNCEMENTS
       ];
     case 'EXPERIENCE_CREW':
-      return [View.HOME, View.ZONE_CHECK_IN, View.EXPERIENCE_DASHBOARD, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [View.HOME, View.ZONE_CHECK_IN, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'GIFTSHOP_CREW':
       return [
         View.HOME,

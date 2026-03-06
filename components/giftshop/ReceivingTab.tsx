@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Truck, CheckCircle2, Camera, UserCheck, AlertCircle, Package, Inbox } from 'lucide-react';
-import { Incident } from '../../types';
+import { Truck, CheckCircle2, Camera, Upload, AlertCircle, Package } from 'lucide-react';
 
 interface ShipmentItem {
     id: string;
@@ -31,12 +30,7 @@ const mockShipments: Shipment[] = [
     }
 ];
 
-interface ReceivingTabProps {
-    incidents?: Incident[];
-    onUpdateIncidentStatus?: (id: string, status: Incident['status']) => void;
-}
-
-const ReceivingTab: React.FC<ReceivingTabProps> = ({ incidents = [], onUpdateIncidentStatus }) => {
+const ReceivingTab: React.FC = () => {
     const [shipments, setShipments] = useState<Shipment[]>(mockShipments);
     const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
 
@@ -244,63 +238,6 @@ const ReceivingTab: React.FC<ReceivingTabProps> = ({ incidents = [], onUpdateInc
                         <Truck className="text-gray-600 w-16 h-16 mb-4" />
                         <h3 className="text-gray-400 font-bold mb-1">No Active Shipments</h3>
                         <p className="text-gray-600 text-sm">You are all caught up for now.</p>
-                    </div>
-                )}
-            </div>
-
-            {/* LOST AND FOUND SECTION */}
-            <div className="mt-16 mb-6 md:mb-8 border-t border-gray-700 pt-8">
-                <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-3 mb-2">
-                    <Inbox className="text-amber-400" size={32} /> Lost & Found Intake
-                </h2>
-                <p className="text-gray-400 text-sm md:text-base">Receive items from Runners and log them for guest pickup.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                {incidents.filter(inc => inc.type === 'Lost and Found' && (inc.status === 'IN_TRANSIT' || inc.status === 'AT_GIFT_SHOP')).map(incident => (
-                    <div
-                        key={incident.id}
-                        className="bg-[#2d3142] rounded-2xl p-5 md:p-6 border border-amber-500/20 shadow-xl"
-                    >
-                        <div className="flex justify-between items-start mb-4">
-                            <div>
-                                <span className={`text-[10px] sm:text-xs font-black px-2 py-1 rounded tracking-widest uppercase mb-3 inline-block ${incident.status === 'AT_GIFT_SHOP' ? 'bg-amber-500/20 text-amber-500' : 'bg-purple-500/20 text-purple-400'
-                                    }`}>
-                                    {incident.status.replace('_', ' ')}
-                                </span>
-                                <h3 className="font-bold text-lg leading-tight line-clamp-2">{incident.description}</h3>
-                                <p className="text-gray-400 text-xs mt-1 font-mono">{incident.id}</p>
-                            </div>
-                            <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20 shrink-0 ml-4">
-                                <Package className="text-amber-400" size={24} />
-                            </div>
-                        </div>
-
-                        <div className="mt-6 pt-4 border-t border-gray-700/50 flex gap-3">
-                            {incident.status === 'IN_TRANSIT' && onUpdateIncidentStatus && (
-                                <button
-                                    onClick={() => onUpdateIncidentStatus(incident.id, 'AT_GIFT_SHOP')}
-                                    className="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
-                                >
-                                    <CheckCircle2 size={18} /> Receive Item
-                                </button>
-                            )}
-                            {incident.status === 'AT_GIFT_SHOP' && onUpdateIncidentStatus && (
-                                <button
-                                    onClick={() => onUpdateIncidentStatus(incident.id, 'RESOLVED')}
-                                    className="flex-1 bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
-                                >
-                                    <UserCheck size={18} /> Mark as Claimed
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                ))}
-
-                {incidents.filter(inc => inc.type === 'Lost and Found' && (inc.status === 'IN_TRANSIT' || inc.status === 'AT_GIFT_SHOP')).length === 0 && (
-                    <div className="col-span-full py-8 flex flex-col items-center justify-center border-2 border-dashed border-gray-700 rounded-3xl cursor-default">
-                        <Inbox className="text-gray-600 w-12 h-12 mb-3" />
-                        <h3 className="text-gray-400 font-bold mb-1">No Pending Items</h3>
                     </div>
                 )}
             </div>

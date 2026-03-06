@@ -66,8 +66,6 @@ const Incidents: React.FC<IncidentsProps> = ({ incidents, onAddIncident, onUpdat
     switch (status) {
       case 'OPEN': return 'text-blue-400 bg-blue-400/10';
       case 'INVESTIGATING': return 'text-yellow-500 bg-yellow-500/10';
-      case 'IN_TRANSIT': return 'text-purple-400 bg-purple-400/10';
-      case 'AT_GIFT_SHOP': return 'text-amber-400 bg-amber-400/10';
       case 'RESOLVED': return 'text-gray-400 bg-gray-500/10';
       default: return 'text-gray-400';
     }
@@ -110,7 +108,6 @@ const Incidents: React.FC<IncidentsProps> = ({ incidents, onAddIncident, onUpdat
                   <option>Creature Malfunction</option>
                   <option>Zone System Failure</option>
                   <option>Safety Hazard</option>
-                  <option>Lost and Found</option>
                   <option>Other</option>
                 </select>
               </div>
@@ -241,26 +238,15 @@ const Incidents: React.FC<IncidentsProps> = ({ incidents, onAddIncident, onUpdat
 
                               <div className="mt-4 pt-4 border-t border-gray-800">
                                 <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-2">Update Status</div>
-                                <div className="flex gap-2 flex-wrap">
-                                  {inc.type === 'Lost and Found' && inc.status === 'OPEN' && (
-                                    <button
-                                      onClick={() => {
-                                        onUpdateIncidentStatus(inc.id, 'IN_TRANSIT');
-                                        setOpenActionId(null);
-                                      }}
-                                      className="flex-1 py-1.5 rounded text-[10px] font-bold border transition-all bg-purple-500/20 text-purple-400 border-purple-500/50 hover:bg-purple-500/30"
-                                    >
-                                      Pick Up Item
-                                    </button>
-                                  )}
-                                  {(['OPEN', 'INVESTIGATING', 'IN_TRANSIT', 'AT_GIFT_SHOP', 'RESOLVED'] as const).map((statusOption) => (
+                                <div className="flex gap-2">
+                                  {(['OPEN', 'INVESTIGATING', 'RESOLVED'] as const).map((statusOption) => (
                                     <button
                                       key={statusOption}
                                       onClick={() => {
                                         onUpdateIncidentStatus(inc.id, statusOption);
                                         setOpenActionId(null);
                                       }}
-                                      className={`flex-1 min-w-[30%] py-1.5 rounded text-[10px] font-bold border transition-all ${inc.status === statusOption
+                                      className={`flex-1 py-1.5 rounded text-[10px] font-bold border transition-all ${inc.status === statusOption
                                           ? getStatusColor(statusOption) + ' border-transparent ring-1 ring-white/20'
                                           : 'bg-[#1a1d29] border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200'
                                         }`}
@@ -341,18 +327,7 @@ const Incidents: React.FC<IncidentsProps> = ({ incidents, onAddIncident, onUpdat
                           <div className="pt-4 border-t border-gray-800">
                             <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-3">Update Status</div>
                             <div className="grid grid-cols-3 gap-2">
-                              {inc.type === 'Lost and Found' && inc.status === 'OPEN' && (
-                                <button
-                                  onClick={() => {
-                                    onUpdateIncidentStatus(inc.id, 'IN_TRANSIT');
-                                    setOpenActionId(null);
-                                  }}
-                                  className="col-span-3 py-2 rounded text-[10px] font-bold border transition-all bg-purple-500/20 text-purple-400 border-purple-500/50"
-                                >
-                                  Pick Up Item
-                                </button>
-                              )}
-                              {(['OPEN', 'INVESTIGATING', 'IN_TRANSIT', 'AT_GIFT_SHOP', 'RESOLVED'] as const).map((statusOption) => (
+                              {(['OPEN', 'INVESTIGATING', 'RESOLVED'] as const).map((statusOption) => (
                                 <button
                                   key={statusOption}
                                   onClick={() => {

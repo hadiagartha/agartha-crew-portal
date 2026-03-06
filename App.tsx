@@ -20,7 +20,6 @@ import PrepBatchesTab from './components/fnb/PrepBatchesTab';
 import RunnerDashboard from './components/runner/RunnerDashboard';
 import SecurityDashboard from './components/security/SecurityDashboard';
 import HealthDashboard from './components/health/HealthDashboard';
-import ExperienceDashboard from './components/service/ExperienceDashboard';
 import CleaningResponseTab from './components/cleaning/CleaningResponseTab';
 import CleaningStockTab from './components/cleaning/CleaningStockTab';
 import CleaningRestockTab from './components/cleaning/CleaningRestockTab';
@@ -558,7 +557,6 @@ const App: React.FC = () => {
       View.HEALTH_CONSUMABLES,
       View.HEALTH_RESTOCK,
       View.HEALTH_EQUIPMENT_AUDIT,
-      View.EXPERIENCE_DASHBOARD,
       View.CLEANING_RESPONSE_QUEUE,
       View.CLEANING_STOCK,
       View.CLEANING_RESTOCK,
@@ -653,7 +651,7 @@ const App: React.FC = () => {
           />
         );
       case View.HEALTH_INCIDENT_LOG:
-        return <HealthIncidentLogTab staff={staff!} handleAddIncident={handleAddIncident} />;
+        return <HealthIncidentLogTab />;
       case View.HEALTH_RESPONSE_TRACKER:
         return <HealthResponseTrackerTab />;
       case View.HEALTH_CONSUMABLES:
@@ -662,14 +660,6 @@ const App: React.FC = () => {
         return <HealthRestockTab />;
       case View.HEALTH_EQUIPMENT_AUDIT:
         return <HealthEquipmentAuditTab />;
-      case View.EXPERIENCE_DASHBOARD:
-        return (
-          <ExperienceDashboard
-            handleAddIncident={handleAddIncident}
-            staff={staff!}
-            zoneStatuses={zoneStatuses}
-          />
-        );
       case View.CLEANING_RESPONSE_QUEUE:
         return <CleaningResponseTab />;
       case View.CLEANING_STOCK:
@@ -679,7 +669,7 @@ const App: React.FC = () => {
       case View.CLEANING_AUDIT:
         return <SanitationAuditTab />;
       case View.RETAIL_RECEIVING:
-        return <ReceivingTab incidents={incidents} onUpdateIncidentStatus={handleUpdateIncidentStatus} />;
+        return <ReceivingTab />;
       case View.RETAIL_STATUS:
         return <RetailStatusTab />;
       case View.RETAIL_RESTOCK:

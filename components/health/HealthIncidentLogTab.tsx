@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, Thermometer, Droplets, HeartPulse, Brain, CheckSquare, Stethoscope, AlertTriangle, User, Package } from 'lucide-react';
-import { Incident, IncidentSeverity, StaffMember } from '../../types';
+import { Activity, Thermometer, Droplets, HeartPulse, Brain, CheckSquare, Stethoscope, AlertTriangle, User } from 'lucide-react';
 
 interface IncidentLog {
     id: string;
@@ -17,12 +16,7 @@ interface IncidentLog {
     status: 'DRAFT' | 'READY_TO_SYNC' | 'SYNCED';
 }
 
-interface HealthIncidentLogTabProps {
-    staff?: StaffMember;
-    handleAddIncident?: (incident: Incident) => void;
-}
-
-const HealthIncidentLogTab: React.FC<HealthIncidentLogTabProps> = ({ staff, handleAddIncident }) => {
+const HealthIncidentLogTab: React.FC = () => {
     const [patientCategory, setPatientCategory] = useState<'GUEST' | 'CREW' | 'VENDOR'>('GUEST');
     const [severity, setSeverity] = useState<'MINOR' | 'MODERATE' | 'EMERGENCY'>('MINOR');
     const [summary, setSummary] = useState('');
@@ -73,31 +67,6 @@ const HealthIncidentLogTab: React.FC<HealthIncidentLogTabProps> = ({ staff, hand
                         <h2 className="text-xl font-bold text-white tracking-tight">New Incident Log</h2>
                         <p className="text-gray-400 text-xs mt-1">Record primary care & vitals</p>
                     </div>
-                </div>
-
-                <div className="flex gap-4 mb-6">
-                    <button
-                        type="button"
-                        onClick={() => {
-                            if (!staff || !handleAddIncident) return;
-                            const newIncident: Incident = {
-                                id: `INC-LF-${Date.now()}`,
-                                timestamp: new Date(),
-                                type: 'Lost and Found',
-                                severity: IncidentSeverity.LOW,
-                                description: `Lost and found item reported by crew in ${staff.current_zone_id || 'Sector'}. Needs pickup.`,
-                                status: 'OPEN',
-                                reportedBy: staff.staff_id,
-                                zone_id: staff.current_zone_id || 'Z-01'
-                            };
-                            handleAddIncident(newIncident);
-                            window.alert('Lost and found item logged. Runner dispatch notified for pickup.');
-                        }}
-                        className="bg-amber-600/20 hover:bg-amber-600 border border-amber-500 rounded-xl p-3 flex 1 items-center justify-center gap-2 group transition-all duration-300 hover:shadow-[0_0_20px_rgba(217,119,6,0.4)] flex-1 text-amber-500 hover:text-white"
-                    >
-                        <Package size={20} />
-                        <span className="font-bold uppercase tracking-widest text-xs">Log Lost & Found</span>
-                    </button>
                 </div>
 
                 <form onSubmit={handleSaveDraft} className="space-y-4">

@@ -45,7 +45,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     View.RUNNER_DASHBOARD,
     View.SECURITY_DASHBOARD,
     View.HEALTH_INCIDENT_LOG,
-    View.EXPERIENCE_DASHBOARD,
     View.HEALTH_RESPONSE_TRACKER,
     View.HEALTH_CONSUMABLES,
     View.HEALTH_RESTOCK,
@@ -100,7 +99,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     { id: View.HEALTH_RESTOCK, label: 'Restock Requests', icon: Truck },
     { id: View.HEALTH_EQUIPMENT_AUDIT, label: 'Equipment Audit', icon: ShieldAlert },
 
-    { id: View.EXPERIENCE_DASHBOARD, label: 'Experience Control', icon: Sparkles },
     { id: View.CLEANING_RESPONSE_QUEUE, label: 'Response Queue', icon: AlertTriangle },
     { id: View.CLEANING_STOCK, label: 'Consumable Tracking', icon: ClipboardList },
     { id: View.CLEANING_RESTOCK, label: 'Supply Restock', icon: PackageOpen },
