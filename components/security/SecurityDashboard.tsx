@@ -68,12 +68,12 @@ const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:overflow-hidden pb-6">
+            <div className="flex flex-col gap-6 lg:overflow-hidden pb-6">
 
                 {/* Tactical Incident Feed */}
                 <div className="bg-[#2d3142]/80 backdrop-blur-md p-4 md:p-6 rounded-2xl border border-white/5 shadow-2xl flex flex-col h-full min-h-[400px] md:min-h-[500px]">
                     <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                        <Crosshair className="text-red-400" /> Priority Operations Feed
+                        <Crosshair className="text-red-400" /> Operations Feed
                     </h3>
 
                     <div className="flex-1 lg:overflow-y-auto pr-2 space-y-4 hide-scrollbar">
@@ -175,68 +175,7 @@ const SecurityDashboard: React.FC<SecurityDashboardProps> = ({
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-6">
-                    {/* Sector Integrity Overview */}
-                    <div className="bg-[#2d3142]/80 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-2xl relative overflow-hidden flex flex-col flex-1">
-                        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2 z-10">
-                            <ShieldAlert className="text-gray-400" /> Sector Integrity Matrix
-                        </h3>
-                        <p className="text-sm text-gray-400 mb-6 z-10 leading-relaxed font-medium">Compliance-ready overview of sector status and physical lock security.</p>
 
-                        <div className="flex-1 min-h-[300px] bg-[#1a1d29]/50 rounded-2xl border border-gray-800 relative flex flex-col p-4 gap-4 overflow-hidden group">
-                            {/* Decorative background grid */}
-                            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] bg-[size:15px_15px] pointer-events-none" />
-
-                            {[
-                                { id: 'Z-01', name: 'Alpha Sector' },
-                                { id: 'Z-02', name: 'Beta Sector' },
-                                { id: 'Z-03', name: 'Gamma Sector' },
-                                { id: 'Z-04', name: 'Delta Sector' }
-                            ].map(sector => {
-                                const zoneStatus = zone_statuses[sector.id] || 'Green';
-                                const sectorStatus = zoneStatus === 'Green' ? 'SECURE' : zoneStatus === 'Yellow' ? 'ELEVATED' : 'BREACH';
-                                const sectorColor = zoneStatus === 'Green' ? 'green' : zoneStatus === 'Yellow' ? 'yellow' : 'red';
-
-                                return (
-                                    <div key={sector.id} className={`group/item relative flex items-center justify-between bg-[#1a1d29] p-4 rounded-xl border transition-all duration-300 hover:translate-x-1 ${sectorColor === 'green' ? 'border-green-500/20' :
-                                        sectorColor === 'yellow' ? 'border-yellow-500/30 shadow-[0_0_15px_rgba(234,179,8,0.05)]' :
-                                            'border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.1)] active-sector-danger'
-                                        }`}>
-                                        <div className="flex items-center gap-4">
-                                            <div className={`p-2 rounded-lg ${sectorColor === 'green' ? 'bg-green-500/10 text-green-400' :
-                                                sectorColor === 'yellow' ? 'bg-yellow-500/10 text-yellow-400' :
-                                                    'bg-red-500/10 text-red-500 animate-pulse'
-                                                }`}>
-                                                {sectorColor === 'red' ? <Lock size={18} /> : <Unlock size={18} />}
-                                            </div>
-                                            <div>
-                                                <span className="text-sm font-black text-white block tracking-tight">{sector.name}</span>
-                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{sector.id}</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col items-end">
-                                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border transition-colors ${sectorColor === 'green' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                sectorColor === 'yellow' ? 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20' :
-                                                    'bg-red-600 text-white border-red-500 animate-pulse'
-                                                }`}>
-                                                {sectorStatus}
-                                            </span>
-                                            <span className="text-[9px] text-gray-600 mt-1 font-mono uppercase">Last Ping: 0.2ms</span>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-
-                            {/* Compliance watermark */}
-                            <div className="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
-                                <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase flex items-center gap-2">
-                                    <ShieldAlert size={12} /> Compliance Protocol 10.4
-                                </span>
-                                <span className="text-[10px] text-gray-500 font-mono">02:59 UTC</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {/* Verification Overlay */}
