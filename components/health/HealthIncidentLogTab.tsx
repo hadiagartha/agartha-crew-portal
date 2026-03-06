@@ -5,47 +5,42 @@ interface IncidentLog {
     id: string;
     timestamp: Date;
     patientCategory: 'GUEST' | 'CREW' | 'VENDOR';
-    severity: 'MINOR' | 'MODERATE' | 'EMERGENCY';
-    summary: string;
-    vitals: {
-        hr: string;
-        bp: string;
-        temp: string;
-        spo2: string;
-    };
+    personName: string;
+    incidentDescription: string;
+    treatmentDescription: string;
     status: 'DRAFT' | 'READY_TO_SYNC' | 'SYNCED';
 }
 
 const HealthIncidentLogTab: React.FC = () => {
     const [patientCategory, setPatientCategory] = useState<'GUEST' | 'CREW' | 'VENDOR'>('GUEST');
-    const [severity, setSeverity] = useState<'MINOR' | 'MODERATE' | 'EMERGENCY'>('MINOR');
-    const [summary, setSummary] = useState('');
-    const [vitals, setVitals] = useState({ hr: '', bp: '', temp: '', spo2: '' });
+    const [personName, setPersonName] = useState('');
+    const [incidentDescription, setIncidentDescription] = useState('');
+    const [treatmentDescription, setTreatmentDescription] = useState('');
 
     const [logs, setLogs] = useState<IncidentLog[]>([]);
 
     const handleSaveDraft = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!summary.trim()) return;
+        if (!personName.trim() || !incidentDescription.trim() || !treatmentDescription.trim()) return;
 
         const newLog: IncidentLog = {
             id: `MED-${Math.floor(1000 + Math.random() * 9000)}`,
             timestamp: new Date(),
             patientCategory,
-            severity,
-            summary,
-            vitals,
+            personName,
+            incidentDescription,
+            treatmentDescription,
             status: 'READY_TO_SYNC'
         };
 
         setLogs(prev => [newLog, ...prev]);
 
         // Reset form
-        setSummary('');
-        setVitals({ hr: '', bp: '', temp: '', spo2: '' });
+        setPersonName('');
+        setIncidentDescription('');
+        setTreatmentDescription('');
         setPatientCategory('GUEST');
-        setSeverity('MINOR');
     };
 
     const handleManualSync = () => {
@@ -72,7 +67,7 @@ const HealthIncidentLogTab: React.FC = () => {
                 <form onSubmit={handleSaveDraft} className="space-y-4">
 
                     {/* Selectors */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-2">
                             <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Category</label>
                             <div className="flex border border-gray-700 rounded-lg overflow-hidden font-bold text-xs bg-[#1a1d29]">
@@ -81,7 +76,7 @@ const HealthIncidentLogTab: React.FC = () => {
                                         key={cat}
                                         type="button"
                                         onClick={() => setPatientCategory(cat as any)}
-                                        className={`flex-1 py-2 text-center transition-colors ${patientCategory === cat ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}
+                                        className={`flex-1 py-3 text-center transition-colors ${patientCategory === cat ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}
                                     >
                                         {cat}
                                     </button>
@@ -90,53 +85,41 @@ const HealthIncidentLogTab: React.FC = () => {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Severity</label>
-                            <div className="flex border border-gray-700 rounded-lg overflow-hidden font-bold text-xs bg-[#1a1d29]">
-                                <button type="button" onClick={() => setSeverity('MINOR')} className={`flex-1 py-2 text-center transition-colors ${severity === 'MINOR' ? 'bg-green-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}>MINOR</button>
-                                <button type="button" onClick={() => setSeverity('MODERATE')} className={`flex-1 py-2 text-center transition-colors ${severity === 'MODERATE' ? 'bg-yellow-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}>MOD</button>
-                                <button type="button" onClick={() => setSeverity('EMERGENCY')} className={`flex-1 py-2 text-center transition-colors ${severity === 'EMERGENCY' ? 'bg-red-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}>EMERG</button>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Name of Person</label>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                <input
+                                    type="text"
+                                    placeholder="Enter full name..."
+                                    value={personName}
+                                    onChange={e => setPersonName(e.target.value)}
+                                    className="w-full bg-[#1a1d29] border border-gray-700 text-white text-sm rounded-lg pl-9 pr-3 py-3 outline-none focus:border-blue-500"
+                                />
                             </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Medical Incident</label>
+                            <textarea
+                                value={incidentDescription}
+                                onChange={e => setIncidentDescription(e.target.value)}
+                                placeholder="Describe the injury or illness..."
+                                className="w-full bg-[#1a1d29] border border-gray-700 text-white text-sm rounded-lg p-3 outline-none focus:border-blue-500 h-24 resize-none"
+                            ></textarea>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Crew Treatment</label>
+                            <textarea
+                                value={treatmentDescription}
+                                onChange={e => setTreatmentDescription(e.target.value)}
+                                placeholder="Describe the assistance or treatment provided..."
+                                className="w-full bg-[#1a1d29] border border-gray-700 text-white text-sm rounded-lg p-3 outline-none focus:border-blue-500 h-24 resize-none"
+                            ></textarea>
                         </div>
                     </div>
 
-                    {/* Vitals Log */}
-                    <div className="bg-[#1a1d29] p-3 rounded-xl border border-gray-700/50">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-3">
-                            <Activity size={14} className="text-red-400" />
-                            Vitals Log
-                        </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="relative">
-                                <HeartPulse className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-400" size={16} />
-                                <input type="number" placeholder="HR mbp" value={vitals.hr} onChange={e => setVitals({ ...vitals, hr: e.target.value })} className="w-full bg-[#2d3142] border border-gray-700 text-white text-sm rounded-lg pl-9 pr-3 py-2 outline-none focus:border-red-500" />
-                            </div>
-                            <div className="relative">
-                                <Activity className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" size={16} />
-                                <input type="text" placeholder="BP mmHg" value={vitals.bp} onChange={e => setVitals({ ...vitals, bp: e.target.value })} className="w-full bg-[#2d3142] border border-gray-700 text-white text-sm rounded-lg pl-9 pr-3 py-2 outline-none focus:border-red-500" />
-                            </div>
-                            <div className="relative">
-                                <Thermometer className="absolute left-3 top-1/2 -translate-y-1/2 text-yellow-400" size={16} />
-                                <input type="number" step="0.1" placeholder="Temp °C" value={vitals.temp} onChange={e => setVitals({ ...vitals, temp: e.target.value })} className="w-full bg-[#2d3142] border border-gray-700 text-white text-sm rounded-lg pl-9 pr-3 py-2 outline-none focus:border-red-500" />
-                            </div>
-                            <div className="relative">
-                                <Droplets className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400" size={16} />
-                                <input type="number" placeholder="SpO2 %" value={vitals.spo2} onChange={e => setVitals({ ...vitals, spo2: e.target.value })} className="w-full bg-[#2d3142] border border-gray-700 text-white text-sm rounded-lg pl-9 pr-3 py-2 outline-none focus:border-red-500" />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Summary */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Treatment Summary</label>
-                        <textarea
-                            value={summary}
-                            onChange={e => setSummary(e.target.value)}
-                            placeholder="Describe injury and assistance provided..."
-                            className="w-full bg-[#1a1d29] border border-gray-700 text-white text-sm rounded-lg p-3 outline-none focus:border-red-500 h-24 resize-none"
-                        ></textarea>
-                    </div>
-
-                    <button type="submit" disabled={!summary.trim()} className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white font-bold py-3 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] disabled:shadow-none">
+                    <button type="submit" disabled={!personName.trim() || !incidentDescription.trim() || !treatmentDescription.trim()} className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white font-bold py-3 mt-4 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] disabled:shadow-none mb-4">
                         Save to Local Queue
                     </button>
                 </form>
@@ -171,20 +154,15 @@ const HealthIncidentLogTab: React.FC = () => {
                                         <span className="text-[10px] text-gray-500">{log.timestamp.toLocaleTimeString()}</span>
                                     </div>
                                     <div className="flex gap-1 flex-wrap">
-                                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase ${log.severity === 'MINOR' ? 'bg-green-500/20 text-green-400 border-green-500/50' : log.severity === 'MODERATE' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' : 'bg-red-500/20 text-red-400 border-red-500/50'}`}>
-                                            {log.severity}
-                                        </span>
                                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-blue-500/20 text-blue-400 border-blue-500/50 uppercase">
                                             {log.patientCategory}
                                         </span>
                                     </div>
                                 </div>
-                                <p className="text-sm text-gray-300 line-clamp-2 mb-2">{log.summary}</p>
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-2 pt-2 border-t border-gray-800">
-                                    <div className="flex gap-3 text-xs text-gray-500 font-mono">
-                                        <span>HR:{log.vitals.hr || '-'}</span>
-                                        <span>BP:{log.vitals.bp || '-'}</span>
-                                    </div>
+                                <h4 className="font-bold text-white text-sm mb-1">{log.personName}</h4>
+                                <p className="text-xs text-gray-300 line-clamp-2 mb-1"><span className="text-gray-500 font-bold">Inc:</span> {log.incidentDescription}</p>
+                                <p className="text-xs text-gray-300 line-clamp-2 mb-2"><span className="text-gray-500 font-bold">Tx:</span> {log.treatmentDescription}</p>
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-2 mt-2 pt-2 border-t border-gray-800">
                                     {log.status === 'SYNCED' ? (
                                         <span className="text-[10px] text-green-500 flex items-center gap-1 font-bold"><CheckSquare size={12} /> SYNCED</span>
                                     ) : (
