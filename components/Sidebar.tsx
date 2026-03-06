@@ -129,7 +129,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     .map(item => {
       // Dynamic relabeling based on mode
       if (appMode === 'SERVICE_CREW' && item.id === View.ZONE_CHECK_IN) {
-        return { ...item, label: 'Ticket Validation' };
+        return { ...item, label: 'Check-In' };
       }
       return item;
     });
