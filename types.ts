@@ -219,7 +219,7 @@ export function allowedViewsForMode(mode: AppMode): View[] {
         View.ANNOUNCEMENTS
       ];
     case 'SERVICE_CREW':
-      return [View.HOME, View.ZONE_CHECK_IN, View.SERVICE_ENTRY_VALIDATION, View.SETTINGS, View.ANNOUNCEMENTS];
+      return [View.HOME, View.ZONE_CHECK_IN, View.SERVICE_ENTRY_VALIDATION, View.EXPERIENCE_LOST_AND_FOUND, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'SECURITY_CREW':
       return [View.HOME, View.ZONE_CHECK_IN, View.SECURITY_DASHBOARD, View.INCIDENTS, View.ZONE_SURVEILLANCE, View.SETTINGS, View.ANNOUNCEMENTS];
     case 'HEALTH_CREW':
@@ -242,6 +242,7 @@ export function allowedViewsForMode(mode: AppMode): View[] {
         View.CLEANING_STOCK,
         View.CLEANING_RESTOCK,
         View.CLEANING_AUDIT,
+        View.EXPERIENCE_LOST_AND_FOUND,
         View.SETTINGS,
         View.ANNOUNCEMENTS
       ];
