@@ -41,7 +41,6 @@ import AuditTab from './components/runner/AuditTab';
 import { View, Incident, IncidentSeverity, CheckInRecord, StaffMember, Alert, AuthResponse, AppMode, deriveModeFromStaff, defaultViewForMode, isViewAllowed, RestockTask } from './types';
 
 import HealthIncidentLogTab from './components/health/HealthIncidentLogTab';
-import HealthResponseTrackerTab from './components/health/HealthResponseTrackerTab';
 import HealthConsumablesTab from './components/health/HealthConsumablesTab';
 import HealthRestockTab from './components/health/HealthRestockTab';
 
@@ -552,7 +551,6 @@ const App: React.FC = () => {
       View.RUNNER_DASHBOARD,
       View.SECURITY_DASHBOARD,
       View.HEALTH_INCIDENT_LOG,
-      View.HEALTH_RESPONSE_TRACKER,
       View.HEALTH_CONSUMABLES,
       View.HEALTH_RESTOCK,
       View.EXPERIENCE_LOST_AND_FOUND,
@@ -650,8 +648,6 @@ const App: React.FC = () => {
         );
       case View.HEALTH_INCIDENT_LOG:
         return <HealthIncidentLogTab />;
-      case View.HEALTH_RESPONSE_TRACKER:
-        return <HealthResponseTrackerTab />;
       case View.HEALTH_CONSUMABLES:
         return <HealthConsumablesTab />;
       case View.HEALTH_RESTOCK:

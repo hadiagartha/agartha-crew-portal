@@ -46,7 +46,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     View.RUNNER_DASHBOARD,
     View.SECURITY_DASHBOARD,
     View.HEALTH_INCIDENT_LOG,
-    View.HEALTH_RESPONSE_TRACKER,
     View.HEALTH_CONSUMABLES,
     View.HEALTH_RESTOCK,
     View.EXPERIENCE_LOST_AND_FOUND,
@@ -94,7 +93,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
 
     // Health Crew Specific Tabs
     { id: View.HEALTH_INCIDENT_LOG, label: 'Incident Log (Medical)', icon: HeartPulse },
-    { id: View.HEALTH_RESPONSE_TRACKER, label: 'Response Tracker', icon: AlertTriangle },
     { id: View.HEALTH_CONSUMABLES, label: 'Medical Consumables', icon: Package },
     { id: View.HEALTH_RESTOCK, label: 'Restock Requests', icon: Truck },
 

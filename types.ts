@@ -231,7 +231,6 @@ export function allowedViewsForMode(mode: AppMode): View[] {
         View.HOME,
         View.ZONE_CHECK_IN,
         View.HEALTH_INCIDENT_LOG,
-        View.HEALTH_RESPONSE_TRACKER,
         View.HEALTH_CONSUMABLES,
         View.HEALTH_RESTOCK,
         View.SETTINGS,
