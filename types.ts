@@ -190,8 +190,11 @@ export function defaultViewForMode(mode: AppMode): View {
     case 'FNB':
       return View.FNB_POS_LITE;
     case 'INTERNAL_MAINTENANCE':
+      return View.MAINTENANCE_LOG;
     case 'SERVICE_CREW':
+      return View.HOME;
     case 'SECURITY_CREW':
+      return View.SECURITY_DASHBOARD;
     case 'HEALTH_CREW':
       return View.HEALTH_INCIDENT_LOG;
     case 'RUNNER':
