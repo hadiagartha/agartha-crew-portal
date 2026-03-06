@@ -24,6 +24,7 @@ import ExperienceLostAndFoundTab from './components/service/ExperienceLostAndFou
 import CleaningResponseTab from './components/cleaning/CleaningResponseTab';
 import CleaningStockTab from './components/cleaning/CleaningStockTab';
 import CleaningRestockTab from './components/cleaning/CleaningRestockTab';
+import CleaningDailyChecklistTab from './components/cleaning/CleaningDailyChecklistTab';
 import ReceivingTab from './components/giftshop/ReceivingTab';
 import RetailStatusTab from './components/giftshop/RetailStatusTab';
 import RetailRestockTab from './components/giftshop/RetailRestockTab';
@@ -558,6 +559,7 @@ const App: React.FC = () => {
       View.HEALTH_RESTOCK,
       View.HEALTH_EQUIPMENT_AUDIT,
       View.EXPERIENCE_LOST_AND_FOUND,
+      View.CLEANING_DAILY_CHECKLIST,
       View.CLEANING_RESPONSE_QUEUE,
       View.CLEANING_STOCK,
       View.CLEANING_RESTOCK,
@@ -662,6 +664,8 @@ const App: React.FC = () => {
         return <HealthEquipmentAuditTab />;
       case View.EXPERIENCE_LOST_AND_FOUND:
         return <ExperienceLostAndFoundTab />;
+      case View.CLEANING_DAILY_CHECKLIST:
+        return <CleaningDailyChecklistTab />;
       case View.CLEANING_RESPONSE_QUEUE:
         return <CleaningResponseTab />;
       case View.CLEANING_STOCK:

@@ -45,6 +45,7 @@ export enum View {
   CLEANING_STOCK = 'CLEANING_STOCK',
   CLEANING_RESTOCK = 'CLEANING_RESTOCK',
   CLEANING_AUDIT = 'CLEANING_AUDIT',
+  CLEANING_DAILY_CHECKLIST = 'CLEANING_DAILY_CHECKLIST',
   HOME = 'HOME'
 }
 
@@ -241,6 +242,7 @@ export function allowedViewsForMode(mode: AppMode): View[] {
       return [
         View.HOME,
         View.ZONE_CHECK_IN,
+        View.CLEANING_DAILY_CHECKLIST,
         View.CLEANING_RESPONSE_QUEUE,
         View.CLEANING_STOCK,
         View.CLEANING_RESTOCK,

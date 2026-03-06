@@ -51,6 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     View.HEALTH_RESTOCK,
     View.HEALTH_EQUIPMENT_AUDIT,
     View.EXPERIENCE_LOST_AND_FOUND,
+    View.CLEANING_DAILY_CHECKLIST,
     View.CLEANING_RESPONSE_QUEUE,
     View.CLEANING_STOCK,
     View.CLEANING_RESTOCK,
@@ -101,6 +102,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     { id: View.HEALTH_EQUIPMENT_AUDIT, label: 'Equipment Audit', icon: ShieldAlert },
 
     { id: View.EXPERIENCE_LOST_AND_FOUND, label: 'Lost & Found', icon: Search },
+    { id: View.CLEANING_DAILY_CHECKLIST, label: 'Daily Checklist', icon: ClipboardCheck },
     { id: View.CLEANING_RESPONSE_QUEUE, label: 'Response Queue', icon: AlertTriangle },
     { id: View.CLEANING_STOCK, label: 'Consumable Tracking', icon: ClipboardList },
     { id: View.CLEANING_RESTOCK, label: 'Supply Restock', icon: PackageOpen },
