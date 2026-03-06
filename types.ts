@@ -246,7 +246,6 @@ export function allowedViewsForMode(mode: AppMode): View[] {
         View.CLEANING_RESPONSE_QUEUE,
         View.CLEANING_STOCK,
         View.CLEANING_RESTOCK,
-        View.EXPERIENCE_LOST_AND_FOUND,
         View.SETTINGS,
         View.ANNOUNCEMENTS
       ];
