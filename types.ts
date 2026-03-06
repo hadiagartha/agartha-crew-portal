@@ -202,7 +202,7 @@ export function defaultViewForMode(mode: AppMode): View {
     case 'EXPERIENCE_CREW':
       return View.HOME;
     case 'CLEANING_CREW':
-      return View.CLEANING_RESPONSE_QUEUE;
+      return View.CLEANING_DAILY_CHECKLIST;
     case 'GIFTSHOP_CREW':
       return View.RETAIL_STATUS;
     case 'EXTERNAL_MAINTENANCE':
@@ -243,9 +243,9 @@ export function allowedViewsForMode(mode: AppMode): View[] {
         View.HOME,
         View.ZONE_CHECK_IN,
         View.CLEANING_DAILY_CHECKLIST,
-        View.CLEANING_RESPONSE_QUEUE,
         View.CLEANING_STOCK,
         View.CLEANING_RESTOCK,
+        View.EXPERIENCE_LOST_AND_FOUND,
         View.SETTINGS,
         View.ANNOUNCEMENTS
       ];

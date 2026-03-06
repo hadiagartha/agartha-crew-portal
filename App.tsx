@@ -21,7 +21,6 @@ import RunnerDashboard from './components/runner/RunnerDashboard';
 import SecurityDashboard from './components/security/SecurityDashboard';
 import HealthDashboard from './components/health/HealthDashboard';
 import ExperienceLostAndFoundTab from './components/service/ExperienceLostAndFoundTab';
-import CleaningResponseTab from './components/cleaning/CleaningResponseTab';
 import CleaningStockTab from './components/cleaning/CleaningStockTab';
 import CleaningRestockTab from './components/cleaning/CleaningRestockTab';
 import CleaningDailyChecklistTab from './components/cleaning/CleaningDailyChecklistTab';
@@ -560,7 +559,6 @@ const App: React.FC = () => {
       View.HEALTH_EQUIPMENT_AUDIT,
       View.EXPERIENCE_LOST_AND_FOUND,
       View.CLEANING_DAILY_CHECKLIST,
-      View.CLEANING_RESPONSE_QUEUE,
       View.CLEANING_STOCK,
       View.CLEANING_RESTOCK,
       View.GIFTSHOP_DASHBOARD,
@@ -666,8 +664,6 @@ const App: React.FC = () => {
         return <ExperienceLostAndFoundTab />;
       case View.CLEANING_DAILY_CHECKLIST:
         return <CleaningDailyChecklistTab />;
-      case View.CLEANING_RESPONSE_QUEUE:
-        return <CleaningResponseTab />;
       case View.CLEANING_STOCK:
         return <CleaningStockTab />;
       case View.CLEANING_RESTOCK:
