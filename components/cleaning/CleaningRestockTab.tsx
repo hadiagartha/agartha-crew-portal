@@ -37,7 +37,6 @@ const CleaningRestockTab: React.FC = () => {
     const [item, setItem] = useState('');
     const [quantity, setQuantity] = useState('');
     const [unit, setUnit] = useState('Units');
-    const [urgency, setUrgency] = useState<'NORMAL' | 'URGENT'>('NORMAL');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -51,7 +50,7 @@ const CleaningRestockTab: React.FC = () => {
             item,
             quantity: numQty,
             unit,
-            urgency,
+            urgency: 'NORMAL',
             status: 'PENDING',
             timestamp: new Date()
         };
@@ -60,7 +59,6 @@ const CleaningRestockTab: React.FC = () => {
         setItem('');
         setQuantity('');
         setUnit('Units');
-        setUrgency('NORMAL');
     };
 
     const getStatusIcon = (status: RestockRequest['status']) => {
@@ -151,27 +149,7 @@ const CleaningRestockTab: React.FC = () => {
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Urgency</label>
-                            <div className="flex bg-[#1a1d29] rounded-xl p-1 border border-gray-700 relative">
-                                <button
-                                    type="button"
-                                    onClick={() => setUrgency('NORMAL')}
-                                    className={`flex-1 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider transition-all z-10 ${urgency === 'NORMAL' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}
-                                >
-                                    Normal
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setUrgency('URGENT')}
-                                    className={`flex-1 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider transition-all z-10 flex flex-wrap justify-center items-center gap-1.5 ${urgency === 'URGENT' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}
-                                >
-                                    {urgency === 'URGENT' && <ShieldAlert size={14} />} Urgent
-                                </button>
-                                {/* Sliding background */}
-                                <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg transition-all duration-300 ease-out shadow-lg ${urgency === 'NORMAL' ? 'left-1 bg-blue-600' : 'left-[calc(50%+2px)] bg-red-600'}`} />
-                            </div>
-                        </div>
+                        {/* Urgency selection removed */}
 
                         <button
                             type="submit"
