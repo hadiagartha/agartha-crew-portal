@@ -23,7 +23,8 @@ import {
   ClipboardList,
   RefreshCcw,
   Trash2,
-  QrCode
+  QrCode,
+  Search
 } from 'lucide-react';
 import { View, AppMode, allowedViewsForMode } from '../types';
 
@@ -49,6 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     View.HEALTH_CONSUMABLES,
     View.HEALTH_RESTOCK,
     View.HEALTH_EQUIPMENT_AUDIT,
+    View.EXPERIENCE_LOST_AND_FOUND,
     View.CLEANING_RESPONSE_QUEUE,
     View.CLEANING_STOCK,
     View.CLEANING_RESTOCK,
@@ -99,6 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, appMode, i
     { id: View.HEALTH_RESTOCK, label: 'Restock Requests', icon: Truck },
     { id: View.HEALTH_EQUIPMENT_AUDIT, label: 'Equipment Audit', icon: ShieldAlert },
 
+    { id: View.EXPERIENCE_LOST_AND_FOUND, label: 'Lost & Found', icon: Search },
     { id: View.CLEANING_RESPONSE_QUEUE, label: 'Response Queue', icon: AlertTriangle },
     { id: View.CLEANING_STOCK, label: 'Consumable Tracking', icon: ClipboardList },
     { id: View.CLEANING_RESTOCK, label: 'Supply Restock', icon: PackageOpen },

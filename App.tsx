@@ -20,6 +20,7 @@ import PrepBatchesTab from './components/fnb/PrepBatchesTab';
 import RunnerDashboard from './components/runner/RunnerDashboard';
 import SecurityDashboard from './components/security/SecurityDashboard';
 import HealthDashboard from './components/health/HealthDashboard';
+import ExperienceLostAndFoundTab from './components/service/ExperienceLostAndFoundTab';
 import CleaningResponseTab from './components/cleaning/CleaningResponseTab';
 import CleaningStockTab from './components/cleaning/CleaningStockTab';
 import CleaningRestockTab from './components/cleaning/CleaningRestockTab';
@@ -557,6 +558,7 @@ const App: React.FC = () => {
       View.HEALTH_CONSUMABLES,
       View.HEALTH_RESTOCK,
       View.HEALTH_EQUIPMENT_AUDIT,
+      View.EXPERIENCE_LOST_AND_FOUND,
       View.CLEANING_RESPONSE_QUEUE,
       View.CLEANING_STOCK,
       View.CLEANING_RESTOCK,
@@ -660,6 +662,8 @@ const App: React.FC = () => {
         return <HealthRestockTab />;
       case View.HEALTH_EQUIPMENT_AUDIT:
         return <HealthEquipmentAuditTab />;
+      case View.EXPERIENCE_LOST_AND_FOUND:
+        return <ExperienceLostAndFoundTab />;
       case View.CLEANING_RESPONSE_QUEUE:
         return <CleaningResponseTab />;
       case View.CLEANING_STOCK:
