@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Users, Wrench, Siren, HeartPulse, CheckCircle2, QrCode as QrCodeIcon, MessageSquare, AlertTriangle } from 'lucide-react';
+import { Sparkles, Users, Wrench, Siren, HeartPulse, CheckCircle2, QrCode as QrCodeIcon, MessageSquare, AlertTriangle, Package } from 'lucide-react';
 import { Incident, StaffMember, IncidentSeverity } from '../../types';
 
 interface ExperienceDashboardProps {
@@ -71,6 +71,22 @@ const ExperienceDashboard: React.FC<ExperienceDashboardProps> = ({
         setHighlightText('');
     };
 
+    const handleLogLostAndFound = () => {
+        const newIncident: Incident = {
+            id: `INC-LF-${Date.now()}`,
+            timestamp: new Date(),
+            type: 'Lost and Found',
+            severity: IncidentSeverity.LOW,
+            description: `Lost and found item reported by Experience Crew in ${staff.current_zone_id || 'Sector'}. Needs pickup.`,
+            status: 'OPEN',
+            reportedBy: staff.staff_id,
+            zone_id: staff.current_zone_id || 'Z-01'
+        };
+        handleAddIncident(newIncident);
+        window.alert('Lost and found item logged. Runner dispatch notified for pickup.');
+    };
+
+
     return (
         <div className="flex flex-col h-full bg-[#1a1d29]">
             {/* Header section */}
@@ -119,6 +135,14 @@ const ExperienceDashboard: React.FC<ExperienceDashboardProps> = ({
                             >
                                 <Wrench size={32} className="text-purple-500 group-hover:text-white mb-2" />
                                 <span className="font-bold text-purple-500 group-hover:text-white uppercase tracking-widest text-xs md:text-sm">Tech/Mech Failure</span>
+                            </button>
+
+                            <button
+                                onClick={handleLogLostAndFound}
+                                className="bg-amber-600/20 hover:bg-amber-600 border border-amber-500 rounded-xl p-4 flex flex-col items-center justify-center gap-2 group transition-all duration-300 hover:shadow-[0_0_20px_rgba(217,119,6,0.4)] sm:col-span-3 lg:col-span-3"
+                            >
+                                <Package size={32} className="text-amber-500 group-hover:text-white mb-2" />
+                                <span className="font-bold text-amber-500 group-hover:text-white uppercase tracking-widest text-xs md:text-sm">Log Lost & Found</span>
                             </button>
                         </div>
 

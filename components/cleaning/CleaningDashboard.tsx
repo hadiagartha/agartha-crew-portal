@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, CheckCircle2, QrCode as QrCodeIcon, AlertTriangle, PackagePlus, Trash2, Droplet, ArrowRightLeft, Clock } from 'lucide-react';
+import { Sparkles, CheckCircle2, QrCode as QrCodeIcon, AlertTriangle, PackagePlus, Trash2, Droplet, ArrowRightLeft, Clock, Package } from 'lucide-react';
 import { StaffMember, Incident, IncidentSeverity } from '../../types';
 import { useGlobalState } from '../GlobalStateContext';
 
@@ -119,6 +119,21 @@ const CleaningDashboard: React.FC<CleaningDashboardProps> = ({
         };
         handleAddIncident(newIncident);
         window.alert(`Facility Issue reported. Maintenance team notified.`);
+    };
+
+    const handleLogLostAndFound = () => {
+        const newIncident: Incident = {
+            id: `INC-LF-${Date.now()}`,
+            timestamp: new Date(),
+            type: 'Lost and Found',
+            severity: IncidentSeverity.LOW,
+            description: `Lost and found item found by Cleaning Crew in Zone ${currentZone.replace('Z-', '')}. Needs pickup.`,
+            status: 'OPEN',
+            reportedBy: staff.staff_id,
+            zone_id: currentZone
+        };
+        handleAddIncident(newIncident);
+        window.alert('Lost and found item logged. Runner dispatch notified for pickup.');
     };
 
     const handleRequestSupplies = (item: string) => {
@@ -265,6 +280,22 @@ const CleaningDashboard: React.FC<CleaningDashboardProps> = ({
                                     className="w-full bg-red-600 hover:bg-red-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 relative z-10 shadow-[0_0_15px_rgba(220,38,38,0.4)]"
                                 >
                                     Log Facility Issue
+                                </button>
+                            </div>
+
+                            {/* Lost and Found */}
+                            <div className="bg-amber-500/10 border border-amber-500/30 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors" />
+                                <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2 relative z-10">
+                                    <Package size={20} className="text-amber-400" /> Lost & Found
+                                </h3>
+                                <p className="text-xs text-amber-200/70 mb-4 leading-relaxed relative z-10">Report items left behind by guests.</p>
+
+                                <button
+                                    onClick={handleLogLostAndFound}
+                                    className="w-full bg-amber-600 hover:bg-amber-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 relative z-10 shadow-[0_0_15px_rgba(217,119,6,0.4)]"
+                                >
+                                    Log Found Item
                                 </button>
                             </div>
                         </div>

@@ -60,7 +60,7 @@ export interface Incident {
   type: 'Missing Items' | 'Damaged on Arrival' | 'Quantity Mismatch' | string;
   severity: IncidentSeverity;
   description: string;
-  status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED';
+  status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'IN_TRANSIT' | 'AT_GIFT_SHOP';
   reportedBy: string;
   arrivalTimestamp?: Date; // Added for Security Arrival Verification
   evidenceLogged?: boolean; // Added for Security Evidence Logging

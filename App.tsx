@@ -653,7 +653,7 @@ const App: React.FC = () => {
           />
         );
       case View.HEALTH_INCIDENT_LOG:
-        return <HealthIncidentLogTab />;
+        return <HealthIncidentLogTab staff={staff!} handleAddIncident={handleAddIncident} />;
       case View.HEALTH_RESPONSE_TRACKER:
         return <HealthResponseTrackerTab />;
       case View.HEALTH_CONSUMABLES:
@@ -679,7 +679,7 @@ const App: React.FC = () => {
       case View.CLEANING_AUDIT:
         return <SanitationAuditTab />;
       case View.RETAIL_RECEIVING:
-        return <ReceivingTab />;
+        return <ReceivingTab incidents={incidents} onUpdateIncidentStatus={handleUpdateIncidentStatus} />;
       case View.RETAIL_STATUS:
         return <RetailStatusTab />;
       case View.RETAIL_RESTOCK:
