@@ -234,7 +234,6 @@ export function allowedViewsForMode(mode: AppMode): View[] {
         View.HEALTH_RESPONSE_TRACKER,
         View.HEALTH_CONSUMABLES,
         View.HEALTH_RESTOCK,
-        View.HEALTH_EQUIPMENT_AUDIT,
         View.SETTINGS,
         View.ANNOUNCEMENTS
       ];

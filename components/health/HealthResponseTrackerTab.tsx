@@ -6,13 +6,13 @@ interface DispatchCall {
     location: string;
     description: string;
     receivedAt: Date;
-    status: 'EN_ROUTE' | 'ON_SCENE' | 'TREATMENT_COMPLETE';
+    status: 'PENDING' | 'ACCEPTED' | 'TREATMENT_COMPLETE';
     completedAt?: Date;
 }
 
 const mockDispatches: DispatchCall[] = [
-    { id: 'DSP-8492', location: 'Zone 4 - Nebula Coaster', description: 'Guest reporting dizziness', receivedAt: new Date(Date.now() - 120000), status: 'EN_ROUTE' },
-    { id: 'DSP-8493', location: 'Zone 1 - Main Entrance', description: 'Minor laceration on hand', receivedAt: new Date(Date.now() - 450000), status: 'ON_SCENE' },
+    { id: 'DSP-8492', location: 'Zone 4 - Nebula Coaster', description: 'Guest reporting dizziness', receivedAt: new Date(Date.now() - 120000), status: 'PENDING' },
+    { id: 'DSP-8493', location: 'Zone 1 - Main Entrance', description: 'Minor laceration on hand', receivedAt: new Date(Date.now() - 450000), status: 'ACCEPTED' },
 ];
 
 const HealthResponseTrackerTab: React.FC = () => {
@@ -24,7 +24,7 @@ const HealthResponseTrackerTab: React.FC = () => {
         return () => clearInterval(timer);
     }, []);
 
-    const updateStatus = (id: string, newStatus: 'EN_ROUTE' | 'ON_SCENE' | 'TREATMENT_COMPLETE') => {
+    const updateStatus = (id: string, newStatus: 'ACCEPTED' | 'TREATMENT_COMPLETE') => {
         setDispatches(prev => prev.map(d => {
             if (d.id === id) {
                 return {
@@ -59,8 +59,8 @@ const HealthResponseTrackerTab: React.FC = () => {
             <div className="space-y-4">
                 {dispatches.filter(d => d.status !== 'TREATMENT_COMPLETE').map(dispatch => (
                     <div key={dispatch.id} className="bg-[#2d3142]/80 border border-blue-500/30 rounded-2xl p-4 shadow-lg overflow-hidden relative">
-                        {/* Flashing indicator for EN_ROUTE */}
-                        {dispatch.status === 'EN_ROUTE' && (
+                        {/* Flashing indicator for PENDING */}
+                        {dispatch.status === 'PENDING' && (
                             <div className="absolute top-0 left-0 w-1 h-full bg-red-500 animate-pulse"></div>
                         )}
 
@@ -77,34 +77,31 @@ const HealthResponseTrackerTab: React.FC = () => {
                             </div>
 
                             <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
-                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Time to Scene</span>
-                                <div className={`flex items-center gap-2 font-mono text-xl font-bold px-3 py-1 rounded-lg w-full sm:w-auto justify-center sm:justify-start ${dispatch.status === 'EN_ROUTE' ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'}`}>
-                                    <Clock size={16} className={dispatch.status === 'EN_ROUTE' ? 'animate-pulse' : ''} />
+                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Time Elapsed</span>
+                                <div className={`flex items-center gap-2 font-mono text-xl font-bold px-3 py-1 rounded-lg w-full sm:w-auto justify-center sm:justify-start ${dispatch.status === 'PENDING' ? 'bg-red-500/20 text-red-400 border border-red-500/50' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'}`}>
+                                    <Clock size={16} className={dispatch.status === 'PENDING' ? 'animate-pulse' : ''} />
                                     {getElapsedTime(dispatch.receivedAt)}
                                 </div>
                             </div>
                         </div>
 
                         {/* Status Toggles */}
-                        <div className="flex flex-col sm:flex-row bg-[#1a1d29] rounded-xl p-1 border border-gray-700/50 ml-0 sm:ml-2 gap-1 sm:gap-0">
-                            <button
-                                onClick={() => updateStatus(dispatch.id, 'EN_ROUTE')}
-                                className={`flex-1 py-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${dispatch.status === 'EN_ROUTE' ? 'bg-red-600 text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
-                            >
-                                <Navigation size={14} /> EN ROUTE
-                            </button>
-                            <button
-                                onClick={() => updateStatus(dispatch.id, 'ON_SCENE')}
-                                className={`flex-1 py-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${dispatch.status === 'ON_SCENE' ? 'bg-yellow-600 text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
-                            >
-                                <AlertCircle size={14} /> ON SCENE
-                            </button>
-                            <button
-                                onClick={() => updateStatus(dispatch.id, 'TREATMENT_COMPLETE')}
-                                className={`flex-1 py-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-gray-500 hover:bg-green-600 hover:text-white`}
-                            >
-                                <CheckCircle2 size={14} /> COMPLETE
-                            </button>
+                        <div className="flex flex-col sm:flex-row bg-[#1a1d29] rounded-xl p-1 border border-gray-700/50 ml-0 sm:ml-2 gap-1 sm:gap-0 mt-4">
+                            {dispatch.status === 'PENDING' ? (
+                                <button
+                                    onClick={() => updateStatus(dispatch.id, 'ACCEPTED')}
+                                    className="flex-1 py-3 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 bg-blue-600 text-white shadow-lg hover:bg-blue-500"
+                                >
+                                    <CheckCircle2 size={16} /> ACCEPT TASK
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => updateStatus(dispatch.id, 'TREATMENT_COMPLETE')}
+                                    className="flex-1 py-3 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-lg hover:bg-emerald-500"
+                                >
+                                    <CheckCircle2 size={16} /> COMPLETE TASK
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}

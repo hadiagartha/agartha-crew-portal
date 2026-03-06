@@ -44,7 +44,6 @@ import HealthIncidentLogTab from './components/health/HealthIncidentLogTab';
 import HealthResponseTrackerTab from './components/health/HealthResponseTrackerTab';
 import HealthConsumablesTab from './components/health/HealthConsumablesTab';
 import HealthRestockTab from './components/health/HealthRestockTab';
-import HealthEquipmentAuditTab from './components/health/HealthEquipmentAuditTab';
 
 // Mock data moved to App level for persistence
 const INITIAL_INCIDENTS: Incident[] = [
@@ -556,7 +555,6 @@ const App: React.FC = () => {
       View.HEALTH_RESPONSE_TRACKER,
       View.HEALTH_CONSUMABLES,
       View.HEALTH_RESTOCK,
-      View.HEALTH_EQUIPMENT_AUDIT,
       View.EXPERIENCE_LOST_AND_FOUND,
       View.CLEANING_DAILY_CHECKLIST,
       View.CLEANING_STOCK,
@@ -658,8 +656,6 @@ const App: React.FC = () => {
         return <HealthConsumablesTab />;
       case View.HEALTH_RESTOCK:
         return <HealthRestockTab />;
-      case View.HEALTH_EQUIPMENT_AUDIT:
-        return <HealthEquipmentAuditTab />;
       case View.EXPERIENCE_LOST_AND_FOUND:
         return <ExperienceLostAndFoundTab />;
       case View.CLEANING_DAILY_CHECKLIST:
