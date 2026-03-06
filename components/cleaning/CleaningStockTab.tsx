@@ -11,12 +11,12 @@ interface Consumable {
 }
 
 const mockStock: Consumable[] = [
-    { id: 'C-01', name: 'Industrial Floor Cleaner', category: 'CHEMICAL', currentVolume: 85, unit: '%', status: 'READY' },
-    { id: 'C-02', name: 'Glass & Surface Spray', category: 'CHEMICAL', currentVolume: 15, unit: '%', status: 'LOW' },
+    { id: 'C-01', name: 'Industrial Floor Cleaner', category: 'CHEMICAL', currentVolume: 12, unit: 'Bottles', status: 'READY' },
+    { id: 'C-02', name: 'Glass & Surface Spray', category: 'CHEMICAL', currentVolume: 2, unit: 'Bottles', status: 'LOW' },
     { id: 'P-01', name: 'Nitrile Gloves (L)', category: 'PPE', currentVolume: 2, unit: 'Boxes', status: 'LOW' },
     { id: 'P-02', name: 'Respirator Masks', category: 'PPE', currentVolume: 45, unit: 'Units', status: 'READY' },
     { id: 'H-01', name: 'Restroom Hand Towels', category: 'HYGIENE', currentVolume: 0, unit: 'Rolls', status: 'EMPTY' },
-    { id: 'H-02', name: 'Antibacterial Soap', category: 'HYGIENE', currentVolume: 60, unit: '%', status: 'READY' }
+    { id: 'H-02', name: 'Antibacterial Soap', category: 'HYGIENE', currentVolume: 8, unit: 'Units', status: 'READY' }
 ];
 
 const CleaningStockTab: React.FC = () => {
@@ -26,7 +26,7 @@ const CleaningStockTab: React.FC = () => {
 
     const calculateStatus = (vol: number): Consumable['status'] => {
         if (vol <= 0) return 'EMPTY';
-        if (vol <= 20) return 'LOW';
+        if (vol <= 3) return 'LOW'; // Generic threshold for units
         return 'READY';
     };
 
@@ -120,17 +120,7 @@ const CleaningStockTab: React.FC = () => {
                                 )}
                             </div>
 
-                            {/* Volumetric Progress Bar */}
-                            {item.unit === '%' && (
-                                <div className="w-full bg-[#1a1d29] rounded-full h-2 mb-4 overflow-hidden border border-gray-700">
-                                    <div
-                                        className={`h-full transition-all duration-500 ${item.status === 'EMPTY' ? 'bg-red-500 w-0' :
-                                            item.status === 'LOW' ? 'bg-amber-400' : 'bg-emerald-400'
-                                            }`}
-                                        style={{ width: `${Math.max(0, Math.min(100, item.currentVolume))}%` }}
-                                    />
-                                </div>
-                            )}
+                            {/* Volumetric Progress Bar - Removed for discrete units */}
 
                             {activeInputId === item.id && (
                                 <div className="mt-4 bg-[#1a1d29] p-3 rounded-xl border border-gray-700 animate-slideUp">
